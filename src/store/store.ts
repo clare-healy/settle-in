@@ -15,7 +15,11 @@
 import type { RunEvent } from '../schema/index.js';
 import { openDatabase, type OpenOptions, type SettleInDatabase } from './db.js';
 import type {
+  LibrarySnapshot,
+  PreferenceEntry,
   PreferenceValue,
+  RestoreHooks,
+  RestoreMode,
   RunProjection,
   StoredClassRevision,
   StoredEvent,
@@ -263,5 +267,120 @@ export class Store {
     const tx = this.db.transaction('preferences', 'readwrite');
     await tx.objectStore('preferences').put(value, key);
     await tx.done;
+  }
+
+  // --- Whole-library backup read --------------------------------------------
+
+  /** Every event across all runs, for a whole-library backup (additive; read-only). */
+  getAllEvents(): Promise<StoredEvent[]> {
+    return this.db.getAll('events');
+  }
+
+  /** Every run's notes, for a whole-library backup (additive; read-only). */
+  getAllNotes(): Promise<StoredNotes[]> {
+    return this.db.getAll('notes');
+  }
+
+  /** Every preference as a keyed entry (the store keeps keys out of line). */
+  async getAllPreferenceEntries(): Promise<PreferenceEntry[]> {
+    const tx = this.db.transaction('preferences', 'readonly');
+    const store = tx.objectStore('preferences');
+    // getAllKeys and getAll both return in key order, so the two lists align.
+    const [keys, values] = await Promise.all([store.getAllKeys(), store.getAll()]);
+    await tx.done;
+    return keys.map((key, i) => ({ key: String(key), value: values[i] as PreferenceValue }));
+  }
+
+  /**
+   * Read the complete durable library as flat arrays — the source for a
+   * whole-library backup. Ordering is by primary key within each store; the
+   * as-taught/backup layers do not depend on cross-store ordering.
+   */
+  async exportLibrary(): Promise<LibrarySnapshot> {
+    const [revisions, runs, events, notes, preferences] = await Promise.all([
+      this.getAllClassRevisions(),
+      this.getAllRuns(),
+      this.getAllEvents(),
+      this.getAllNotes(),
+      this.getAllPreferenceEntries(),
+    ]);
+    return { revisions, runs, events, notes, preferences };
+  }
+
+  // --- Whole-library restore (atomic) ---------------------------------------
+
+  /**
+   * Apply an already-validated library snapshot atomically, in one strict
+   * transaction across every store, so a failure mid-apply leaves the library
+   * byte-identical (docs/implementation-treaty.md § Export; build plan restore
+   * atomicity). The caller must have parsed and validated the backup BEFORE
+   * calling this — validation opens no transaction (src/export/restore.ts).
+   *
+   * merge (default): deterministic union by identity — revisions by `sourceHash`,
+   * runs by `runId` (their events and notes travel with them), preferences by key.
+   * An identity already present locally is skipped, never overwritten, so merge
+   * cannot destroy local data. replace: wipe-and-write; destructive, and gated by
+   * the caller's explicit confirmation (screen-states § 13).
+   */
+  async restore(snapshot: LibrarySnapshot, mode: RestoreMode, hooks?: RestoreHooks): Promise<void> {
+    const tx = this.db.transaction(
+      ['classes', 'runs', 'events', 'notes', 'preferences'],
+      'readwrite',
+      durabilityOption('strict'),
+    );
+    try {
+      const classes = tx.objectStore('classes');
+      const runs = tx.objectStore('runs');
+      const events = tx.objectStore('events');
+      const notes = tx.objectStore('notes');
+      const prefs = tx.objectStore('preferences');
+
+      if (mode === 'replace') {
+        await Promise.all([classes.clear(), runs.clear(), events.clear(), notes.clear(), prefs.clear()]);
+        for (const r of snapshot.revisions) await classes.put(r);
+        hooks?.midApply?.(); // test-injection point: a throw here aborts the whole apply
+        for (const run of snapshot.runs) await runs.put(run);
+        for (const e of snapshot.events) await events.put(e);
+        for (const n of snapshot.notes) await notes.put(n);
+        for (const p of snapshot.preferences) await prefs.put(p.value, p.key);
+      } else {
+        // Merge: skip any identity that already exists locally.
+        for (const r of snapshot.revisions) {
+          if (!(await classes.get(r.sourceHash))) await classes.put(r);
+        }
+        hooks?.midApply?.();
+        const newRunIds = new Set<string>();
+        for (const run of snapshot.runs) {
+          if (!(await runs.get(run.runId))) {
+            await runs.put(run);
+            newRunIds.add(run.runId);
+          }
+        }
+        // Events and notes travel with a run: only a newly added run brings its own.
+        for (const e of snapshot.events) {
+          if (newRunIds.has(e.runId)) await events.put(e);
+        }
+        for (const n of snapshot.notes) {
+          if (newRunIds.has(n.runId)) await notes.put(n);
+        }
+        for (const p of snapshot.preferences) {
+          if ((await prefs.get(p.key)) === undefined) await prefs.put(p.value, p.key);
+        }
+      }
+      await tx.done;
+    } catch (err) {
+      // Abort so a mid-apply fault writes nothing; swallow the resulting AbortError.
+      try {
+        tx.abort();
+      } catch {
+        /* already settling */
+      }
+      try {
+        await tx.done;
+      } catch {
+        /* expected AbortError */
+      }
+      throw err;
+    }
   }
 }

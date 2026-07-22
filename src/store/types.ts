@@ -109,6 +109,41 @@ export interface StoredNotes {
 /** Local preferences are simple string-keyed values (relaxed durability is fine). */
 export type PreferenceValue = string | number | boolean | null;
 
+/** One out-of-line preference entry (the preferences store keeps keys out of line). */
+export interface PreferenceEntry {
+  readonly key: string;
+  readonly value: PreferenceValue;
+}
+
+// --- Whole-library snapshot (backup read + restore write) -------------------
+
+/**
+ * The complete durable library as flat arrays — the read shape for a whole-library
+ * backup and the write shape for a restore. A stored class revision already embeds
+ * its original Markdown and normalized definition, so `revisions` is lossless for
+ * classes; runs, events, notes, and preferences complete it. The export layer's
+ * BackupPayload is structurally identical, so a validated backup restores directly.
+ */
+export interface LibrarySnapshot {
+  readonly revisions: readonly StoredClassRevision[];
+  readonly runs: readonly StoredRun[];
+  readonly events: readonly StoredEvent[];
+  readonly notes: readonly StoredNotes[];
+  readonly preferences: readonly PreferenceEntry[];
+}
+
+/** How a restore reconciles the incoming snapshot with the local library. */
+export type RestoreMode = 'merge' | 'replace';
+
+/**
+ * Optional test-only fault injection for restore atomicity checks. `midApply` runs
+ * once partway through the apply loop; throwing from it forces the transaction to
+ * abort, proving a mid-apply failure leaves the library byte-identical.
+ */
+export interface RestoreHooks {
+  readonly midApply?: () => void;
+}
+
 // --- Convenience re-exports for consumers -----------------------------------
 
 export type { Side, RunStateKind };

@@ -34,7 +34,7 @@ export function renderHome(props: HomeProps): HTMLElement {
     );
   }
 
-  // Import / Library entries: present but inert for M5.
+  // Import and Library access (screen-states § 3).
   children.push(
     el('div', {
       class: 'home__secondary',
@@ -42,16 +42,17 @@ export function renderHome(props: HomeProps): HTMLElement {
         el('button', {
           class: 'btn btn--quiet',
           text: 'Import a class',
-          attrs: { disabled: 'true', 'aria-disabled': 'true', title: 'Coming in M5' },
+          attrs: { 'data-testid': 'home-import' },
+          on: { click: () => actions.openImport() },
         }),
         el('button', {
           class: 'btn btn--quiet',
           text: 'Library',
-          attrs: { disabled: 'true', 'aria-disabled': 'true', title: 'Coming in M5' },
+          attrs: { 'data-testid': 'home-library' },
+          on: { click: () => actions.openLibrary() },
         }),
       ],
     }),
-    el('p', { class: 'stub', text: 'Import and Library arrive in a later build (M5).' }),
     el('p', {
       class: 'backup-status',
       text: 'Local backup: manage in Library after class.',

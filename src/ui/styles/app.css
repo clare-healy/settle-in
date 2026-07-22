@@ -820,6 +820,287 @@ button {
   color: var(--raw-pine);
 }
 
+/* --- First launch / empty library (screen-states § 1) -------------------- */
+
+.empty {
+  gap: var(--space-4);
+}
+.empty__brand {
+  margin-bottom: var(--space-4);
+}
+.empty__lede {
+  margin-bottom: var(--space-5);
+}
+.empty__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.empty__actions .btn {
+  width: 100%;
+}
+
+/* --- Import (screen-states § 2) ------------------------------------------- */
+
+.import {
+  gap: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.import__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.import__back,
+.detail__back {
+  flex: 0 0 auto;
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+.import__head .class-card__title {
+  margin: 0;
+}
+.import__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.import__field {
+  width: 100%;
+  min-height: 12rem;
+  background: var(--deep-water-slate);
+  color: var(--curtain-linen);
+  border: 1px solid rgba(169, 140, 100, 0.35);
+  border-radius: var(--radius-surface);
+  padding: var(--space-3);
+  font-family: var(--font-cue);
+  font-size: var(--size-body-cue);
+  line-height: 1.5;
+  resize: vertical;
+}
+.import__field--preserved {
+  min-height: 8rem;
+  opacity: 0.85;
+}
+.import__actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.import__actions .btn {
+  flex: 1 1 0;
+  min-width: 10rem;
+}
+.import__example-code {
+  background: var(--deep-water-slate);
+  border: 1px solid rgba(169, 140, 100, 0.25);
+  border-radius: var(--radius-surface);
+  padding: var(--space-3);
+  margin-top: var(--space-3);
+  overflow-x: auto;
+  color: var(--curtain-linen);
+  font-size: var(--size-secondary);
+  white-space: pre;
+}
+
+/* Blocking errors: warm contrast + structure, never red-only (design system, J5). */
+.import__summary-line {
+  color: var(--taper-wax);
+}
+.import__errors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.import__error-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 3px solid var(--candlelight-amber);
+  background: rgba(214, 166, 106, 0.08);
+  border-radius: 0 var(--radius-surface) var(--radius-surface) 0;
+  padding: var(--space-3);
+}
+.import__error-locus {
+  color: var(--candlelight-amber);
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.import__error-message {
+  color: var(--curtain-linen);
+  font-size: var(--size-secondary);
+}
+.import__notice {
+  color: var(--taper-wax);
+  border: 1px solid rgba(214, 166, 106, 0.4);
+  border-radius: var(--radius-surface);
+  padding: var(--space-3) var(--space-4);
+}
+.import__summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0 0 var(--space-4);
+}
+.import__summary dt {
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+}
+.import__summary dd {
+  margin: 0;
+  color: var(--taper-wax);
+  text-align: right;
+}
+.import__summary-block {
+  margin-bottom: var(--space-3);
+}
+.import__summary-block ul {
+  margin: var(--space-2) 0 0;
+  padding-left: 1.2em;
+}
+.import__warnings {
+  border: 1px solid rgba(214, 166, 106, 0.35);
+  border-radius: var(--radius-surface);
+  padding: var(--space-3);
+}
+.import__warnings ul {
+  margin: var(--space-1) 0 0;
+  padding-left: 1.2em;
+}
+.import__warning {
+  color: var(--curtain-linen);
+  font-size: var(--size-secondary);
+}
+
+/* --- Library list + class detail (screen-states § 13) -------------------- */
+
+.library {
+  gap: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.library__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.library__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: left;
+  align-items: stretch;
+  width: 100%;
+  background: var(--deep-water-slate);
+  border: 1px solid rgba(169, 140, 100, 0.25);
+  border-radius: var(--radius-surface);
+  padding: var(--space-4);
+  cursor: pointer;
+}
+.library__row--upcoming {
+  border-color: var(--candlelight-amber);
+}
+.library__row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+.library__row-title {
+  color: var(--taper-wax);
+  font-size: 18px;
+}
+.library__upcoming-mark {
+  color: var(--candlelight-amber);
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.library__row-date {
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+  margin: 0;
+}
+.library__row-theme {
+  margin: 0;
+}
+.library__row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+}
+.library__set-upcoming {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+  border: 1px solid var(--raw-pine);
+}
+.library__backup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.library__backup-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.library__backup-actions .btn {
+  flex: 1 1 0;
+  min-width: 12rem;
+}
+.library__storage-warning {
+  color: var(--candlelight-amber);
+  font-size: var(--size-secondary);
+  border: 1px solid rgba(214, 166, 106, 0.4);
+  border-radius: var(--radius-surface);
+  padding: var(--space-3) var(--space-4);
+}
+.library__restore-error {
+  color: var(--lotus-blush);
+  font-size: var(--size-secondary);
+}
+.library__restore-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.detail__section {
+  margin-top: var(--space-4);
+}
+.detail__revisions,
+.detail__runs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.detail__revision,
+.detail__run {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  border-bottom: 1px solid rgba(169, 140, 100, 0.18);
+  padding: var(--space-2) 0;
+}
+.detail__revision-id,
+.detail__run-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.detail__run-meta span:first-child {
+  color: var(--taper-wax);
+}
+
 /* --- Reduced motion (design-system § Motion) ------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   .screen-enter,

@@ -33,9 +33,25 @@ import {
   type BeginResult,
   type RecoverySnapshot,
 } from '../run/index.js';
-import { Store, type StoredClassRevision } from '../store/index.js';
+import { Store, type StoredClassRevision, type StoredRun, type LibrarySnapshot } from '../store/index.js';
+import { importClass } from '../parser/index.js';
+import { APP_VERSION } from '../version.js';
+import {
+  exportAsTaught,
+  exportOriginalMarkdown,
+  finishInstant,
+  buildBackup,
+  serializeBackup,
+  backupFilenameFor,
+  parseBackupText,
+  validateBackup,
+} from '../export/index.js';
 import { clear, el } from './dom.js';
 import { renderHome } from './screens/home.js';
+import { renderEmpty } from './screens/empty.js';
+import { renderImport } from './screens/import.js';
+import { renderLibrary } from './screens/library.js';
+import { renderClassDetail } from './screens/class-detail.js';
 import { renderPrep } from './screens/prep.js';
 import { renderLive } from './screens/live.js';
 import { renderRecovery } from './screens/recovery.js';
@@ -44,13 +60,29 @@ import { renderDialog } from './screens/dialogs.js';
 import { WakeLockManager } from './wake-lock.js';
 import { backIsIntercepted, resolveBack } from './back-stack.js';
 import { enterClass } from './motion.js';
-import { loadPreferences, setNextPosePreview, type Preferences } from './preferences.js';
+import { downloadMarkdown, downloadJson, copyToClipboard } from './deliver.js';
+import {
+  groupClasses,
+  pickUpcomingClassId,
+  upcomingChoiceIsAmbiguous,
+  upcomingDefinition,
+  type ClassGroup,
+} from './library-model.js';
+import {
+  loadPreferences,
+  setNextPosePreview,
+  setUpcomingClassId,
+  type Preferences,
+} from './preferences.js';
 import type {
   AppActions,
   Dialog,
+  ImportView,
   LiveHandle,
   LiveProps,
+  RestoreView,
   Route,
+  RunRow,
 } from './view-types.js';
 
 export interface AppOptions {
@@ -68,7 +100,23 @@ export class AppController {
   private controller: RunController | null = null;
   private recoverySnapshot: RecoverySnapshot | null = null;
   private upcomingDef: ClassDefinition | null = null;
+  private upcomingClassId: string | null = null;
   private revisions: readonly StoredClassRevision[] = [];
+  private runs: readonly StoredRun[] = [];
+  private groups: readonly ClassGroup[] = [];
+
+  /** The class Prep/Begin acts on: the upcoming class, or a chosen rerun class. */
+  private prepDef: ClassDefinition | null = null;
+
+  /** Import screen state machine (screen-states § 2). */
+  private importState: ImportView = { phase: 'input', source: '' };
+
+  /** Restore section state, plus the validated payload awaiting merge/replace. */
+  private restoreState: RestoreView = { phase: 'idle' };
+  private pendingRestore: LibrarySnapshot | null = null;
+
+  /** §14 storage warning: rechecked when the Library opens, never during a run. */
+  private storageWarning = false;
 
   private finishArmed = false;
   private draftNote = '';
@@ -132,6 +180,15 @@ export class AppController {
   /** The open dialog kind, or null. */
   get dialogKind(): Dialog['kind'] | null {
     return this.dialog ? this.dialog.kind : null;
+  }
+
+  /**
+   * Test-only: the action surface. DOM tests use this to drive flows that are
+   * normally entered through a native file picker (import-by-file, restore), which
+   * cannot be synthesized reliably in happy-dom. Production code never reads it.
+   */
+  get actionsForTest(): AppActions {
+    return this.actions;
   }
 
   /** Await every in-flight dispatched action (tests drive the DOM, then await). */
@@ -200,19 +257,41 @@ export class AppController {
 
   private async loadLibrary(): Promise<void> {
     this.revisions = await this.store.getAllClassRevisions();
-    this.upcomingDef = this.pickUpcoming(this.revisions);
+    this.runs = await this.store.getAllRuns();
+    this.groups = groupClasses(this.revisions, this.runs);
+    this.upcomingClassId = pickUpcomingClassId(this.groups, this.prefs.upcomingClassId, this.todayLocalDate());
+    this.upcomingDef = upcomingDefinition(this.groups, this.upcomingClassId);
   }
 
-  /** Suggest the earliest future class, else the most recent (screen-states § 3). */
-  private pickUpcoming(revisions: readonly StoredClassRevision[]): ClassDefinition | null {
-    if (revisions.length === 0) return null;
-    const byDate = [...revisions].sort((a, b) => a.definition.date.localeCompare(b.definition.date));
-    const todayLocal = new Date(this.clock.now().getTime() + this.offsetMinutes * 60_000)
+  /** The device's local calendar date (YYYY-MM-DD) at the current offset. */
+  private todayLocalDate(): string {
+    return new Date(this.clock.now().getTime() + this.offsetMinutes * 60_000)
       .toISOString()
       .slice(0, 10);
-    const future = byDate.find((r) => r.definition.date >= todayLocal);
-    const chosen = future ?? byDate[byDate.length - 1];
-    return chosen ? chosen.definition : null;
+  }
+
+  /** Best-effort persistent-storage request + recheck for the §14 warning. */
+  private async refreshStorageWarning(): Promise<void> {
+    if (typeof navigator === 'undefined' || !navigator.storage || !navigator.storage.persisted) {
+      this.storageWarning = false;
+      return;
+    }
+    try {
+      const persisted = await navigator.storage.persisted();
+      this.storageWarning = !persisted;
+    } catch {
+      this.storageWarning = false;
+    }
+  }
+
+  /** Ask the platform to persist storage (best-effort; after the first import). */
+  private async requestPersist(): Promise<void> {
+    if (typeof navigator === 'undefined' || !navigator.storage || !navigator.storage.persist) return;
+    try {
+      await navigator.storage.persist();
+    } catch {
+      /* best-effort only; the backup export is the real safety net */
+    }
   }
 
   private async gotoHomeOrEmpty(): Promise<void> {
@@ -252,19 +331,35 @@ export class AppController {
       case 'loading':
         return this.loadingScreen();
       case 'empty':
-        return this.emptyScreen();
+        return renderEmpty({ actions: this.actions });
       case 'home':
         return renderHome({ upcoming: this.upcomingDef, actions: this.actions });
-      case 'prep':
-        return this.upcomingDef
+      case 'import':
+        return renderImport({ view: this.importState, actions: this.actions });
+      case 'library':
+        return renderLibrary({
+          groups: this.groups,
+          upcomingClassId: this.upcomingClassId,
+          ambiguousUpcoming: upcomingChoiceIsAmbiguous(this.groups, this.todayLocalDate()),
+          restore: this.restoreState,
+          storageWarning: this.storageWarning,
+          offsetMinutes: this.offsetMinutes,
+          actions: this.actions,
+        });
+      case 'class-detail':
+        return this.buildClassDetail(this.route.classId);
+      case 'prep': {
+        const def = this.prepDef ?? this.upcomingDef;
+        return def
           ? renderPrep({
-              def: this.upcomingDef,
-              runStartedPreviewEpochMs: this.prepPreviewStart(this.upcomingDef),
+              def,
+              runStartedPreviewEpochMs: this.prepPreviewStart(def),
               offsetMinutes: this.offsetMinutes,
               prefs: this.prefs,
               actions: this.actions,
             })
-          : this.emptyScreen();
+          : renderEmpty({ actions: this.actions });
+      }
       case 'recovery':
         return this.recoverySnapshot
           ? renderRecovery({
@@ -342,21 +437,29 @@ export class AppController {
     });
   }
 
-  private emptyScreen(): HTMLElement {
-    return el('section', {
-      class: 'screen',
-      attrs: { 'data-screen': 'empty' },
-      children: [
-        el('h1', { class: 'class-card__title', text: 'Settle In' }),
-        el('p', { class: 'cue', text: 'Import your first authored class to begin.' }),
-        el('button', {
-          class: 'btn btn--quiet',
-          text: 'Import a class',
-          attrs: { disabled: 'true', 'aria-disabled': 'true', title: 'Coming in M5' },
-        }),
-        el('p', { class: 'stub', text: 'Import arrives in a later build (M5).' }),
-      ],
+  private buildClassDetail(classId: string): HTMLElement {
+    const group = this.groups.find((g) => g.classId === classId);
+    if (!group) return renderEmpty({ actions: this.actions });
+    return renderClassDetail({
+      group,
+      isUpcoming: this.upcomingClassId === classId,
+      runs: this.runRowsFor(classId),
+      offsetMinutes: this.offsetMinutes,
+      actions: this.actions,
     });
+  }
+
+  /** Taught runs for a class, newest first — one detail row + export handle each. */
+  private runRowsFor(classId: string): RunRow[] {
+    return this.runs
+      .filter((r) => r.classId === classId)
+      .sort((a, b) => b.runStartedAtEpochMs - a.runStartedAtEpochMs)
+      .map((r) => ({
+        runId: r.runId,
+        runLocalDate: r.runLocalDate,
+        startedAtEpochMs: r.runStartedAtEpochMs,
+        status: r.status,
+      }));
   }
 
   // --- Actions --------------------------------------------------------------
@@ -364,6 +467,7 @@ export class AppController {
   private buildActions(): AppActions {
     return {
       openPrep: () => {
+        this.prepDef = this.upcomingDef;
         this.route = { kind: 'prep' };
         this.render();
       },
@@ -393,7 +497,236 @@ export class AppController {
       saveNote: (value) => this.saveNote(value),
       finalizeNotes: () => this.finalize(this.draftNote),
       skipNotes: () => this.finalize(''),
+
+      // --- Navigation between the library-side screens ---------------------
+      openImport: () => {
+        this.importState = { phase: 'input', source: '' };
+        this.route = { kind: 'import' };
+        this.render();
+      },
+      openLibrary: () => this.dispatch(async () => {
+        await this.loadLibrary();
+        await this.refreshStorageWarning();
+        this.restoreState = { phase: 'idle' };
+        this.route = { kind: 'library' };
+      }),
+      openClassDetail: (classId) => this.dispatch(async () => {
+        await this.loadLibrary();
+        this.route = { kind: 'class-detail', classId };
+      }),
+      goHome: () => this.dispatch(async () => {
+        await this.gotoHomeOrEmpty();
+      }),
+
+      // --- Import flow (screen-states § 2) ---------------------------------
+      importFileLoaded: (source) => {
+        this.importState = { phase: 'input', source };
+        this.route = { kind: 'import' };
+        this.render();
+      },
+      importValidate: (source) => this.importValidate(source),
+      importCheckAgain: () => this.importBackToInput(),
+      importReturnToSource: () => this.importBackToInput(),
+      importCopyErrors: () => this.importCopyErrors(),
+      importConfirm: () => this.importConfirm(),
+      importOpenExisting: (classId) => this.dispatch(async () => {
+        await this.loadLibrary();
+        this.importState = { phase: 'input', source: '' };
+        this.route = { kind: 'class-detail', classId };
+      }),
+
+      // --- Library / class detail ------------------------------------------
+      setUpcoming: (classId) => this.dispatch(async () => {
+        await setUpcomingClassId(this.store, classId);
+        this.prefs = { ...this.prefs, upcomingClassId: classId };
+        await this.loadLibrary();
+        this.route = { kind: 'library' };
+      }),
+      runClassAgain: (classId) => {
+        const def = upcomingDefinition(this.groups, classId);
+        if (!def) return;
+        this.prepDef = def;
+        this.route = { kind: 'prep' };
+        this.render();
+      },
+      exportOriginal: (sourceHash) => this.exportOriginal(sourceHash),
+      exportAsTaughtRun: (runId) => this.exportAsTaughtRun(runId),
+
+      // --- Backup / restore (screen-states § 13) ---------------------------
+      exportBackup: () => this.exportBackup(),
+      restoreFileLoaded: (text) => this.restoreFileLoaded(text),
+      restoreMerge: () => this.applyRestore('merge'),
+      requestRestoreReplace: () => { this.dialog = { kind: 'restore-replace-confirm' }; this.render(); },
+      confirmRestoreReplace: () => this.applyRestore('replace'),
+      dismissRestore: () => {
+        this.restoreState = { phase: 'idle' };
+        this.pendingRestore = null;
+        this.render();
+      },
     };
+  }
+
+  // --- Import flow implementation -------------------------------------------
+
+  private importValidate(source: string): void {
+    this.importState = { phase: 'validating', source };
+    this.render();
+    this.dispatch(async () => {
+      const result = await importClass(source);
+      if (!result.ok) {
+        this.importState = { phase: 'error', source, errors: result.errors, copied: false };
+        return;
+      }
+      const def = result.classDefinition;
+      const existing = await this.store.getClassRevision(def.sourceHash);
+      if (existing) {
+        // Exact source_hash already present → open the existing class (C5).
+        this.importState = { phase: 'duplicate', source, existingClassId: existing.classId };
+        return;
+      }
+      const sameId = await this.store.getClassRevisionsByClassId(def.classId);
+      this.importState = {
+        phase: 'confirm',
+        source,
+        kind: sameId.length > 0 ? 'revision' : 'new', // same class_id, different hash → revision (C6)
+        def,
+        summary: result.summary,
+        warnings: result.warnings,
+      };
+    });
+  }
+
+  private importBackToInput(): void {
+    const source = 'source' in this.importState ? this.importState.source : '';
+    this.importState = { phase: 'input', source };
+    this.render();
+  }
+
+  private importCopyErrors(): void {
+    this.dispatch(async () => {
+      if (this.importState.phase !== 'error') return;
+      const text = this.importState.errors
+        .map((e) => {
+          const locus = [e.segment, e.field, e.sourceLine !== null ? `line ${e.sourceLine}` : null]
+            .filter((x): x is string => Boolean(x))
+            .join(' · ');
+          return locus ? `${locus}: ${e.message}` : e.message;
+        })
+        .join('\n');
+      await copyToClipboard(text);
+      if (this.importState.phase === 'error') {
+        this.importState = { ...this.importState, copied: true };
+      }
+    });
+  }
+
+  private importConfirm(): void {
+    this.dispatch(async () => {
+      if (this.importState.phase !== 'confirm') return;
+      const { def, warnings } = this.importState;
+      const record: StoredClassRevision = {
+        sourceHash: def.sourceHash,
+        classId: def.classId,
+        schemaVersion: def.schemaVersion,
+        warnings,
+        importedAt: this.nowIso(),
+        definition: def,
+      };
+      await this.store.putClassRevision(record);
+      await this.requestPersist(); // request persistence after the first successful import
+      this.importState = { phase: 'input', source: '' };
+      await this.gotoHomeOrEmpty(); // the imported class now surfaces as upcoming
+    });
+  }
+
+  // --- Export / backup / restore implementation -----------------------------
+
+  private exportOriginal(sourceHash: string): void {
+    this.dispatch(async () => {
+      const rev = await this.store.getClassRevision(sourceHash);
+      if (!rev) return;
+      downloadMarkdown(`${rev.classId}.md`, exportOriginalMarkdown(rev.definition));
+    });
+  }
+
+  private exportAsTaughtRun(runId: string): void {
+    this.dispatch(async () => {
+      const run = await this.store.getRun(runId);
+      if (!run) return;
+      const rev = await this.store.getClassRevision(run.revisionSourceHash);
+      if (!rev) return;
+      const events = await this.store.getEvents(runId);
+      const notes = await this.store.getNotes(runId);
+      const markdown = exportAsTaught({
+        definition: rev.definition,
+        revisionSourceHash: run.revisionSourceHash,
+        runId: run.runId,
+        runLocalDate: run.runLocalDate,
+        runStartedAt: run.runStartedAt,
+        runFinishedAt: finishInstant(events),
+        hardCloseAt: run.hardCloseAt,
+        appVersion: APP_VERSION,
+        events,
+        roomNote: notes?.final ?? null,
+      });
+      downloadMarkdown(`as-taught-${run.classId}-${run.runLocalDate}.md`, markdown);
+    });
+  }
+
+  private exportBackup(): void {
+    this.dispatch(async () => {
+      const snapshot = await this.store.exportLibrary();
+      const file = buildBackup(snapshot, this.nowIso(), APP_VERSION);
+      const filename = backupFilenameFor(this.clock.now().getTime(), this.offsetMinutes);
+      downloadJson(filename, serializeBackup(file));
+    });
+  }
+
+  private restoreFileLoaded(text: string): void {
+    this.dispatch(async () => {
+      const parsed = parseBackupText(text);
+      if (!parsed.ok) return this.showRestoreError(parsed.reason);
+      const validation = validateBackup(parsed.value);
+      if (!validation.ok) return this.showRestoreError(validation.reason);
+      this.pendingRestore = validation.payload;
+      this.restoreState = {
+        phase: 'confirm',
+        counts: { classes: validation.payload.revisions.length, runs: validation.payload.runs.length },
+      };
+      await this.loadLibrary();
+      await this.refreshStorageWarning();
+      this.route = { kind: 'library' };
+    });
+  }
+
+  private async showRestoreError(reason: string): Promise<void> {
+    this.pendingRestore = null;
+    this.restoreState = { phase: 'error', reason };
+    await this.loadLibrary();
+    await this.refreshStorageWarning();
+    this.route = { kind: 'library' };
+  }
+
+  private applyRestore(mode: 'merge' | 'replace'): void {
+    this.dispatch(async () => {
+      if (!this.pendingRestore) {
+        this.dialog = null;
+        return;
+      }
+      await this.store.restore(this.pendingRestore, mode);
+      this.pendingRestore = null;
+      this.restoreState = { phase: 'idle' };
+      this.dialog = null;
+      // A replace may have overwritten preferences (e.g. the upcoming choice).
+      this.prefs = await loadPreferences(this.store);
+      await this.loadLibrary();
+      this.route = { kind: 'library' };
+    });
+  }
+
+  /** ISO 8601 with offset for the current instant (for importedAt / exported_at). */
+  private nowIso(): string {
+    return this.sampleNow().wall;
   }
 
   private beginClass(): void {

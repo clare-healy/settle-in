@@ -11,6 +11,11 @@ import { Store } from '../store/index.js';
 import type { StoredClassRevision } from '../store/index.js';
 
 export async function seedDevLibrary(store: Store): Promise<void> {
+  // The Playwright import/first-launch spec pins an empty library by setting this
+  // flag before boot, so the real Import UI can be driven from a true empty state.
+  // Dev-only (this whole module is behind import.meta.env.DEV), so it never ships.
+  if (typeof localStorage !== 'undefined' && localStorage.getItem('__settleInNoSeed') === '1') return;
+
   const existing = await store.getAllClassRevisions();
   if (existing.length > 0) return;
 

@@ -95,5 +95,24 @@ function sheetChildren(dialog: Dialog, actions: AppActions): HTMLElement[] {
           on: { click: () => actions.closeDialog() },
         }),
       ];
+    case 'restore-replace-confirm':
+      return [
+        el('h2', { class: 'sheet__title', text: 'Replace the whole library?' }),
+        el('p', {
+          class: 'sheet__body',
+          text: 'This clears every class and run on this device, then writes the backup in their place. This cannot be undone.',
+        }),
+        el('button', {
+          class: 'btn btn--danger',
+          text: 'Replace library',
+          attrs: { 'data-testid': 'confirm-restore-replace' },
+          on: { click: () => actions.confirmRestoreReplace() },
+        }),
+        el('button', {
+          class: 'btn btn--quiet',
+          text: 'Cancel',
+          on: { click: () => actions.closeDialog() },
+        }),
+      ];
   }
 }

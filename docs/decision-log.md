@@ -252,3 +252,16 @@ Visual judgment calls (tap-zone chevrons, savasana dot markers, `m:ss / m:ss` ac
 Decision: M4b delivered by an Opus agent and verified by the orchestrator — 185 Vitest + 17 Playwright specs green under independent runs, and a browser walkthrough confirming both fixes: the wake-lock indicator now occupies a reserved top band (overlap impossible by construction, geometry-asserted in real Chromium), and the wake-lock request fires synchronously inside the Begin/Resume gesture with post-persistence reconciliation (the agent mutation-tested its own spec by reverting the fix). Reload-recovery verified live: Run Recovery appeared after a half-hour-old abandoned session and resumed to the exact segment with truthful elapsed time.
 
 Also established: a dev-only test-clock seam (`window.__settleInTestClock`), dynamic-imported behind `import.meta.env.DEV` and proven absent from the production bundle (byte-identical JS before/after). Playwright is marked regression/smoke only — G-series, A-series, H3, J-series, and B-series remain device-only per the CI-fidelity NO verdict, scripted in `docs/device-checklist.md`.
+
+## July 22, 2026 — M5 complete (import, library, exports, backup/restore)
+
+Decision: M5 delivered by an Opus agent and verified by the orchestrator — 228 Vitest + 18 Playwright green under independent runs, and a live UI walkthrough: the warning fixture pasted through the real import flow produced the exact C8 summary (40 minutes, 2 poses, 3 sides, 2 transitions, peak Sleeping Swan) with the C9 warning in warm contrast, non-blocking. The as-taught generator implements Export Schema v1 byte-deterministically with golden files covering clean, revisited, skipped, and substituted runs; restore validates the whole backup before any write and applies atomically. The export treaty was not modified.
+
+The agent's Y/N questions, resolved:
+
+- `APP_VERSION` starts at `0.1.0`? **Yes** — 1.0.0 belongs to the first taught Tuesday.
+- Backup folds classes and original Markdown into a `revisions[]` shape? **Yes** — the treaty requires lossless payload, not a particular internal shape; the round-trip test is the proof.
+- Merge treats preferences as put-if-absent? **Yes** — consistent with never-overwrite merge semantics.
+- The upcoming-class chooser appears only when more than one future class exists? **Yes** — exactly screen-states §3.
+
+Noted, no change: transition names retain their `Transition:` prefix in exports, faithful to M1 normalization and consistent with Prep's display. Bundle grew to 60.9 KB gzip (import ships the parser + yaml at runtime) — well under budget; an optional M6 code-split of the import path may restore a smaller teaching shell.
