@@ -36,7 +36,7 @@ The implementation may use a build tool, but the deployed result must remain a s
 
 Production hosting is GitHub Pages from the `settle-in` repository. The free tier requires the repository to be public; this is acceptable because real classes are never committed — they exist only on Clare's device — and all fixture content is invented.
 
-Browser storage is bound to the origin. The production origin (`https://<account>.github.io`, app scoped under `/settle-in/`) is permanent once the first real class is imported. Any future move of the app's address requires a whole-library backup export and restore, planned deliberately outside class time.
+Browser storage is bound to the origin. The production origin (`https://clare-healy.github.io`, app scoped under `/settle-in/`) is permanent once the first real class is imported. Any future move of the app's address requires a whole-library backup export and restore, planned deliberately outside class time.
 
 ## Time model
 

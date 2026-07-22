@@ -59,7 +59,8 @@ Do not silently choose between conflicting requirements during implementation. R
 │   ├── design-system.md
 │   ├── acceptance-tests.md
 │   ├── decision-log.md
-│   └── yin-flow-state-instructions.md
+│   ├── yin-flow-state-instructions.md
+│   └── build-plan.md
 ├── fixtures/
 │   ├── valid-desire-paths.md
 │   ├── warning-short-plan.md

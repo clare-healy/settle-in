@@ -6,7 +6,7 @@ The log operates on the yes/no/triangulate primitive. Each entry records a quest
 
 ## Open triangulate nodes
 
-- None currently open.
+- **Build-plan architecture review** (opened July 22, 2026): `docs/build-plan.md` is proposed and awaiting the GPT-5.6/Codex adversarial pass. Its four internal nodes (YAML library, idb wrapper, no-framework, offline-test fidelity) resolve to Y/N here before milestone M1 begins.
 
 ## July 21, 2026 — Context-package scope
 
@@ -147,3 +147,7 @@ Decision: `yin-app/` is initialized as a standalone git repository (GitHub name 
 Question: may the studio photographs enter the public repository as taken? **No.**
 
 Decision: before the first push, all EXIF metadata (including GPS coordinates) was stripped from the four reference photographs, and the QR codes and instructor names on the tip sign were blurred in the altar-shelf photo (GPT-5.6 flagged the GPS metadata; Claude flagged the sign). The root commit was rewritten so unscrubbed copies never exist in public history. Unmodified originals remain on Clare's phone.
+
+## July 22, 2026 — Phase 1 build plan proposed
+
+Decision: `docs/build-plan.md` proposes the v1 architecture — vanilla strict TypeScript + Vite, exactly two runtime dependencies (`yaml`, `idb`), a purpose-built container parser with text-only rendering, hand-written service worker, injectable Clock, event-sourced runs, and seven milestones mapped to the acceptance tests. Held as an open triangulate node pending adversarial review; not yet locked.
