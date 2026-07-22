@@ -200,3 +200,14 @@ Decision: acceptance tests C10 (schedule warning), E6 (durable fade-once), E7 (a
 Question: should the orchestrating model also write the application code? **No.**
 
 Decision: Claude Fable 5 handles orchestration, strategy, treaty stewardship, review, and verification; milestone build work is delegated to Claude Opus agents working from written work orders. Each work order scopes one milestone, cites the binding documents, forbids doc/fixture/archive edits, and requires ambiguities to be returned as Y/N/T questions rather than resolved silently in code. The orchestrator verifies (runs tests, reviews diffs) and commits; agents do not commit. Ratified by Clare (token economy: Fable tokens on judgment, Opus tokens on execution).
+
+## July 22, 2026 — M1 complete (parse and validate)
+
+Decision: M1 delivered by an Opus agent and verified by the orchestrator — 36 tests green plus independent orchestrator probes (expansion offsets match the treaty's D2 windows exactly; YAML anchors and aliases rejected). Four conservative agent readings ratified, none room-visible:
+
+- The per-scalar input budget is enforced as an 8 KB physical-line cap before parsing (with the 512 KB file cap bounding block scalars) — an honest pre-parse proxy.
+- Non-kebab-case `id`/`class_id` is a blocking error (the treaty states the rule without severity; strict is the safe reading).
+- A non-Tuesday date and non-19:00 start produce one combined schedule warning.
+- `hard_close_local` other than `"20:00"` is blocking, per the v1 rule.
+
+Also noted: `npm audit` shows dev-only advisories (esbuild via vite 5/vitest 2); nothing ships in the bundle. Deferred — revisit at M6 when the build pipeline becomes release-bearing.
