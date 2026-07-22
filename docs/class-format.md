@@ -16,9 +16,10 @@ The app stores both the original Markdown and a normalized `ClassDefinition` gen
 - One H1 title matching the front-matter title
 - Ordered H2 segment headings
 - Exactly one fenced `yaml` block immediately beneath each segment heading
-- YAML parsed with a safe schema; custom types and executable tags are forbidden
+- Each fenced YAML block is a single document parsed to an AST with the core schema; directives, tags, anchors, aliases, multiple documents, non-string keys, and non-finite numbers are rejected before conversion
 - Unknown fields produce warnings in v1 unless they begin with `x_`
-- Duplicate keys are blocking errors
+- Duplicate keys are blocking errors at every nesting depth
+- Over-budget input (file size, line count, nesting depth, node count, scalar length) is rejected before parsing; canonical caps live in the build plan
 
 ## Front matter
 
@@ -52,6 +53,7 @@ Rules:
 - `date` is an ISO local date.
 - Local times use zero-padded 24-hour `HH:MM` strings.
 - For v1, `hard_close_local` must be `20:00` and later than `scheduled_start_local`.
+- The canonical class is Tuesday 19:00–20:00. A `date` that is not a Tuesday or a `scheduled_start_local` other than `"19:00"` is valid but produces a warning, so shifted weeks, subbing, and rehearsal files import without any scheduling UI.
 - `props` is a nonempty list of display-ready strings.
 - `room_setup` may be an empty list.
 - `arrival`, `breathwork`, `theme_line`, and `felt_sense` are single display paragraphs.
@@ -188,7 +190,7 @@ Rules:
 
 - `id` must be `savasana`.
 - Schema v1 requires exactly six nonempty steps.
-- `wake_message` is required.
+- `wake_message` is required and authored per class; it is the exact text shown on screen at 7:58. Keep it glanceable — a warning appears above 90 characters.
 
 ## Sequence validation
 
@@ -253,6 +255,7 @@ Validation warnings, not blocking errors, should appear when:
 - Any minimal-state midpoint cue exceeds 150 characters
 - Any expanded cue exceeds 280 characters
 - Arrival, breathwork, theme anchor, or guided/silent note exceeds 320 characters
+- `wake_message` exceeds 90 characters
 - More than 14 authored poses appear
 
 Warnings protect the two-second-glance principle while allowing Clare to make the final teaching judgment.
@@ -301,7 +304,7 @@ app_version: "<application version>"
 
 One H1: `As Taught — {class title} — {run local date}`.
 
-A `## Segments` section containing exactly one fenced `yaml` block: an ordered list with one entry per expanded runtime segment, in taught order:
+A `## Segments` section containing exactly one fenced `yaml` block: an ordered list with exactly one entry per expanded runtime segment, in canonical expanded-plan order (the authored plan's order, not visit order). `visits` and `status: revisited` summarize out-of-order teaching; visit-level detail lives in the run's event history, not in this summary.
 
 ```yaml
 - id: sleeping-swan--right

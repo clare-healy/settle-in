@@ -91,7 +91,7 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 4. A deliberate central action opens the expanded reference state without changing the teaching segment.
 5. Going back records a navigation correction without deleting history.
 6. Savasana remains manually staged, while the two-minute text appears automatically at 7:58 PM and remains until Clare advances.
-7. The run ends at or before 8:00 PM through Clare's manual action; the app never advances or ends the class for her.
+7. Teaching ends at the 8:00 PM hard close; the run is finished through Clare's manual action, which may fall a few minutes after 8:00 as the room resolves. The app never advances or ends the class for her, and navigation never locks.
 
 ### After class
 

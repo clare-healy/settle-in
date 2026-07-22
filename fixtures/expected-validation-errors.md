@@ -15,6 +15,17 @@ These messages define meaning, not mandatory punctuation. Implementations may im
 - Savasana planned window at a 7:00 start: 7:45–8:00
 - Hard-close message: 7:58
 
+## `valid-boundary-content.md`
+
+- Blocking errors: none
+- Warnings: none
+- Planned duration: 60 minutes
+- Authored poses: 4
+- Teaching sides: 6
+- Transitions: 4
+- Peak pose: Supported Caterpillar
+- Boundary content, all on the first pose: 36-character pose title, 150-character midpoint cue, 280-character entry cue (each exactly at its warning threshold, so none fires)
+
 ## `warning-short-plan.md`
 
 - Blocking errors: none

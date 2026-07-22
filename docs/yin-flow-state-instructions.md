@@ -155,8 +155,8 @@ Clare is open to seasonal and elemental TCM frameworks in teaching. She leans mo
 
 ## Class File Rules (Non-negotiable)
 
-- YAML front matter with `schema_version: 1`; `class_id` is unique kebab-case including the date (like `desire-paths-2026-07-28`); `hard_close_local` is `"20:00"`.
-- Exactly one Grounding segment first and one Savasana segment last (six steps per the mapping above; `wake_message` required).
+- YAML front matter with `schema_version: 1`; `class_id` is unique kebab-case including the date (like `desire-paths-2026-07-28`); `hard_close_local` is `"20:00"`. A non-Tuesday `date` or a start other than `"19:00"` is allowed (shifted weeks, subbing) but imports with a warning.
+- Exactly one Grounding segment first and one Savasana segment last (six steps per the mapping above). `wake_message` is Clare's own two-minute awakening line for that class, shown verbatim on screen at 7:58 — write it in her voice, themed for the night, and keep it under ~90 characters.
 - Every pose is followed by exactly one Transition whose `next_segment_id` names the next pose or Savasana.
 - Bilateral poses use `duration_per_side_min` and a two-item `side_order`; non-bilateral poses use `duration_min`. Per-side means per side.
 - The expanded plan must total 60 minutes (Grounding + poses with sides + transitions + Savasana). Show the duration arithmetic before the file.

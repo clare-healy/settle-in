@@ -88,6 +88,10 @@ Before saving the valid fixture, the confirmation shows title, date, 60 planned 
 
 Importing `fixtures/warning-short-plan.md` produces no blocking errors and exactly the short-plan warning from `fixtures/expected-validation-errors.md`. Confirmation remains available and the class can be saved.
 
+### C10 — Schedule warning
+
+A valid file with a non-Tuesday `date` or a `scheduled_start_local` other than `19:00` imports with a warning and no blocking error.
+
 ## D. Timing
 
 Automated timing tests use a controllable clock.
@@ -154,6 +158,14 @@ After appearing, the wake message does not fade out, restart, pulse, or repeat a
 
 The wake message produces no audio, vibration, haptic, or notification.
 
+### E6 — Durable fade-once
+
+`wake_message_shown` persists before the message first renders. A reload or process death after 7:58 recovers with the authored message present and no replayed fade animation.
+
+### E7 — Authored text
+
+The message displays the class's authored `wake_message` verbatim.
+
 ## F. Navigation and state
 
 ### F1 — Manual forward
@@ -183,6 +195,14 @@ Finishing and abandoning each require a deliberate two-step action.
 ### F7 — One active run
 
 The app prevents beginning a second run until the current run is resumed, finished, or abandoned.
+
+### F8 — Revisited display
+
+A segment entered via Previous shows `revisited` in place of a drift value. The original visit's drift remains in the event history and the as-taught export.
+
+### F9 — Serialized input
+
+Rapid repeated taps produce exactly one committed teaching-state action each; a second tap during a pending persistence transaction cannot reorder or skip segments.
 
 ## G. Wake lock
 
@@ -262,7 +282,7 @@ At normal and 125% Android font scaling, every critical live value and action re
 
 ### J2 — Long-content fixtures
 
-A 36-character pose title, 150-character midpoint cue, and 280-character expanded cue render without collision or inaccessible content.
+Importing `fixtures/valid-boundary-content.md` — which pins a 36-character pose title, 150-character midpoint cue, and 280-character expanded cue on a single pose — renders without collision or inaccessible content.
 
 ### J3 — Touch targets
 

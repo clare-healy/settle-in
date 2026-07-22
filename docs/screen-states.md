@@ -198,6 +198,8 @@ Hierarchy:
 6. Next authored pose name and planned start
 7. Subtle Previous / Reference / Next affordances
 
+A visit entered via Previous shows `revisited` in place of the drift value (see the implementation treaty's drift rules).
+
 For Side 1, the next preview names the same pose's Side 2 only if that is the immediate teaching destination. A separate secondary label may show the next authored pose. The UI must not imply that Side 2 is being skipped.
 
 ### Expanded
@@ -235,7 +237,8 @@ Transition navigation is manual. Expiration of its planned minute changes no sta
 
 At 7:58 PM during any active live screen:
 
-- Fade in `Two minutes. Time to begin the gentle awakening.` once.
+- Fade in the class's authored `wake_message` once, verbatim.
+- Persist `wake_message_shown` before first render; after a reload or recovery the message is simply present, with no replayed fade.
 - Keep it visible until the next teaching-state action or Finish Class.
 - Do not obscure the wall clock, current pose, or navigation affordances.
 - Do not animate it again.
@@ -256,7 +259,7 @@ Shows only:
 
 Past steps remain quietly visible; future steps are subdued but legible at close viewing distance. The active step is not animated continuously.
 
-At or after 8:00, replace countdown language with `8:00 · hard close`. Do not use negative time.
+At or after 8:00, replace countdown language with `8:00 · hard close`. Do not use negative time. Navigation and Finish remain fully available after 8:00; nothing locks.
 
 After the final step, Next reveals a deliberate `Finish Class` action with confirmation.
 

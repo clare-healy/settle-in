@@ -6,7 +6,7 @@ The log operates on the yes/no/triangulate primitive. Each entry records a quest
 
 ## Open triangulate nodes
 
-- **Build-plan architecture review** (opened July 22, 2026): `docs/build-plan.md` is proposed and awaiting the GPT-5.6/Codex adversarial pass. Its four internal nodes (YAML library, idb wrapper, no-framework, offline-test fidelity) resolve to Y/N here before milestone M1 begins.
+- None currently open. (The build-plan architecture review node, opened July 22, 2026, resolved the same day — see the adversarial-review entries below.)
 
 ## July 21, 2026 — Context-package scope
 
@@ -161,3 +161,36 @@ Decision: `docs/yin-flow-state-instructions.md` v2 merges Clare's existing proje
 ## July 22, 2026 — Adversarial review prompt canonized
 
 Decision: the Phase 1 review prompt for GPT-5.6 lives at `docs/adversarial-review-prompt.md` (six attack surfaces, evidence-citation rules, [UNVERIFIED] discipline, severity-ranked deliverable). Reusable at later review gates; review verdicts return here as Y/N entries before M1.
+
+## July 22, 2026 — Adversarial review verdicts
+
+The Phase 1 review (`docs/phase-1-adversarial-review.md`) ruled on the four open nodes:
+
+- `yaml` library? **Yes**, with AST hardening (no directives/tags/anchors/aliases, `maxAliasCount: 0`, string keys, finite scalars, duplicate keys blocked at depth).
+- `idb` wrapper? **Yes**, with strict IndexedDB durability for teaching-state transactions — awaiting `tx.done` under relaxed durability is not durability.
+- No framework? **Yes**, conditional on one centralized renderer/dispatcher, deterministic focus and teardown, and state-transition tests.
+- CI offline emulation as A2/A3 acceptance evidence? **No.** CI is smoke coverage; A1–A3/A5 pass only on the scripted physical Pixel 6 checklist.
+
+## July 22, 2026 — Blocker resolutions (technical)
+
+All seven review blockers are resolved and folded into the treaties and the build plan's amendments section:
+
+- **A5 semantics:** a waiting service worker never activates while a client with an active run is open; after process death it may activate, so recovery is version-crossing and migrations run before the recovery screen.
+- **Durability:** teaching-state, run-start, wake-message, finish/abandon, and note transactions use `durability: "strict"` and complete before UI acknowledgment; current-state fields are transactional projections of the event log with tested rebuild equivalence.
+- **Clock discontinuities:** events carry wall + monotonic samples and an execution identity; elapsed uses monotonic deltas within an execution; discontinuities are noted quietly and never render as negative or alarming values. `hard_close_at` is computed once at Begin and persisted, never recomputed.
+- **Savasana back:** `savasana_step_back` joins the event vocabulary; step movement in both directions persists before rendering.
+- **Parser hardening:** input budgets enforced before parsing; the container splitter is specified as a total grammar with honest line attribution.
+- The wake-message and schedule-scope blockers were product decisions — see the next entry.
+
+## July 22, 2026 — Product resolutions ratified by Clare
+
+Four room-visible questions from the review, each answered by Clare:
+
+- Authored `wake_message` or fixed sentence at 7:58? **Authored text wins**, shown verbatim; validation warns above 90 characters. The screen treaty's example sentence is now just the canonical example.
+- Non-Tuesday or non-19:00 class files? **Warn, don't block** — shifted weeks, subbing, and rehearsal files import with a visible warning and no scheduling UI.
+- Drift display on a revisited segment? **Show `revisited`** in place of the number; the original drift stays in history and the export.
+- After 8:00 PM? **Navigation stays open.** The hard close ends teaching, not the record; Clare finishes manually at the room's pace and nothing ever locks.
+
+## July 22, 2026 — Review-driven test additions
+
+Decision: acceptance tests C10 (schedule warning), E6 (durable fade-once), E7 (authored wake text), F8 (revisited display), F9 (serialized input) added; J2 now pins `fixtures/valid-boundary-content.md`, a valid 60-minute class carrying the 36/150/280-character copy boundaries on a single pose. M1 may begin.

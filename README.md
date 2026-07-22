@@ -60,9 +60,12 @@ Do not silently choose between conflicting requirements during implementation. R
 │   ├── acceptance-tests.md
 │   ├── decision-log.md
 │   ├── yin-flow-state-instructions.md
-│   └── build-plan.md
+│   ├── build-plan.md
+│   ├── adversarial-review-prompt.md
+│   └── phase-1-adversarial-review.md
 ├── fixtures/
 │   ├── valid-desire-paths.md
+│   ├── valid-boundary-content.md
 │   ├── warning-short-plan.md
 │   ├── invalid-missing-duration.md
 │   ├── invalid-bilateral-duration.md

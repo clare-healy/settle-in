@@ -79,17 +79,23 @@ The hard close does not shift:
 hard_close_at = run_local_date + hard_close_local
 ```
 
+`hard_close_at` is constructed exactly once, at Begin Class, using the device's then-current time zone offset, and is persisted with the run. It is never recomputed: a mid-run zone change, DST oddity, or clock adjustment does not move it, and the export shows the same instant Begin Class showed.
+
 If a late start makes the re-anchored plan extend beyond the hard close, the UI continues to show the re-anchored planned window while also showing the fixed hard close. The app does not compress or automatically recompute remaining segments.
 
 ### Elapsed time
 
-On entry to a segment, record an `enter_segment` event. While it remains current:
+On entry to a segment, record a `segment_entered` event. While it remains current:
 
 ```text
-elapsed = now - latest enter_segment timestamp for the current visit
+elapsed = now - latest segment_entered timestamp for the current visit
 ```
 
 Elapsed display uses `m:ss` and is calculated from timestamps, not by counting timer ticks. Rendering may update once per second.
+
+### Clock discontinuities
+
+Durable truth is the wall-clock timestamp; display stability comes from the monotonic clock. Teaching-state events record the wall-clock timestamp, a monotonic sample, and an execution identity. Within one execution, elapsed display uses monotonic deltas anchored to the visit's durable timestamp, so a wall-clock adjustment cannot make elapsed jump or go negative. Across process death, durable wall timestamps are the only truth and small adjustment error is accepted. When a discontinuity is detected (monotonic and wall deltas disagree beyond tolerance, or wall time moves backward), the app appends a `clock_discontinuity_noted` presentation event and continues calmly: no negative values, no alarm, no correction prompt.
 
 ### Drift
 
@@ -109,17 +115,23 @@ Display drift rounded to the nearest whole minute:
 
 Drift is never red, alarming, animated, or described as an error.
 
+A visit that begins via Previous (`segment_back`) displays `revisited` in place of a drift value: comparing a late correction against the segment's original planned start would be mathematically true but operationally meaningless. The original visit's drift remains in the event history and the as-taught record.
+
 ### Hard close and savasana signal
 
 The wake message becomes eligible at exactly two minutes before `hard_close_at`, normally 7:58 PM.
 
 It appears only while a run is active. If Clare reaches Savasana before 7:58, it appears at 7:58. If she enters Savasana after 7:58, it is immediately present. If she has not yet reached Savasana, a quiet two-minute message appears in the current live screen without changing the segment.
 
-The message fades in once over approximately three seconds and remains visible until Clare advances or finishes. It never cycles, fades away on its own, makes sound, vibrates, or posts a notification.
+The message text is the class's authored `wake_message`, shown verbatim.
+
+The message fades in once over approximately three seconds and remains visible until Clare advances or finishes. It never cycles, fades away on its own, makes sound, vibrates, or posts a notification. The `wake_message_shown` event is persisted before the message is first rendered; the fade-once guarantee derives from that durable event, so a reload or process death after 7:58 recovers with the message simply present — no replayed fade.
 
 At 8:00 PM the app does not advance or end the class. It changes the quiet close indicator to `8:00 · hard close` and leaves the action with Clare.
 
 A run begun at or after `hard_close_at` — for example a rehearsal later in the evening — shows the wake message and the `8:00 · hard close` indicator immediately. This is defined behavior, not an error. There is no separate rehearsal or practice mode; the re-anchored planned windows still shift with the actual start, and nothing blocks running the class.
+
+8:00 PM ends teaching, not the record. After the hard close, forward and back navigation and Finish remain fully available so Clare can stage the room's actual ending — even a few minutes past 8:00 while students roll up mats — and finalize the record at her pace. Nothing locks and nothing advances.
 
 ## Run state model
 
@@ -145,6 +157,8 @@ An active run contains:
 - Wake-message acknowledgment state
 - Draft post-class notes
 
+The current-segment, savasana-step, presentation, and wake-acknowledgment fields are transactional projections of the event log: each is written atomically in the same transaction as the event it reflects, and rebuilding them from the event log must produce identical values (equivalence is tested). The event log remains the single source of truth; the projections exist for fast recovery, never as an independent record.
+
 ### Run events
 
 Append events; do not rewrite history:
@@ -154,6 +168,7 @@ Append events; do not rewrite history:
 - `reference_expanded`
 - `reference_collapsed`
 - `savasana_step_advanced`
+- `savasana_step_back`
 - `segment_back`
 - `segment_skipped`
 - `substitution_noted`
@@ -161,6 +176,9 @@ Append events; do not rewrite history:
 - `run_finished`
 - `run_abandoned`
 - `run_resumed`
+- `clock_discontinuity_noted`
+
+Savasana step movement in either direction is a teaching-state event and persists before rendering, so recovery returns to the exact step. `clock_discontinuity_noted` is a presentation-class event.
 
 Only teaching-state events affect derived durations. Presentation events are retained only if useful for recovery and may be excluded from exports.
 
@@ -215,6 +233,8 @@ No application code may invoke audio playback, vibration, notifications, or hapt
 
 Use IndexedDB or an equivalently durable structured browser database rather than `localStorage` as the source of truth.
 
+Run-start, teaching-state, wake-message, finish/abandon, and note transactions request strict storage durability (`durability: "strict"`) and are awaited to completion before the UI acknowledges the action. Default relaxed durability is acceptable only for presentation events and preferences.
+
 Persist:
 
 - Original imported Markdown
@@ -224,7 +244,7 @@ Persist:
 - Post-class notes
 - Local preferences
 
-Request persistent browser storage after the first successful import or installation. If the request is not granted, explain in the Library—not during class—that device/browser cleanup could remove local data and that backup export is recommended.
+Request persistent browser storage after the first successful import or installation, and re-check `navigator.storage.persisted()` on every launch. If persistence is not granted, explain in the Library—not during class—that device/browser cleanup could remove local data and that backup export is recommended. Persistence, even when granted, does not protect against user-initiated data clearing; the backup export is the real safety net and a verified backup is required before the first live-class pilot.
 
 ## Identity and immutability
 
@@ -239,11 +259,12 @@ Request persistent browser storage after the first successful import or installa
 
 ### Import
 
-1. Parse without executing embedded HTML, scripts, or links.
-2. Normalize into the canonical data model.
-3. Validate the complete object.
-4. Present warnings separately from blocking errors.
-5. Require confirmation before saving.
+1. Enforce input budgets before parsing: over-budget file size, line count, nesting depth, node count, or scalar length is rejected quietly with a plain explanation (canonical caps in the build plan).
+2. Parse without executing embedded HTML, scripts, or links.
+3. Normalize into the canonical data model.
+4. Validate the complete object.
+5. Present warnings separately from blocking errors.
+6. Require confirmation before saving.
 
 Validation errors should name the segment and field and include a source line when the parser can determine it.
 
@@ -255,7 +276,7 @@ Support:
 - One as-taught Markdown record containing plan and actuals, conforming to the as-taught export schema in `docs/class-format.md`
 - Whole-library backup containing schema version, classes, revisions, runs, events, and notes
 
-A whole-library restore must validate before replacing or merging any data. Replacement is destructive and requires explicit confirmation. Merge is the default.
+A whole-library restore parses and validates the entire backup before any write transaction opens; merge or replacement is then applied atomically, so a failure mid-apply leaves the library unchanged. Replacement is destructive and requires explicit confirmation. Merge is the default.
 
 Merge semantics are deterministic union by identity: classes merge by `class_id`, revisions by `source_hash`, runs by `run_id`; events and notes travel with their run. An incoming entity whose identity already exists locally is skipped, never overwritten. Merge therefore cannot destroy local data; only explicit replacement can.
 
@@ -267,7 +288,8 @@ Class and as-taught exports are human-readable Markdown. The whole-library backu
 - Stored data and class inputs have independent schema versions.
 - Database migrations must be forward-only, transactional where possible, and tested against fixture backups.
 - A failed migration must preserve the prior data and show a non-studio-blocking recovery path.
-- Service-worker updates must not interrupt an active run. Activate a waiting update only after no run is active or after explicit confirmation outside class.
+- Service-worker updates must never interrupt a running client: while any client with an active run is open, a waiting worker must not activate, and the application never forces a reload to activate an update.
+- If the process dies while a durable run is still active, the waiting worker may activate before the next launch. Recovery is therefore version-crossing: database migrations run before the recovery screen appears, and recovery must return to the exact segment across an application-version boundary. A failed migration preserves the prior data as above.
 
 ## Responsive and platform behavior
 

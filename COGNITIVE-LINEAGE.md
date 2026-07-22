@@ -34,6 +34,10 @@ GPT-5.6 operating through Codex contributed a substantial triangulation and buil
 
 Codex's technical recommendations are subordinate to Clare's ends and principles. Where platform constraints require a different means—such as a small multi-file PWA rather than a literal single HTML file—the chosen means must preserve the intended room experience.
 
+## OpenAI GPT-5.6 — July 22, 2026 (Phase 1 adversarial review)
+
+GPT-5.6, with the repository mounted, performed the Phase 1 adversarial review (`docs/phase-1-adversarial-review.md`): verdicts on the four open architecture nodes (YES on the `yaml` library, `idb`, and no-framework; NO on CI offline emulation as acceptance evidence), seven blockers (service-worker activation after client death, IndexedDB durability, clock discontinuities, the missing savasana back event, wake-message authority, schedule-schema scope, YAML AST policy), and a body of material findings on projections, drift semantics, parser budgets, restore atomicity, and test-gate honesty. It also flagged GPS metadata in the reference photographs before publication. All verdicts and blockers were resolved into the treaties and decision log by Claude with Clare's ratification of the four room-visible questions.
+
 ## Claude Fable 5 (Claude Code) — July 21, 2026
 
 Claude Fable 5, operating through Claude Code, performed the final build-readiness pass with Clare. Its contribution included:

@@ -1,6 +1,6 @@
 # Settle In — v1 Build Plan
 
-Status: architecture proposal, Phase 1. Open for adversarial review (GPT-5.6 / Codex) before code. On ratification, its locked choices join the decision log; the treaties it cites always outrank it.
+Status: ratified for M1, as amended. The Phase 1 adversarial review (`docs/phase-1-adversarial-review.md`, July 22, 2026) returned YES on triangulate nodes 1–3, NO on node 4, and seven blockers; every verdict and blocker is resolved in the decision log and folded into the treaties and the amendments section at the end of this document. The treaties it cites always outrank it.
 
 ## Architecture stance
 
@@ -103,4 +103,21 @@ Each milestone ends green, committed, and reviewable. This is the README vertica
 3. No framework vs Preact — proposed: none; attack if the screen inventory looks underestimated.
 4. Playwright offline emulation fidelity for A2/A3 — proposed: CI approximation + physical truth on device; is that gap acceptable pre-pilot?
 
-The review's verdicts land in the decision log as Y/N resolutions before M1 begins.
+The review's verdicts land in the decision log as Y/N resolutions before M1 begins. *(Resolved July 22, 2026: nodes 1–3 YES, node 4 NO — see below.)*
+
+## Adversarial review amendments (July 22, 2026)
+
+These amendments are binding on the build. Where they touch treaty behavior, the treaties were amended in the same change and remain the authority.
+
+- **YAML hardening.** Each fenced block parses to an AST with the core schema; directives, tags, anchors, aliases (`maxAliasCount: 0`), multiple documents, non-string keys, and non-finite scalars are rejected before conversion; duplicate keys block at every depth.
+- **Parser budgets and total grammar.** Canonical input caps, enforced before parsing: 512 KB file, 10,000 lines, nesting depth 8, 5,000 YAML nodes, 8 KB per scalar. The container splitter is a total grammar: BOM/newline normalization, every line consumed, exact heading/fence adjacency, stray content rejected, YAML-relative offsets mapped back to source lines, and honest "line unavailable" reporting when attribution is impossible. Fuzz tests near every cap and malformed-container cases join M1.
+- **Strict durability.** Run-start, teaching-state, wake-message, finish/abandon, and note transactions use `durability: "strict"` and await completion before UI acknowledgment. Current-state fields are transactional projections written atomically with their events; projection-rebuild equivalence is tested (M3).
+- **Input serialization.** A single-flight action queue serializes teaching-state actions; navigation is disabled until the pending transaction commits. Double-tap, rejection, and retry tests join M3 (acceptance F9).
+- **Clock policy.** Events carry wall + monotonic samples and an execution identity; elapsed uses monotonic deltas within an execution; discontinuities append `clock_discontinuity_noted` and never render as negative or alarming values. Forward and backward clock-change tests join M2. `hard_close_at` is computed once at Begin and persisted.
+- **Service-worker lifecycle.** A waiting worker never activates while a client with an active run is open; after process death it may activate, so recovery is version-crossing and migrations run before the recovery screen. Close/reopen-with-waiting-update-and-active-run is an M6 integration test. Precache completeness is audited against the production asset graph; installation fails atomically on any missing asset; browser tests intercept and fail every cross-origin request; a self-only CSP ships with the app.
+- **Persistence reality.** `navigator.storage.persisted()` is rechecked on launch. Real-Chromium tests with a persistent profile cover blocked upgrades, quota failure, forced browser termination, and relaunch; `fake-indexeddb` is unit-level only. A verified backup is required before the pilot.
+- **Restore atomicity.** Backups are fully parsed and validated before any write transaction opens; merge/replace applies atomically. Corrupt, future-version, identity-colliding, and truncated backups are fixture-tested (M5).
+- **Test-gate honesty (node 4, NO).** CI offline emulation is smoke coverage only and is never reported as acceptance evidence. A1–A3 and A5 can only be marked passed by the scripted physical Pixel 6 checklist; M6's exit criterion is amended accordingly, and M7 owns the device matrix — wake-lock denial, release-while-visible, background/foreground, screen lock, battery saver, low battery, launcher cold start, standalone export, and update-during-recovery.
+- **D8/D9.** Pure model tests are retained and supplemented by run-state and rendered-screen integration tests before D8/D9 are claimed.
+- **Boundary fixture.** `fixtures/valid-boundary-content.md` pins J2's 36/150/280-character boundaries and feeds automated screenshots plus the physical 100%/125% font-scale passes.
+- **Product resolutions ratified by Clare (July 22, 2026):** the authored `wake_message` is authoritative on screen (warning above 90 characters); non-Tuesday or non-19:00 files warn, never block; revisited segments display `revisited` instead of a drift value; navigation stays open after 8:00 — the hard close ends teaching, not the record.
