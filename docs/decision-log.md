@@ -221,3 +221,13 @@ Decision: M2 delivered by an Opus agent and verified by the orchestrator — 107
 - The timing-status boundary is strict "exceeds": exactly 30s/15% reads on-plan.
 - A segment never entered and not marked skipped derives `short` with 0 actual — the derivation never usurps Clare's explicit Skipped marking; Post-Class invites the correction.
 - `run_started` carries the begin instant, run-local date, offset-at-Begin, and the persisted `hard_close_at`, making the event log self-sufficient for replay.
+
+## July 22, 2026 — M3 complete (store and run machine)
+
+Decision: M3 delivered by an Opus agent and verified by the orchestrator — 137 tests green plus an end-to-end probe (double-tap commits exactly one advance; a second Begin is blocked while a run is active; process-death recovery with a fresh execution identity lands on the exact segment and side with cues intact). Store: `idb` with strict durability on teaching-state transactions, transactional projections with rebuild-equivalence, immutable class revisions enforced by API shape, forward-only migration scaffold. Run machine: persist-before-acknowledge with a reject-while-pending single-flight guard (a double tap can never advance two segments).
+
+The agent's three Y/N questions, resolved by the orchestrator against the treaties:
+
+- Add a `run_completed` event to the vocabulary? **No.** `run_finished` is the durable teaching truth; completion is the administrative note-finalization transition on the run record. The event vocabulary is unchanged, so no instructions update is owed.
+- Does the single-run guard block only `active_run`? **Yes.** A finished run with notes still pending must never block beginning next week's class — the room outranks the paperwork. The un-noted run stays completable from the Library.
+- Does segment navigation collapse an open expanded reference? **Yes.** Every segment starts minimal; predictability on screen mirrors predictability in cueing (Principle 5).
