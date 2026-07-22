@@ -246,3 +246,9 @@ Defects and risks carried into M4b as required work:
 - **Risk (agent-flagged):** the wake-lock request currently happens after the IndexedDB write inside the Begin/Resume chain; some browsers only honor requests within the user-gesture task. M4b/Playwright must verify, and restructure to request synchronously in the gesture if needed.
 
 Visual judgment calls (tap-zone chevrons, savasana dot markers, `m:ss / m:ss` actuals, authored dialog copy) accepted pending Claude Design frames and the studio rehearsal.
+
+## July 22, 2026 — M4b complete (flow harness and the two fixes)
+
+Decision: M4b delivered by an Opus agent and verified by the orchestrator — 185 Vitest + 17 Playwright specs green under independent runs, and a browser walkthrough confirming both fixes: the wake-lock indicator now occupies a reserved top band (overlap impossible by construction, geometry-asserted in real Chromium), and the wake-lock request fires synchronously inside the Begin/Resume gesture with post-persistence reconciliation (the agent mutation-tested its own spec by reverting the fix). Reload-recovery verified live: Run Recovery appeared after a half-hour-old abandoned session and resumed to the exact segment with truthful elapsed time.
+
+Also established: a dev-only test-clock seam (`window.__settleInTestClock`), dynamic-imported behind `import.meta.env.DEV` and proven absent from the production bundle (byte-identical JS before/after). Playwright is marked regression/smoke only — G-series, A-series, H3, J-series, and B-series remain device-only per the CI-fidelity NO verdict, scripted in `docs/device-checklist.md`.

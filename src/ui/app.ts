@@ -27,7 +27,12 @@ import type {
   EventSample,
   RunStartedEvent,
 } from '../schema/index.js';
-import { RunController, buildRecoverySnapshot, type RecoverySnapshot } from '../run/index.js';
+import {
+  RunController,
+  buildRecoverySnapshot,
+  type BeginResult,
+  type RecoverySnapshot,
+} from '../run/index.js';
 import { Store, type StoredClassRevision } from '../store/index.js';
 import { clear, el } from './dom.js';
 import { renderHome } from './screens/home.js';
@@ -394,10 +399,27 @@ export class AppController {
   private beginClass(): void {
     const def = this.upcomingDef;
     if (!def) return;
+    // Fire the wake-lock request synchronously inside the Begin gesture task, in
+    // parallel with persistence (wake-lock treaty; risk carried from M4a). Some
+    // browsers only grant `navigator.wakeLock.request` from within the originating
+    // user-gesture task, and the IndexedDB write below would push a later request
+    // out of that window. The request never blocks the run: a denied lock only
+    // shows the quiet indicator (G1); a lock granted here is reconciled after
+    // persistence — released if the run does not actually start.
+    const wakeRequest = this.wakeLock.request();
     this.dispatch(async () => {
-      const result = await RunController.begin(this.store, this.env(), def);
+      let result: BeginResult;
+      try {
+        result = await RunController.begin(this.store, this.env(), def);
+      } catch (err) {
+        // Persist threw: a lock granted in the gesture must not linger.
+        await this.releaseSpeculativeWake(wakeRequest);
+        throw err;
+      }
       if (!result.ok) {
-        // An active run already exists (F7): route to recovery rather than begin.
+        // An active run already exists (F7): route to recovery rather than begin,
+        // and release the speculative lock — recovery re-requests on Resume.
+        await this.releaseSpeculativeWake(wakeRequest);
         const active = await RunController.loadActive(this.store, this.env());
         if (active) {
           this.controller = active;
@@ -412,7 +434,9 @@ export class AppController {
       this.wakeVisibleRendered = false;
       this.finishArmed = false;
       this.route = { kind: 'run' };
-      await this.wakeLock.request();
+      // The request already fired in the gesture; await only to settle its state
+      // before the run renders. A denied lock never blocks (quiet indicator).
+      await wakeRequest.catch(() => false);
     });
   }
 
@@ -467,12 +491,21 @@ export class AppController {
 
   private resume(): void {
     if (!this.controller) return;
+    // Wake-lock request fired synchronously in the Resume gesture, same reason as
+    // Begin (recovery treaty: resuming requests a new wake lock). Reconciled after
+    // the resume persists; a denied lock never blocks the resumed run.
+    const wakeRequest = this.wakeLock.request();
     this.dispatch(async () => {
-      await this.controller!.resume();
+      try {
+        await this.controller!.resume();
+      } catch (err) {
+        await this.releaseSpeculativeWake(wakeRequest);
+        throw err;
+      }
       this.dialog = null;
       this.route = { kind: 'run' };
       this.wakeVisibleRendered = false;
-      await this.wakeLock.request();
+      await wakeRequest.catch(() => false);
     });
   }
 
@@ -533,6 +566,18 @@ export class AppController {
   private onWakeLockStateChange(): void {
     // Platform-side release/acquire: refresh the quiet indicator if a run is live.
     if (this.route.kind === 'run' && this.controller) this.render();
+  }
+
+  /**
+   * Settle an in-flight speculative wake request (fired in a Begin/Resume gesture)
+   * and release any lock it won. Used when the run does not actually start — a
+   * failed persist or an existing active run — so a lock granted inside the gesture
+   * never lingers on a non-run screen. Never throws: request() resolves to false on
+   * failure, and releasing a lock the platform already dropped is a no-op.
+   */
+  private async releaseSpeculativeWake(request: Promise<boolean>): Promise<void> {
+    await request.catch(() => false);
+    await this.wakeLock.release();
   }
 
   // --- Dispatch and async plumbing ------------------------------------------

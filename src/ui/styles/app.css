@@ -310,7 +310,22 @@ button {
 .live {
   position: relative;
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   overflow: hidden; /* the live layer itself; cue content lives in .reference */
+}
+
+/* The teaching stage fills whatever height remains below the reserved wake-lock
+   indicator band, and is the positioned/clipping context for the tap zones, live
+   content, expanded reference, and lower wake callout. Because the indicator lives
+   in its own flex band ABOVE the stage, it can never overlap teaching content —
+   segment label, wall clock, pose, or navigation affordances (screen-states § 14). */
+.live__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Three-zone tap map: Previous 20% / Reference 60% / Next 20%
@@ -782,12 +797,14 @@ button {
 
 /* --- Quiet technical indicators ------------------------------------------ */
 
+/* Reserved top band: an in-flow flex item, centered, that reserves its own height
+   above the teaching stage rather than floating over it. This is the layout fix
+   for the M4a overlap defect — the indicator never covers teaching content. */
 .wake-lock-indicator {
-  position: absolute;
-  top: max(env(safe-area-inset-top), 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 4;
+  flex: 0 0 auto;
+  align-self: center;
+  margin-top: max(env(safe-area-inset-top), 12px);
+  z-index: 5;
   color: var(--raw-pine);
   font-size: var(--size-secondary);
   background: rgba(35, 46, 56, 0.7);

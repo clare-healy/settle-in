@@ -39,31 +39,11 @@ export function renderLive(props: LiveProps): LiveHandle {
     attrs: { 'data-screen': 'live', 'data-segment-type': seg ? seg.type : 'none' },
   });
 
-  if (!seg) {
-    // Defensive: a run with no current segment cannot occur after Begin, but the
-    // surface stays calm rather than throwing.
-    container.appendChild(el('div', { class: 'live-content', children: [el('p', { class: 'loading-copy', text: 'Opening…' })] }));
-    return { root: container, update: () => {} };
-  }
-
-  const entry = entrySample(props.events, seg.id);
-  const drift = currentDriftDisplay(props.def, props.events, props.runStartedAtEpochMs);
-
-  if (props.referenceOpen && (seg.type === 'pose' || seg.type === 'grounding')) {
-    container.appendChild(referencePanel(props, seg, updaters, entry));
-    container.appendChild(sideZones(props));
-  } else {
-    container.appendChild(zonesLayer(props, seg));
-    container.appendChild(liveContent(props, seg, entry, drift, updaters));
-  }
-
-  // Wake callout outside Savasana: a quiet, non-obscuring lower callout.
-  if (props.snapshot.currentSegment?.type !== 'savasana') {
-    const wake = wakeCallout(props);
-    if (wake) container.appendChild(wake);
-  }
-
-  // Quiet wake-lock indicator, only when unavailable (screen-states § 14).
+  // Quiet wake-lock indicator (screen-states § 14; wake-lock treaty). It occupies a
+  // reserved top band ABOVE the teaching stage, so it can never overlap the segment
+  // label, wall clock, pose, or navigation affordances — the stage centers its
+  // content within the space that remains below the band. Rendered only when the
+  // platform exposed no wake lock or refused the request.
   if (!props.wakeLock.available) {
     container.appendChild(
       el('button', {
@@ -73,6 +53,35 @@ export function renderLive(props: LiveProps): LiveHandle {
         on: { click: () => props.actions.retryWakeLock() },
       }),
     );
+  }
+
+  // The teaching stage: the positioned, clipping container the tap zones, live
+  // content, expanded reference, and lower wake callout all live inside.
+  const stage = el('div', { class: 'live__stage', attrs: { 'data-testid': 'live-stage' } });
+  container.appendChild(stage);
+
+  if (!seg) {
+    // Defensive: a run with no current segment cannot occur after Begin, but the
+    // surface stays calm rather than throwing.
+    stage.appendChild(el('div', { class: 'live-content', children: [el('p', { class: 'loading-copy', text: 'Opening…' })] }));
+    return { root: container, update: () => {} };
+  }
+
+  const entry = entrySample(props.events, seg.id);
+  const drift = currentDriftDisplay(props.def, props.events, props.runStartedAtEpochMs);
+
+  if (props.referenceOpen && (seg.type === 'pose' || seg.type === 'grounding')) {
+    stage.appendChild(referencePanel(props, seg, updaters, entry));
+    stage.appendChild(sideZones(props));
+  } else {
+    stage.appendChild(zonesLayer(props, seg));
+    stage.appendChild(liveContent(props, seg, entry, drift, updaters));
+  }
+
+  // Wake callout outside Savasana: a quiet, non-obscuring lower callout.
+  if (props.snapshot.currentSegment?.type !== 'savasana') {
+    const wake = wakeCallout(props);
+    if (wake) stage.appendChild(wake);
   }
 
   const update: Updater = (now) => {
