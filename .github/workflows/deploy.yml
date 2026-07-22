@@ -63,7 +63,7 @@ jobs:
       - name: Flow harness (dev server, Chromium)
         run: npm run test:e2e
 
-      - name: PWA suite (production build: offline, persistence, update deferral)
+      - name: "PWA suite (production build: offline, persistence, update deferral)"
         run: npm run test:e2e:pwa
 
       - name: Rebuild a pristine dist for publishing
