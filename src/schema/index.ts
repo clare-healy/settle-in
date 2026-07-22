@@ -6,6 +6,9 @@
 // (grounding, each non-bilateral pose, each side of a bilateral pose, transitions,
 // savasana), with planned durations in integer seconds and cumulative offsets.
 
+// Run events, run-state types, and event-sample types (M2). Additive extension.
+export * from './run.js';
+
 /** Class-input schema version. Only v1 is supported; a higher version is rejected intact. */
 export const SUPPORTED_SCHEMA_VERSION = 1;
 
