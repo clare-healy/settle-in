@@ -62,7 +62,8 @@ Do not silently choose between conflicting requirements during implementation. R
 │   ├── yin-flow-state-instructions.md
 │   ├── build-plan.md
 │   ├── adversarial-review-prompt.md
-│   └── phase-1-adversarial-review.md
+│   ├── phase-1-adversarial-review.md
+│   └── device-checklist.md
 ├── fixtures/
 │   ├── valid-desire-paths.md
 │   ├── valid-boundary-content.md

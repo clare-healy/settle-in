@@ -194,3 +194,9 @@ Four room-visible questions from the review, each answered by Clare:
 ## July 22, 2026 — Review-driven test additions
 
 Decision: acceptance tests C10 (schedule warning), E6 (durable fade-once), E7 (authored wake text), F8 (revisited display), F9 (serialized input) added; J2 now pins `fixtures/valid-boundary-content.md`, a valid 60-minute class carrying the 36/150/280-character copy boundaries on a single pose. M1 may begin.
+
+## July 22, 2026 — Execution model: orchestrate with Fable, build with Opus
+
+Question: should the orchestrating model also write the application code? **No.**
+
+Decision: Claude Fable 5 handles orchestration, strategy, treaty stewardship, review, and verification; milestone build work is delegated to Claude Opus agents working from written work orders. Each work order scopes one milestone, cites the binding documents, forbids doc/fixture/archive edits, and requires ambiguities to be returned as Y/N/T questions rather than resolved silently in code. The orchestrator verifies (runs tests, reviews diffs) and commits; agents do not commit. Ratified by Clare (token economy: Fable tokens on judgment, Opus tokens on execution).
