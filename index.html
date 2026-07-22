@@ -6,8 +6,26 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
+    <!--
+      Self-only Content Security Policy (M6). The app is fully offline and same-origin:
+      no CDN, no analytics, no third-party fonts or images. script-src / style-src carry
+      no 'unsafe-inline' — the one inline style element below (the anti-flash background)
+      is admitted by its sha256 hash, and runtime styling uses CSSOM properties, which CSP
+      does not govern. Any stray cross-origin request is therefore blocked, which is the
+      security posture the treaty asks for (§ Privacy and security; A4). The build fails
+      if this hash drifts from the inline style (vite-plugin-sw.ts verifyCspHash).
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'sha256-kzWJkfgcIWR2dOtQcnYgOEXlHVeitjUk4WH4BjnvBC4='; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; form-action 'none'"
+    />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#14181A" />
+    <link rel="manifest" href="/settle-in/app.webmanifest" />
+    <link rel="icon" href="/settle-in/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/settle-in/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/settle-in/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="/settle-in/apple-touch-icon.png" />
     <title>Settle In</title>
     <!--
       Critical background, inlined so the dim studio never sees a white flash —

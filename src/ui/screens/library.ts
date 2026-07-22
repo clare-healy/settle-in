@@ -10,6 +10,7 @@ import { el } from '../dom.js';
 import { readTextFile } from '../file-input.js';
 import { classDateLabel, minutesLabel } from '../format.js';
 import { peakPoseName, type ClassGroup } from '../library-model.js';
+import { renderUpdateReady } from './update-ready.js';
 import type { LibraryProps } from '../view-types.js';
 
 export function renderLibrary(props: LibraryProps): HTMLElement {
@@ -49,7 +50,14 @@ export function renderLibrary(props: LibraryProps): HTMLElement {
   return el('section', {
     class: 'screen library',
     attrs: { 'data-screen': 'library' },
-    children: [head, importBtn, list, el('hr', { class: 'divider' }), renderBackupRestore(props)],
+    children: [
+      head,
+      renderUpdateReady(props.updateReady, actions),
+      importBtn,
+      list,
+      el('hr', { class: 'divider' }),
+      renderBackupRestore(props),
+    ],
   });
 }
 

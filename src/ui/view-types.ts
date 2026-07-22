@@ -87,6 +87,7 @@ export type RestoreView =
 /** Every side-effecting thing a screen can ask the controller to do. */
 export interface AppActions {
   openPrep(): void;
+  applyUpdate(): void;
   beginClass(): void;
   next(): void;
   previous(): void;
@@ -153,11 +154,13 @@ export interface LiveHandle {
 /** Props for the home screen. */
 export interface HomeProps {
   readonly upcoming: ClassDefinition | null;
+  readonly updateReady: boolean;
   readonly actions: AppActions;
 }
 
 /** Props for the first-launch / empty-library screen (screen-states § 1). */
 export interface EmptyProps {
+  readonly updateReady: boolean;
   readonly actions: AppActions;
 }
 
@@ -182,6 +185,7 @@ export interface LibraryProps {
   readonly ambiguousUpcoming: boolean;
   readonly restore: RestoreView;
   readonly storageWarning: boolean;
+  readonly updateReady: boolean;
   readonly offsetMinutes: number;
   readonly actions: AppActions;
 }

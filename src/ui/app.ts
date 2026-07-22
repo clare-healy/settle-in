@@ -11,6 +11,7 @@
 // state-transition tests are the conditions the Phase 1 review set for shipping
 // without a framework (decision log, July 22 2026).
 
+import '../assets/fonts/fonts.css';
 import './styles/tokens.css';
 import './styles/app.css';
 
@@ -34,7 +35,6 @@ import {
   type RecoverySnapshot,
 } from '../run/index.js';
 import { Store, type StoredClassRevision, type StoredRun, type LibrarySnapshot } from '../store/index.js';
-import { importClass } from '../parser/index.js';
 import { APP_VERSION } from '../version.js';
 import {
   exportAsTaught,
@@ -118,6 +118,12 @@ export class AppController {
   /** §14 storage warning: rechecked when the Library opens, never during a run. */
   private storageWarning = false;
 
+  // §14 "Update ready · apply now": set by the SW registration when a waiting
+  // worker appears. The pill shows only outside a run (Home / Library); applying
+  // messages skipWaiting and reloads. Never surfaced or applied during a run (A5).
+  private updateReady = false;
+  private applyUpdateFn: (() => void) | null = null;
+
   private finishArmed = false;
   private draftNote = '';
 
@@ -194,6 +200,17 @@ export class AppController {
   /** Await every in-flight dispatched action (tests drive the DOM, then await). */
   async idle(): Promise<void> {
     await this.pendingChain;
+  }
+
+  /**
+   * The SW registration reports a waiting worker. Store the applier and re-render
+   * so Home/Library surface §14's quiet "Update ready" pill — but never mid-run,
+   * and a re-render during a run is skipped so nothing disturbs the live surface.
+   */
+  setUpdateReady(ready: boolean, apply: () => void): void {
+    this.updateReady = ready;
+    this.applyUpdateFn = ready ? apply : null;
+    if (this.route.kind !== 'run') this.render();
   }
 
   /** One render tick: refresh live time nodes, or rebuild on a structural change. */
@@ -331,9 +348,13 @@ export class AppController {
       case 'loading':
         return this.loadingScreen();
       case 'empty':
-        return renderEmpty({ actions: this.actions });
+        return renderEmpty({ actions: this.actions, updateReady: this.updateReady });
       case 'home':
-        return renderHome({ upcoming: this.upcomingDef, actions: this.actions });
+        return renderHome({
+          upcoming: this.upcomingDef,
+          actions: this.actions,
+          updateReady: this.updateReady,
+        });
       case 'import':
         return renderImport({ view: this.importState, actions: this.actions });
       case 'library':
@@ -343,6 +364,7 @@ export class AppController {
           ambiguousUpcoming: upcomingChoiceIsAmbiguous(this.groups, this.todayLocalDate()),
           restore: this.restoreState,
           storageWarning: this.storageWarning,
+          updateReady: this.updateReady,
           offsetMinutes: this.offsetMinutes,
           actions: this.actions,
         });
@@ -358,7 +380,7 @@ export class AppController {
               prefs: this.prefs,
               actions: this.actions,
             })
-          : renderEmpty({ actions: this.actions });
+          : renderEmpty({ actions: this.actions, updateReady: this.updateReady });
       }
       case 'recovery':
         return this.recoverySnapshot
@@ -439,7 +461,7 @@ export class AppController {
 
   private buildClassDetail(classId: string): HTMLElement {
     const group = this.groups.find((g) => g.classId === classId);
-    if (!group) return renderEmpty({ actions: this.actions });
+    if (!group) return renderEmpty({ actions: this.actions, updateReady: this.updateReady });
     return renderClassDetail({
       group,
       isUpcoming: this.upcomingClassId === classId,
@@ -470,6 +492,12 @@ export class AppController {
         this.prepDef = this.upcomingDef;
         this.route = { kind: 'prep' };
         this.render();
+      },
+      applyUpdate: () => {
+        // A5: only ever apply an update outside a run. The pill is shown only on
+        // idle screens, but guard here too so nothing can swap versions mid-class.
+        if (this.route.kind === 'run' || this.route.kind === 'recovery') return;
+        this.applyUpdateFn?.();
       },
       beginClass: () => this.beginClass(),
       next: () => this.next(),
@@ -572,6 +600,11 @@ export class AppController {
     this.importState = { phase: 'validating', source };
     this.render();
     this.dispatch(async () => {
+      // The parser (and its `yaml` dependency) is imported lazily so it ships as a
+      // separate chunk, out of the teaching shell — it is only needed on the Import
+      // screen. The SW precache walks the whole dist/, so the chunk is still cached
+      // for offline import.
+      const { importClass } = await import('../parser/index.js');
       const result = await importClass(source);
       if (!result.ok) {
         this.importState = { phase: 'error', source, errors: result.errors, copied: false };

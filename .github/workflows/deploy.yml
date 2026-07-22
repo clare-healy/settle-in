@@ -1,0 +1,88 @@
+# Settle In — CI gate + GitHub Pages deploy (M6).
+#
+# On every push to main: install, run the full automated gate (Vitest, typecheck of
+# both the app and the service worker, production build with the precache + CSP audit,
+# the dev-server flow harness, and the production-build PWA suite), and only on green
+# deploy dist/ to GitHub Pages. Any failing gate fails the deploy.
+#
+# The production origin is https://clare-healy.github.io/settle-in/ (permanent per the
+# implementation treaty); Vite's base is already /settle-in/.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; let an in-progress run finish so a half-published shell is
+# never live during a class.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit + integration tests (Vitest)
+        run: npm test
+
+      - name: Typecheck (app + service worker)
+        run: npm run typecheck
+
+      - name: Production build (precache + CSP audit)
+        run: npm run build
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Flow harness (dev server, Chromium)
+        run: npm run test:e2e
+
+      - name: PWA suite (production build: offline, persistence, update deferral)
+        run: npm run test:e2e:pwa
+
+      - name: Rebuild a pristine dist for publishing
+        # The PWA update test mutates dist/sw.js and restores it; rebuild so the
+        # published artifact is always a clean, audited shell regardless of test runs.
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

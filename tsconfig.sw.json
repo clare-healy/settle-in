@@ -1,0 +1,21 @@
+{
+  // The service worker is type-checked separately from the app because it needs the
+  // WebWorker lib (ServiceWorkerGlobalScope, FetchEvent, ExtendableEvent), which does
+  // not compose cleanly with the DOM lib in the main tsconfig. `npm run typecheck`
+  // and the build run both checks; src/sw.ts is excluded from tsconfig.json.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "WebWorker"],
+    "types": [],
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["src/sw.ts"]
+}

@@ -1,0 +1,63 @@
+/*
+ * Locally bundled fonts (M6) — no runtime network fetch ever (acceptance A4).
+ *
+ * Hanken Grotesk (400/500/700) and Spectral (400 / 400-italic / 500) are copied
+ * from @fontsource (a dev dependency only) into src/assets/fonts/, each family
+ * beside its SIL Open Font License 1.1 text (OFL.txt) as the treaty and AGENTS.md
+ * require. The `latin` subset covers the app's English teaching content.
+ *
+ * Vite fingerprints these woff2 files into dist/assets on build, so the service
+ * worker precaches them content-addressed with the rest of the shell. The url()s
+ * are relative so Vite rewrites them; nothing loads from a third-party origin.
+ *
+ * font-display: swap — the design system's system fallbacks (declared in
+ * tokens.css --font-ui / --font-cue) stay legible during the brief swap window,
+ * and after install the bundled fonts are cache-first, so there is no flash in
+ * studio use. The family names match the tokens.css stacks exactly.
+ */
+
+/* --- Hanken Grotesk: wall clock, pose names, navigation, labels, data ------- */
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./hanken-grotesk/hanken-grotesk-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./hanken-grotesk/hanken-grotesk-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./hanken-grotesk/hanken-grotesk-latin-700-normal.woff2') format('woff2');
+}
+
+/* --- Spectral: teaching cues, theme language, notes, reflective copy --------- */
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./spectral/spectral-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./spectral/spectral-latin-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./spectral/spectral-latin-500-normal.woff2') format('woff2');
+}

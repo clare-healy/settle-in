@@ -226,6 +226,18 @@ button {
   font-size: var(--size-secondary);
 }
 
+/* §14 "Update ready · apply now" — a quiet chip, never an alarm. Warm amber text
+ * on a low-contrast Raw Pine edge; shown only on idle screens (Home / Library). */
+.update-ready {
+  align-self: center;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-chip);
+  border-color: var(--raw-pine);
+  color: var(--candlelight-amber);
+  font-size: var(--size-secondary);
+}
+
 /* --- Prep ----------------------------------------------------------------- */
 
 .prep {

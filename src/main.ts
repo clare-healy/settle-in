@@ -8,6 +8,7 @@
 
 import { Store } from './store/index.js';
 import { AppController, type AppOptions } from './ui/app.js';
+import { registerServiceWorker } from './ui/sw-registration.js';
 
 async function main(): Promise<void> {
   const root = document.getElementById('app');
@@ -50,6 +51,10 @@ async function main(): Promise<void> {
   const app = await AppController.boot(options);
   app.start();
   onBoot?.(app);
+
+  // Register the service worker (production build, or dev behind __settleInSW).
+  // Surfaces §14's "Update ready" outside a run; never interrupts a live class.
+  registerServiceWorker(app);
 }
 
 void main();

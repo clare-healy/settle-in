@@ -9,6 +9,7 @@
 
 import { el } from '../dom.js';
 import { readTextFile } from '../file-input.js';
+import { renderUpdateReady } from './update-ready.js';
 import type { EmptyProps } from '../view-types.js';
 
 export function renderEmpty(props: EmptyProps): HTMLElement {
@@ -56,6 +57,7 @@ export function renderEmpty(props: EmptyProps): HTMLElement {
         attrs: { 'data-testid': 'install-status' },
         text: 'Offline install: available after the first save.',
       }),
+      renderUpdateReady(props.updateReady, actions),
     ],
   });
 }

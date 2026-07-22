@@ -1,0 +1,40 @@
+{
+  "id": "/settle-in/",
+  "name": "Settle In",
+  "short_name": "Settle In",
+  "description": "A quiet, offline reference for teaching a yin class.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/settle-in/",
+  "scope": "/settle-in/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#14181A",
+  "background_color": "#14181A",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -8,6 +8,7 @@
 import { el } from '../dom.js';
 import { classDateLabel, minutesLabel } from '../format.js';
 import { format12hLabel } from '../../model/index.js';
+import { renderUpdateReady } from './update-ready.js';
 import type { HomeProps } from '../view-types.js';
 
 export function renderHome(props: HomeProps): HTMLElement {
@@ -21,7 +22,7 @@ export function renderHome(props: HomeProps): HTMLElement {
     ],
   });
 
-  const children: (Node | null)[] = [brand];
+  const children: (Node | null)[] = [brand, renderUpdateReady(props.updateReady, actions)];
 
   if (upcoming) {
     children.push(renderCard(upcoming, actions));

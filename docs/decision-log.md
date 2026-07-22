@@ -265,3 +265,15 @@ The agent's Y/N questions, resolved:
 - The upcoming-class chooser appears only when more than one future class exists? **Yes** — exactly screen-states §3.
 
 Noted, no change: transition names retain their `Transition:` prefix in exports, faithful to M1 normalization and consistent with Prep's display. Bundle grew to 60.9 KB gzip (import ships the parser + yaml at runtime) — well under budget; an optional M6 code-split of the import path may restore a smaller teaching shell.
+
+## July 22, 2026 — M6 complete (PWA shell); the build is code-complete
+
+Decision: M6 delivered by an Opus agent and verified by the orchestrator — 232 Vitest + 18 flow + 3 PWA Playwright specs green under independent runs, both typecheck configs clean, and the precache audit verifying all 19 dist assets. The taper icon renders exactly to the locked identity (orchestrator-inspected at 512 and 48 px). Teaching shell code-split to 23.8 KB gzip with the parser as a 38.3 KB lazy chunk, both precached so offline import still works; fonts bundled locally (108 KB, latin subsets, OFL licenses preserved); self-only CSP; hand-written service worker with atomic install and §14 update surfaces; GitHub Actions deploy workflow gated on every test suite. Real-Chromium evidence now includes browser-process SIGKILL recovery to the exact segment.
+
+Rulings:
+
+- **A5 semantics (agent's Q1): Yes** — activation after process death is the treaty's MAY, not a MUST; the integration test asserts what A5 protects: deferral through the run (including close/reopen while active), version-crossing recovery to the exact segment, and safe out-of-run apply. Natural-activation remains an M7 on-device observation.
+- **Update chip on the first-launch empty screen: accepted** — it is "outside a run" per §14's scope.
+- **Audit bill: defer the breaking vite 8 migration.** The only remaining advisories are the dev-only esbuild dev-server chain; nothing ships in dist. Revisit as a deliberate, separately-tested migration after the first live-class pilot.
+
+Remaining before the pilot: push + first deploy (blocked on GitHub account access), the M7 physical checklist (`docs/device-checklist.md`), the Yin Flow State project paste, and one real class authored through the workflow.
