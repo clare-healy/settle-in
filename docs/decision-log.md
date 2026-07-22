@@ -231,3 +231,18 @@ The agent's three Y/N questions, resolved by the orchestrator against the treati
 - Add a `run_completed` event to the vocabulary? **No.** `run_finished` is the durable teaching truth; completion is the administrative note-finalization transition on the run record. The event vocabulary is unchanged, so no instructions update is owed.
 - Does the single-run guard block only `active_run`? **Yes.** A finished run with notes still pending must never block beginning next week's class — the room outranks the paperwork. The un-noted run stays completable from the Library.
 - Does segment navigation collapse an open expanded reference? **Yes.** Every segment starts minimal; predictability on screen mirrors predictability in cueing (Principle 5).
+
+## July 22, 2026 — M4a complete (live surfaces)
+
+Decision: M4a delivered by an Opus agent and verified by the orchestrator — 175 tests green, 18.6 KB gzipped shell (budget: 150 KB), zero fixture content in the production bundle, and a hands-on browser walkthrough of Home → Prep → Begin → Grounding → Pose confirming the design system and the re-anchored windows live. The agent's Y/N questions, resolved:
+
+- A visible Leave affordance on live screens? **No** — system Back opens the guard; the live surface stays sparse (Principle 2).
+- Wall clock shows bare 12-hour time without meridiem? **Yes** — `7:24` matches `8:00 · hard close`; am/pm is noise in a 7–8 PM class.
+- Upcoming-class chooser now? **No** — defers to M5 with the Library, per screen-states §3.
+
+Defects and risks carried into M4b as required work:
+
+- **Defect (found in orchestrator walkthrough):** the quiet wake-lock indicator overlaps the segment label on the Grounding screen — §14 forbids covering teaching content. Fix in M4b.
+- **Risk (agent-flagged):** the wake-lock request currently happens after the IndexedDB write inside the Begin/Resume chain; some browsers only honor requests within the user-gesture task. M4b/Playwright must verify, and restructure to request synchronously in the gesture if needed.
+
+Visual judgment calls (tap-zone chevrons, savasana dot markers, `m:ss / m:ss` actuals, authored dialog copy) accepted pending Claude Design frames and the studio rehearsal.

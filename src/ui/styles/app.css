@@ -1,0 +1,819 @@
+/*
+ * Layout and components for Settle In.
+ *
+ * The visual authority is docs/design-system.md; this file implements it.
+ * Live screens are sparse; Prep, expanded reference, Post-Class, and Library are
+ * deliberately denser (design-system.md § Layout). Nothing moves faster than a
+ * slow breath, and no screen is ever light.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--pond-charcoal);
+  color: var(--curtain-linen);
+  font-family: var(--font-ui);
+  font-size: var(--size-body);
+  line-height: 1.5;
+  /* A warm radial vignette that disappears behind text (design-system § Texture). */
+  background-image: radial-gradient(
+    140% 100% at 50% 0%,
+    rgba(35, 46, 56, 0.35) 0%,
+    rgba(20, 24, 26, 0) 60%
+  );
+  background-attachment: fixed;
+}
+
+#app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Every screen respects the device safe-area insets (design-system § Layout). */
+.screen {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: calc(env(safe-area-inset-top) + var(--space-5))
+    calc(env(safe-area-inset-right) + var(--space-5))
+    calc(env(safe-area-inset-bottom) + var(--space-5))
+    calc(env(safe-area-inset-left) + var(--space-5));
+}
+
+/* --- Typography roles ----------------------------------------------------- */
+
+.eyebrow {
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--raw-pine);
+  font-weight: 600;
+}
+
+.cue {
+  font-family: var(--font-cue);
+  color: var(--curtain-linen);
+  font-size: var(--size-body-cue);
+  line-height: 1.5;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* --- Buttons and actions -------------------------------------------------- */
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 48px;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-action);
+  border: 1px solid var(--raw-pine);
+  background: transparent;
+  color: var(--curtain-linen);
+  cursor: pointer;
+  line-height: 1.2;
+  transition: background-color 160ms var(--motion-ease),
+    border-color 160ms var(--motion-ease);
+}
+
+.btn:active {
+  /* Immediate subtle luminance change (design-system § States and feedback). */
+  background: rgba(214, 166, 106, 0.12);
+}
+
+/* Primary action: warm amber edge and lift, never a bright filled block. */
+.btn--primary {
+  border-color: var(--candlelight-amber);
+  color: var(--taper-wax);
+  box-shadow: 0 0 0 1px rgba(214, 166, 106, 0.25),
+    0 8px 30px -18px rgba(214, 166, 106, 0.6);
+}
+
+.btn--primary:active {
+  background: rgba(214, 166, 106, 0.18);
+}
+
+.btn--quiet {
+  border-color: transparent;
+  color: var(--curtain-linen);
+}
+
+.btn--danger {
+  /* Warm, not alarm-red: communicates through text + structure. */
+  border-color: var(--lotus-blush);
+  color: var(--lotus-blush);
+}
+
+.btn[disabled] {
+  cursor: default;
+  opacity: 0.55; /* retain enough contrast to read as unavailable */
+  border-style: dashed;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* --- Cards and surfaces --------------------------------------------------- */
+
+.surface {
+  background: var(--deep-water-slate);
+  border-radius: var(--radius-surface);
+  border: 1px solid rgba(169, 140, 100, 0.25);
+  padding: var(--space-5);
+}
+
+.divider {
+  height: 1px;
+  border: 0;
+  background: rgba(169, 140, 100, 0.35);
+  margin: var(--space-5) 0;
+}
+
+.stub {
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+}
+
+/* --- Home ----------------------------------------------------------------- */
+
+.home__brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+.home__name {
+  font-size: 22px;
+  color: var(--taper-wax);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.home__purpose {
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+}
+
+.class-card__title {
+  font-size: 26px;
+  color: var(--taper-wax);
+  margin: 0 0 var(--space-2);
+}
+.class-card__meta {
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+  margin-bottom: var(--space-3);
+}
+.class-card__theme {
+  font-family: var(--font-cue);
+  color: var(--curtain-linen);
+  font-size: var(--size-body-cue);
+  margin-bottom: var(--space-4);
+}
+.class-card__timing {
+  display: flex;
+  gap: var(--space-5);
+  color: var(--curtain-linen);
+  font-size: var(--size-secondary);
+  margin-bottom: var(--space-5);
+}
+.class-card__timing .tabular {
+  color: var(--taper-wax);
+}
+
+.home__actions {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.home__secondary {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+.backup-status {
+  margin-top: auto;
+  padding-top: var(--space-5);
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+}
+
+/* --- Prep ----------------------------------------------------------------- */
+
+.prep {
+  gap: var(--space-4);
+}
+.prep__scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+}
+.prep__section-label {
+  margin-bottom: var(--space-2);
+}
+.prep__preflight {
+  color: var(--candlelight-amber);
+  font-size: var(--size-secondary);
+  border: 1px solid rgba(214, 166, 106, 0.4);
+  border-radius: var(--radius-surface);
+  padding: var(--space-3) var(--space-4);
+}
+.prep ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.prep__sequence-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid rgba(169, 140, 100, 0.18);
+}
+.prep__sequence-name {
+  color: var(--curtain-linen);
+}
+.prep__sequence-row--peak .prep__sequence-name {
+  color: var(--candlelight-amber);
+}
+.prep__peak-mark {
+  color: var(--candlelight-amber);
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.prep__sequence-window {
+  color: var(--raw-pine);
+  white-space: nowrap;
+}
+.prep__hardclose {
+  color: var(--taper-wax);
+  font-size: var(--size-secondary);
+}
+.prep__begin {
+  /* Always reachable, never clipped or obscured by system UI. */
+  flex: 0 0 auto;
+  padding-top: var(--space-4);
+}
+.prep__begin .btn {
+  width: 100%;
+}
+.disclosure summary {
+  cursor: pointer;
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+  list-style: none;
+}
+.disclosure summary::-webkit-details-marker {
+  display: none;
+}
+.display-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+/* --- Live surface (grounding / pose / transition / savasana) -------------- */
+
+.live {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: hidden; /* the live layer itself; cue content lives in .reference */
+}
+
+/* Three-zone tap map: Previous 20% / Reference 60% / Next 20%
+   (screen-states § Live-run tap map). Inset ≥12px from gesture edges. */
+.zones {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  z-index: 1;
+  padding: max(env(safe-area-inset-top), 12px)
+    max(env(safe-area-inset-right), 12px)
+    max(env(safe-area-inset-bottom), 12px)
+    max(env(safe-area-inset-left), 12px);
+  gap: 0;
+}
+.zone {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+}
+.zone--prev {
+  flex: 0 0 20%;
+  justify-content: flex-start;
+}
+.zone--ref {
+  flex: 1 1 60%;
+  justify-content: center;
+  align-items: flex-end;
+}
+.zone--next {
+  flex: 0 0 20%;
+  justify-content: flex-end;
+}
+.zone[disabled] {
+  cursor: default;
+}
+/* Subtle, persistent affordances — never an invisible remembered gesture. */
+.zone__chevron {
+  color: var(--raw-pine);
+  opacity: 0.5;
+  font-size: 24px;
+  padding: var(--space-3);
+  line-height: 1;
+}
+.zone[disabled] .zone__chevron {
+  opacity: 0.18;
+}
+.zone__ref-hint {
+  color: var(--raw-pine);
+  opacity: 0.4;
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-bottom: var(--space-2);
+}
+
+/* The display layer floats above the zones but passes taps through to them. */
+.live-content {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-5);
+}
+
+.segment-label {
+  color: var(--raw-pine);
+}
+
+.pose-name {
+  font-size: var(--size-pose-name);
+  color: var(--curtain-linen);
+  font-weight: 600;
+  line-height: 1.15;
+  max-width: 20ch;
+}
+.pose-side {
+  color: var(--candlelight-amber);
+  font-size: var(--size-secondary);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wall-clock {
+  font-size: var(--size-wall-clock);
+  color: var(--taper-wax);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+.wall-clock--savasana {
+  font-size: var(--size-savasana-clock);
+}
+
+.timing-line {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  color: var(--curtain-linen);
+  font-size: var(--size-secondary);
+}
+.planned-window {
+  color: var(--raw-pine);
+}
+.elapsed {
+  color: var(--curtain-linen);
+}
+
+/* Drift: cool indigo, never urgent. `revisited` stays warm text. */
+.drift {
+  display: inline-block;
+  border-radius: var(--radius-chip);
+  padding: 2px 12px;
+  font-size: var(--size-secondary);
+}
+.drift--value {
+  background: var(--mandala-indigo);
+  color: var(--legible-indigo);
+}
+.drift--revisited {
+  color: var(--raw-pine);
+  border: 1px solid rgba(169, 140, 100, 0.4);
+}
+
+.midpoint {
+  font-family: var(--font-cue);
+  font-size: var(--size-midpoint);
+  line-height: 1.5;
+  color: var(--curtain-linen);
+  max-width: 30ch;
+}
+
+.next-preview {
+  color: var(--lotus-blush);
+  font-size: var(--size-secondary);
+}
+.next-preview__label {
+  color: var(--raw-pine);
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-right: var(--space-2);
+}
+
+/* --- Expanded reference --------------------------------------------------- */
+
+.reference {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  background: var(--pond-charcoal);
+  padding: max(env(safe-area-inset-top), 12px)
+    max(env(safe-area-inset-right), 12px)
+    max(env(safe-area-inset-bottom), 12px)
+    max(env(safe-area-inset-left), 12px);
+}
+/* Compact sticky header: pose, side, wall clock, planned window, elapsed. */
+.reference__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2);
+  background: var(--pond-charcoal);
+  border-bottom: 1px solid rgba(169, 140, 100, 0.35);
+}
+.reference__header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+.reference__header .pose-name {
+  font-size: 19px;
+}
+.reference__header .wall-clock {
+  font-size: 22px;
+}
+/* Cue fields scroll; authored content is NEVER clipped (screen-states § 6). */
+.reference__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--space-4) var(--space-2) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.reference-field {
+  /* No overflow:hidden anywhere on authored cue content. */
+  overflow: visible;
+}
+.reference-field__label {
+  margin-bottom: var(--space-1);
+}
+.reference-field__value {
+  font-family: var(--font-cue);
+  font-size: var(--size-body-cue);
+  color: var(--curtain-linen);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.reference__close {
+  flex: 0 0 auto;
+  margin-top: var(--space-3);
+}
+.reference__close .btn {
+  width: 100%;
+}
+
+/* --- Savasana ------------------------------------------------------------- */
+
+.savasana__steps {
+  list-style: none;
+  margin: var(--space-5) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 28ch;
+}
+.savasana__step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--size-body-cue);
+  font-family: var(--font-cue);
+}
+.savasana__marker {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--raw-pine);
+}
+/* Past: quietly visible. Future: subdued but legible at close distance
+   (not opacity alone). Active: warmer, static marker. */
+.savasana__step--past {
+  color: var(--raw-pine);
+}
+.savasana__step--future {
+  color: var(--curtain-linen);
+  opacity: 0.72;
+}
+.savasana__step--active {
+  color: var(--taper-wax);
+}
+.savasana__step--active .savasana__marker {
+  background: var(--candlelight-amber);
+  border-color: var(--candlelight-amber);
+}
+.savasana__close-line {
+  color: var(--taper-wax);
+  font-size: var(--size-secondary);
+}
+.savasana__hardclose {
+  color: var(--candlelight-amber);
+}
+.savasana__finish {
+  pointer-events: auto;
+  margin-top: var(--space-4);
+}
+
+/* --- Two-minute wake callout ---------------------------------------------- */
+
+.wake-callout {
+  color: var(--candlelight-amber);
+  font-family: var(--font-cue);
+  font-size: var(--size-body-cue);
+  line-height: 1.5;
+  max-width: 30ch;
+  text-align: center;
+}
+/* Quiet persistent lower callout outside Savasana; dedicated lower area in it. */
+.wake-callout--lower {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + var(--space-6));
+  z-index: 2;
+  pointer-events: none;
+  padding: 0 var(--space-6);
+}
+.wake-callout--savasana {
+  margin-top: var(--space-5);
+}
+/* One fade from 0 → 1 over ~3s; remains visible afterward. */
+.wake-callout--fade {
+  animation: wake-fade var(--motion-wake) var(--motion-ease) both;
+}
+@keyframes wake-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --- Segment enter motion ------------------------------------------------- */
+/* Cross-fade + small settle (design-system § Motion). The reduced-motion
+   variant drops the positional settle — see below. */
+.screen-enter {
+  animation: settle-enter var(--motion-settle) var(--motion-ease) both;
+}
+.screen-enter--reduced {
+  animation: fade-enter var(--motion-settle) var(--motion-ease) both;
+}
+@keyframes settle-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--settle-shift));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fade-enter {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --- Dialogs -------------------------------------------------------------- */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(9, 11, 12, 0.6);
+  padding: var(--space-5);
+}
+.sheet {
+  width: 100%;
+  max-width: 34rem;
+  background: var(--deep-water-slate);
+  border: 1px solid rgba(169, 140, 100, 0.35);
+  border-radius: var(--radius-surface);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: calc(env(safe-area-inset-bottom));
+}
+.sheet__title {
+  color: var(--taper-wax);
+  font-size: 20px;
+  margin: 0 0 var(--space-2);
+}
+.sheet__body {
+  color: var(--curtain-linen);
+  font-size: var(--size-secondary);
+}
+.sheet .btn {
+  width: 100%;
+}
+
+/* --- Recovery ------------------------------------------------------------- */
+
+.recovery__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-5) 0;
+}
+.recovery__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-bottom: 1px solid rgba(169, 140, 100, 0.18);
+  padding: var(--space-2) 0;
+}
+.recovery__row dt {
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+}
+.recovery__row dd {
+  margin: 0;
+  color: var(--taper-wax);
+}
+
+/* --- Post-class notes ----------------------------------------------------- */
+
+.post__scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.post__row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid rgba(169, 140, 100, 0.18);
+}
+.post__row-name {
+  color: var(--curtain-linen);
+}
+.post__row-side {
+  color: var(--candlelight-amber);
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.post__row-times {
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+  white-space: nowrap;
+}
+.post__row-status {
+  font-size: var(--size-secondary);
+  color: var(--curtain-linen);
+}
+.post__row-controls {
+  display: flex;
+  gap: var(--space-2);
+  grid-column: 1 / -1;
+  margin-top: var(--space-2);
+  flex-wrap: wrap;
+}
+.post__note-field {
+  width: 100%;
+  min-height: 4.5rem;
+  margin-top: var(--space-4);
+  background: var(--deep-water-slate);
+  color: var(--curtain-linen);
+  border: 1px solid rgba(169, 140, 100, 0.35);
+  border-radius: var(--radius-surface);
+  padding: var(--space-3);
+  font-family: var(--font-cue);
+  font-size: var(--size-body-cue);
+  resize: vertical;
+}
+.post__actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+}
+.post__actions .btn {
+  flex: 1 1 0;
+}
+
+/* --- Quiet technical indicators ------------------------------------------ */
+
+.wake-lock-indicator {
+  position: absolute;
+  top: max(env(safe-area-inset-top), 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  color: var(--raw-pine);
+  font-size: var(--size-secondary);
+  background: rgba(35, 46, 56, 0.7);
+  border: 1px solid rgba(169, 140, 100, 0.3);
+  border-radius: var(--radius-chip);
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.loading-copy {
+  margin: auto;
+  color: var(--raw-pine);
+}
+
+/* --- Reduced motion (design-system § Motion) ------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .screen-enter,
+  .screen-enter--reduced {
+    animation: fade-enter 200ms var(--motion-ease) both;
+  }
+  .wake-callout--fade {
+    animation: none;
+  }
+  .btn,
+  .zone {
+    transition: none;
+  }
+}

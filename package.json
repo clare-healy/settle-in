@@ -19,6 +19,7 @@
   "devDependencies": {
     "@types/node": "^20.19.43",
     "fake-indexeddb": "^6.2.5",
+    "happy-dom": "^20.11.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.2",
     "vitest": "^2.0.5"

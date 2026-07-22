@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#14181A" />
+    <title>Settle In</title>
+    <!--
+      Critical background, inlined so the dim studio never sees a white flash —
+      not even before the stylesheet loads. The design system forbids any light
+      screen (docs/design-system.md § What the app never looks or feels like).
+    -->
+    <style>
+      html,
+      body {
+        margin: 0;
+        background-color: #14181a;
+        color: #eadfc8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

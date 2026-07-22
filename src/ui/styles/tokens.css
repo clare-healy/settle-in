@@ -1,0 +1,61 @@
+/*
+ * Design tokens — the canonical visual system for Settle In.
+ *
+ * Values are lifted verbatim from docs/design-system.md (Color tokens, Typography,
+ * Soft edges, Motion). This file defines custom properties only; layout and
+ * component rules live in app.css. The design system is the visual authority.
+ */
+
+:root {
+  /* --- Color tokens (design-system.md § Color tokens) --------------------- */
+  --pond-charcoal: #14181a; /* primary app background */
+  --deep-water-slate: #232e38; /* raised and reference surfaces */
+  --taper-wax: #eadfc8; /* wall clock, highest-priority text */
+  --curtain-linen: #c6b79e; /* primary pose and cue text */
+  --candlelight-amber: #d6a66a; /* live state, peak, primary action, wake */
+  --lotus-blush: #c68c7f; /* next destination, functional alternative */
+  --mandala-indigo: #3e3f6b; /* non-text drift surface only */
+  --legible-indigo: #8586b0; /* drift text */
+  --raw-pine: #a98c64; /* dividers, labels, frame edges */
+
+  /* --- Soft edges (design-system.md § Soft edges) ------------------------- */
+  --radius-surface: 12px; /* standard surface radius 10–12px */
+  --radius-action: 14px; /* large action radius, no more than 14px */
+  --radius-chip: 999px; /* pills only for chips / status */
+
+  /* --- Type families ------------------------------------------------------
+   * Fonts are bundled locally in M6; until then the system fallbacks must stay
+   * legible (design-system.md § Typography). Hanken Grotesk for data/labels,
+   * Spectral for reflective cues. */
+  --font-ui: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-cue: 'Spectral', Georgia, 'Times New Roman', 'Noto Serif', serif;
+
+  /* --- Type scale (design-system.md § Typography, Pixel 6 sizes) ---------- */
+  --size-wall-clock: clamp(72px, 23vw, 104px);
+  --size-savasana-clock: 56px;
+  --size-pose-name: clamp(26px, 8vw, 32px);
+  --size-midpoint: 18px;
+  --size-body-cue: 17px;
+  --size-body: 16px;
+  --size-secondary: 14px;
+  --size-eyebrow: 11px;
+
+  /* --- Motion (design-system.md § Motion) -------------------------------- */
+  --motion-settle: 700ms; /* segment cross-fade 600–800ms */
+  --motion-ease: cubic-bezier(0.25, 0.1, 0.25, 1); /* the one easing curve */
+  --motion-wake: 3000ms; /* wake message fade, ~3s */
+  --settle-shift: 3px; /* 2–4px positional settle */
+
+  /* --- Spacing ----------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* --- Focus ------------------------------------------------------------- */
+  --focus-ring: 2px solid var(--candlelight-amber);
+}
