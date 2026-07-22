@@ -211,3 +211,13 @@ Decision: M1 delivered by an Opus agent and verified by the orchestrator — 36 
 - `hard_close_local` other than `"20:00"` is blocking, per the v1 rule.
 
 Also noted: `npm audit` shows dev-only advisories (esbuild via vite 5/vitest 2); nothing ships in the bundle. Deferred — revisit at M6 when the build pipeline becomes release-bearing.
+
+## July 22, 2026 — M2 complete (timing model)
+
+Decision: M2 delivered by an Opus agent and verified by the orchestrator — 107 tests green plus independent probes (wake eligibility flips at exactly 7:58:00; hard close proven offset-dependent and therefore persisted at Begin; drift boundary and U+2212 display; revisited override; monotonic elapsed truth with cross-execution clamping). Conservative agent readings ratified:
+
+- Clock-discontinuity tolerance is 2 seconds (both clocks advance together under tab throttling, so real jumps — DST, manual set, NTP steps — sit far above jitter).
+- Drift of exactly 30 seconds displays `+1 min`/`−1 min` (the treaty's "below 30 seconds" bound is strict).
+- The timing-status boundary is strict "exceeds": exactly 30s/15% reads on-plan.
+- A segment never entered and not marked skipped derives `short` with 0 actual — the derivation never usurps Clare's explicit Skipped marking; Post-Class invites the correction.
+- `run_started` carries the begin instant, run-local date, offset-at-Begin, and the persisted `hard_close_at`, making the event log self-sufficient for replay.
