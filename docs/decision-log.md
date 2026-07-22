@@ -151,3 +151,13 @@ Decision: before the first push, all EXIF metadata (including GPS coordinates) w
 ## July 22, 2026 — Phase 1 build plan proposed
 
 Decision: `docs/build-plan.md` proposes the v1 architecture — vanilla strict TypeScript + Vite, exactly two runtime dependencies (`yaml`, `idb`), a purpose-built container parser with text-only rendering, hand-written service worker, injectable Clock, event-sourced runs, and seven milestones mapped to the acceptance tests. Held as an open triangulate node pending adversarial review; not yet locked.
+
+## July 22, 2026 — Project instructions v2: teaching corpus triangulated in
+
+Question: do the Yin Flow State project instructions carry Clare's full teaching framework, not just the schema rules? **Yes, now.**
+
+Decision: `docs/yin-flow-state-instructions.md` v2 merges Clare's existing project instructions (four-phase cueing architecture, accessibility principles, sequence-building workflow, Bethany's Monday review, cueing style, key learnings) with the app system. Material triangulations: the four-phase cueing architecture maps onto the schema's cue fields (entry/target, settling, midpoint, exit); Clare's nine-beat savasana arc maps into the schema's six steps without a schema change; the instructor guide remains the full script for design, rehearsal, and Bethany review while Settle In replaces it as the in-class reference; Clare's 5–6 pose ceiling is carried as a stricter authoring rule than the schema warning; the relational late start is honored by re-anchoring. Nothing from Clare's teaching instructions was dropped.
+
+## July 22, 2026 — Adversarial review prompt canonized
+
+Decision: the Phase 1 review prompt for GPT-5.6 lives at `docs/adversarial-review-prompt.md` (six attack surfaces, evidence-citation rules, [UNVERIFIED] discipline, severity-ranked deliverable). Reusable at later review gates; review verdicts return here as Y/N entries before M1.
