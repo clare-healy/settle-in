@@ -277,3 +277,9 @@ Rulings:
 - **Audit bill: defer the breaking vite 8 migration.** The only remaining advisories are the dev-only esbuild dev-server chain; nothing ships in dist. Revisit as a deliberate, separately-tested migration after the first live-class pilot.
 
 Remaining before the pilot: push + first deploy (blocked on GitHub account access), the M7 physical checklist (`docs/device-checklist.md`), the Yin Flow State project paste, and one real class authored through the workflow.
+
+## July 22, 2026 — First deploy live
+
+Decision: the repository is pushed to `clare-healy/settle-in` and the app is live at `https://clare-healy.github.io/settle-in/` (permanent origin). GitHub Pages was enabled by Clare with the "GitHub Actions" source; the first two deploy attempts failed at 0s because an unquoted colon in a workflow step name (`production build: offline…`) made GitHub reject the YAML — a validation the local test gates do not cover. Quoting the name fixed it; the full CI gate (Vitest, both typechecks, build + precache audit, flow harness, PWA suite) then passed and published. Root, manifest, service worker, and icon verified serving 200.
+
+Noted, not blocking: the GitHub-hosted runner warns that Node 20 is deprecated and forces the `actions/*` steps onto Node 24. Bump `actions/checkout`, `actions/setup-node`, `actions/cache`, and `actions/upload-pages-artifact` to their Node-24 majors when convenient; no effect on the deployed app. Every push to `main` now runs the full gate and redeploys, so documentation-only commits also spend a CI run.
