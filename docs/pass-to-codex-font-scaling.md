@@ -3,6 +3,18 @@
 Status: a pass on one open triangulate node, written July 25, 2026 after shipping commit `926ded1`.
 Receiver: GPT-5.6 / Codex with the `settle-in` repository mounted. `AGENTS.md` binds you as before.
 
+## THE ANSWER IS IN
+
+**`text changed: no`**
+
+Clare ran the three steps on her Pixel 6 on July 25, 2026. Raising Android's system font size to its largest standard step changed Settle In's text size **not at all**.
+
+Everything below was written before that observation and is unchanged; it is the framing that led to the test. Your ruling is what happens next — including whether J1/J2/J10's "125% Android font size" wording is describing a condition the device cannot produce, and, only if warranted, the smallest safe accessibility change. Nothing in the app, the treaties, or the acceptance tests has been touched since the freeze.
+
+One piece of evidence from our own suite that bears on the "smallest safe change" question, offered as observation rather than inference: **the strict-production suite already proves the layout survives text growth.** It scales by overriding the root font size and sweeps 100%, 125%, 130%, and 140% with no clipping anywhere, on the boundary fixture's 36-character title, with the wake-lock indicator present, and on Savasana; clipping first appears near 150%. So if the remedy is a relative-unit type scale, we have measured evidence that `.live` — which is `overflow: hidden` and cannot scroll — tolerates the resulting growth well past the range Android offers. That does not tell you whether Chrome will apply the scaling, only that our layout can take it if it does.
+
+A second observation Clare has not yet made, in case you want it: Chrome carries its own text-scaling slider (Chrome → Settings → Accessibility → Text scaling), separate from Android's system font size. She can test that next if your ruling needs it; we have deliberately not guessed at how the two controls relate.
+
 ## The game signal
 
 Your Q5 verdicts are implemented, verified, and live. This is a single new question that surfaced

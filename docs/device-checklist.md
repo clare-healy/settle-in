@@ -92,6 +92,8 @@ In the actual studio, lights at class levels, phone at Clare's normal placement:
 
 `html { -webkit-text-size-adjust: 100% }` with an all-pixel type scale may mean Chrome never enlarges Settle In's text. If so, every "125% font scale" check above is measuring nothing, and Clare's system font preference is being ignored.
 
-- [ ] Note the app's text size on a live pose screen at the default Android font size (photograph it).
-- [ ] Raise the system font size to its largest standard step. Reopen the app and photograph the same screen.
-- [ ] **Did the text change size at all?** Record yes/no. This answer resolves the open triangulate node in the decision log; do not change the type scale before it is known.
+- [x] Note the app's text size on a live pose screen at the default Android font size (photograph it).
+- [x] Raise the system font size to its largest standard step. Reopen the app and photograph the same screen.
+- [x] **Did the text change size at all?** — **`text changed: no`** (Clare, Pixel 6, July 25, 2026).
+
+**Observed result: raising Android's system font size to its largest standard step does not change Settle In's text size at all.** Recorded as field evidence only; the ruling is Codex's and had not returned when this was written. Do not change the type scale, or the wording of J1/J2/J10, before it does.
