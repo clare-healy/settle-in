@@ -109,8 +109,9 @@ export interface AppActions {
   requestEndRecovery(): void;
   confirmEndRecovery(): void;
 
-  correctSkip(segmentId: string): void;
-  correctSubstitute(segmentId: string, name: string): void;
+  // Post-Class is one reflection: no per-segment corrections exist to dispatch
+  // (Q5c). The store/event capability for `segment_skipped` / `substitution_noted`
+  // remains in the run machine so historic runs still export correctly.
   saveNote(value: string): void;
   finalizeNotes(): void;
   skipNotes(): void;
@@ -233,11 +234,13 @@ export interface RecoveryProps {
   readonly actions: AppActions;
 }
 
-/** Props for post-class notes. */
+/** Props for the post-class reflection (screen-states § 12). */
 export interface PostClassProps {
   readonly def: ClassDefinition;
   readonly events: readonly RunEvent[];
   readonly draftNote: string;
+  /** For rendering the run's actual start and finish as local wall times. */
+  readonly offsetMinutes: number;
   readonly actions: AppActions;
 }
 

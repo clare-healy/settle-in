@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:pwa": "playwright test --config playwright.pwa.config.ts",
+    "test:e2e:strict": "playwright test --config playwright.strict.config.ts",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.sw.json",
     "icons": "node scripts/generate-icons.mjs"
   },

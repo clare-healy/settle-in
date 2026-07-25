@@ -1,8 +1,9 @@
 // @vitest-environment happy-dom
 //
-// Post-Class Notes (screen-states § 12): rows derived from the event log (I1), and
-// Skipped/Substituted corrections that update the run record but never the
-// immutable class definition (H5 guard).
+// Post-Class Reflection (screen-states § 12; acceptance I1). One multiline
+// reflection box and nothing to curate: no per-segment rows, no manual status
+// controls. The draft persists on every `input` event — not merely `change` — so a
+// Gboard dictation survives backgrounding, a lock, or process death mid-sentence.
 
 import { describe, it, expect } from 'vitest';
 import {
@@ -11,6 +12,7 @@ import {
   advanceSegments,
   zone,
   byId,
+  maybeId,
   jul28,
   type Harness,
 } from './test-support.js';
@@ -28,69 +30,121 @@ async function finishToPostClass(h: Harness): Promise<void> {
   expect(h.app.routeKind).toBe('post-class');
 }
 
-describe('Post-Class Notes', () => {
-  it('derives plan-vs-actual rows from events, without asking Clare to classify (I1)', async () => {
+/** The persisted draft for the run, straight from the store. */
+async function storedDraft(h: Harness): Promise<string | null> {
+  const runs = await h.store.getAllRuns();
+  const run = runs[0];
+  if (!run) return null;
+  const notes = await h.store.getNotes(run.runId);
+  return notes ? notes.draft : null;
+}
+
+describe('Post-Class Reflection', () => {
+  it('renders exactly one reflection textarea and nothing to curate (I1)', async () => {
+    const def = await loadValidClass();
     const h = await bootApp({ wallEpochMs: jul28(19, 0) });
     await finishToPostClass(h);
 
-    // A derived row for grounding with its planned 10:00 and a derived status.
-    const row = byId(h.root, 'actual-grounding');
-    expect(row.textContent).toContain('10:00'); // planned duration, derived
-    const status = byId(h.root, 'status-grounding');
-    expect(status.textContent).toBeTruthy(); // derived status text, not a manual picker
-    // No long/short input control exists — status is text, derived from timing.
+    const textareas = h.root.querySelectorAll('textarea');
+    expect(textareas).toHaveLength(1);
+    expect(textareas[0]!.getAttribute('data-testid')).toBe('room-note');
+
+    // The class identity and the ACTUAL start/finish times are shown.
+    const meta = byId(h.root, 'post-meta').textContent ?? '';
+    expect(h.root.querySelector('h1')!.textContent).toBe(def.title);
+    expect(meta).toContain(def.date);
+    expect(meta).toContain('7:00'); // the run began at 7:00 PM
+
+    // No per-segment rows, no status text, no manual controls of any kind.
+    expect(h.root.querySelectorAll('.post__row')).toHaveLength(0);
+    expect(maybeId(h.root, 'actual-grounding')).toBeNull();
+    expect(maybeId(h.root, 'status-grounding')).toBeNull();
+    expect(maybeId(h.root, 'skip-grounding')).toBeNull();
+    expect(maybeId(h.root, 'substitute-supported-butterfly')).toBeNull();
     expect(h.root.querySelector('select')).toBeNull();
+    expect(h.root.querySelector('input')).toBeNull();
+
+    // Only the two completing actions.
+    expect(byId(h.root, 'save-notes').textContent).toBe('Save and complete');
+    expect(byId(h.root, 'skip-notes').textContent).toBe('Skip and complete');
   });
 
-  it('a Skipped correction updates the run record but never the class definition (H5)', async () => {
-    const def = await loadValidClass();
-    const h = await bootApp({ wallEpochMs: jul28(19, 0) });
-    // Capture the immutable class markdown before any correction.
-    const before = (await h.store.getClassRevision(def.sourceHash))!.definition.originalMarkdown;
-
-    await finishToPostClass(h);
-    byId(h.root, 'skip-grounding').click();
-    await h.app.idle();
-
-    // Run record reflects the correction…
-    expect(byId(h.root, 'status-grounding').textContent).toBe('skipped');
-    // …but the authored class definition is byte-for-byte unchanged.
-    const after = (await h.store.getClassRevision(def.sourceHash))!.definition.originalMarkdown;
-    expect(after).toBe(before);
-  });
-
-  it('a Substituted correction records a short name against the run only (H5)', async () => {
-    const def = await loadValidClass();
+  it('persists the draft on every input event, not only on change (I1)', async () => {
     const h = await bootApp({ wallEpochMs: jul28(19, 0) });
     await finishToPostClass(h);
+    const field = byId<HTMLTextAreaElement>(h.root, 'room-note');
 
-    const input = h.root.querySelector<HTMLInputElement>('[data-testid="actual-supported-butterfly"] input');
-    expect(input).not.toBeNull();
-    input!.value = 'Reclined Butterfly';
-    byId(h.root, 'substitute-supported-butterfly').click();
+    // A dictation arriving phrase by phrase — no blur, no change event anywhere.
+    field.value = 'Warm room.';
+    field.dispatchEvent(new Event('input'));
     await h.app.idle();
+    expect(await storedDraft(h)).toBe('Warm room.');
 
-    expect(byId(h.root, 'status-supported-butterfly').textContent).toContain('Reclined Butterfly');
-    // Class definition still immutable.
-    const stored = (await h.store.getClassRevision(def.sourceHash))!.definition;
-    expect(stored.expandedRuntimeSegments.some((s) => s.name === 'Reclined Butterfly')).toBe(false);
+    field.value = 'Warm room. Caterpillar ran long.';
+    field.dispatchEvent(new Event('input'));
+    await h.app.idle();
+    expect(await storedDraft(h)).toBe('Warm room. Caterpillar ran long.');
   });
 
-  it('completes with a saved note (Save) and completes with no note (Skip)', async () => {
+  it('an interrupted dictation is recovered intact into the box', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(19, 0) });
+    await finishToPostClass(h);
+    const field = byId<HTMLTextAreaElement>(h.root, 'room-note');
+    field.value = 'Half a sentence about the';
+    field.dispatchEvent(new Event('input'));
+    await h.app.idle();
+
+    // Re-render the screen (as backgrounding and returning would).
+    h.app.render();
+    expect(byId<HTMLTextAreaElement>(h.root, 'room-note').value).toBe('Half a sentence about the');
+  });
+
+  it('imposes no character limit and does not intercept keystrokes', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(19, 0) });
+    await finishToPostClass(h);
+    const field = byId<HTMLTextAreaElement>(h.root, 'room-note');
+    expect(field.getAttribute('maxlength')).toBeNull();
+    const long = 'a'.repeat(4000);
+    field.value = long;
+    field.dispatchEvent(new Event('input'));
+    await h.app.idle();
+    expect(await storedDraft(h)).toBe(long);
+  });
+
+  it('completes with a saved reflection (Save) and completes with none (Skip)', async () => {
     const h1 = await bootApp({ wallEpochMs: jul28(19, 0) });
     await finishToPostClass(h1);
     const note = byId<HTMLTextAreaElement>(h1.root, 'room-note');
     note.value = 'Warm room; caterpillar ran long.';
-    note.dispatchEvent(new Event('change'));
+    note.dispatchEvent(new Event('input'));
     await h1.app.idle();
     byId(h1.root, 'save-notes').click();
     await h1.app.idle();
     expect(h1.app.routeKind === 'home' || h1.app.routeKind === 'empty').toBe(true);
+    const runs1 = await h1.store.getAllRuns();
+    expect((await h1.store.getNotes(runs1[0]!.runId))?.final).toBe('Warm room; caterpillar ran long.');
 
     const h2 = await bootApp({ wallEpochMs: jul28(19, 0) });
     await finishToPostClass(h2);
     byId(h2.root, 'skip-notes').click();
     await h2.app.idle();
     expect(h2.app.routeKind === 'home' || h2.app.routeKind === 'empty').toBe(true);
+  });
+
+  it('never mutates the immutable class definition (H5)', async () => {
+    const def = await loadValidClass();
+    const h = await bootApp({ wallEpochMs: jul28(19, 0) });
+    const before = (await h.store.getClassRevision(def.sourceHash))!.definition.originalMarkdown;
+
+    await finishToPostClass(h);
+    const field = byId<HTMLTextAreaElement>(h.root, 'room-note');
+    field.value = 'Swapped the saddle for a reclined figure four.';
+    field.dispatchEvent(new Event('input'));
+    await h.app.idle();
+    byId(h.root, 'save-notes').click();
+    await h.app.idle();
+
+    const after = (await h.store.getClassRevision(def.sourceHash))!.definition.originalMarkdown;
+    expect(after).toBe(before);
   });
 });

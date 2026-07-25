@@ -1,5 +1,10 @@
 // The live teaching surface: Grounding, Pose, Transition, Savasana, plus the
-// expanded reference and the two-minute wake callout.
+// expanded reference and Savasana's two-minute wake message.
+//
+// The wake message exists ONLY inside Savasana's dedicated lower message area
+// (screen-states § 8, Q5a). There is no lower callout on Grounding, a pose, or a
+// transition, at any time — including a rehearsal begun after the hard close. The
+// `8:00 · hard close` indicator is unaffected and appears on the clock alone.
 //
 // Every value is recomputed from durable timestamps through src/model — never
 // reimplemented timing math (implementation-treaty § Time model). The screen is
@@ -78,11 +83,8 @@ export function renderLive(props: LiveProps): LiveHandle {
     stage.appendChild(liveContent(props, seg, entry, drift, updaters));
   }
 
-  // Wake callout outside Savasana: a quiet, non-obscuring lower callout.
-  if (props.snapshot.currentSegment?.type !== 'savasana') {
-    const wake = wakeCallout(props);
-    if (wake) stage.appendChild(wake);
-  }
+  // No wake callout is appended here: outside Savasana the message does not exist
+  // (Q5a). Savasana renders it inside its own content, below.
 
   const update: Updater = (now) => {
     for (const u of updaters) u(now);
@@ -268,8 +270,8 @@ function savasanaContent(props: LiveProps, seg: ExpandedSegment, updaters: Updat
     closeLine,
   ];
 
-  // Two-minute message: dedicated lower area within Savasana.
-  const wake = wakeCallout(props, true);
+  // Two-minute message: the ONE place it renders — Savasana's dedicated lower area.
+  const wake = wakeCallout(props);
   if (wake) children.push(wake);
 
   // After the final step, Next has exposed Finish (never a silent finish).
@@ -518,16 +520,24 @@ function referenceField(label: string, value: string): HTMLElement {
   });
 }
 
-// --- Wake callout -----------------------------------------------------------
+// --- Wake callout (Savasana only) -------------------------------------------
 
-function wakeCallout(props: LiveProps, savasana = false): HTMLElement | null {
-  const wake = deriveWakeState(props.now.wallEpochMs, props.hardCloseAtEpochMs, props.hardCloseLocal, props.events);
+// Called only from savasanaContent. The Savasana condition is still passed to the
+// model explicitly rather than assumed, so the gate lives in one place.
+function wakeCallout(props: LiveProps): HTMLElement | null {
+  const inSavasana = props.snapshot.currentSegment?.type === 'savasana';
+  const wake = deriveWakeState(
+    props.now.wallEpochMs,
+    props.hardCloseAtEpochMs,
+    props.hardCloseLocal,
+    props.events,
+    inSavasana,
+  );
   if (!wake.wakeMessageVisible) return null;
   const message = authoredWakeMessage(props);
   if (!message) return null;
 
-  const classes = ['wake-callout'];
-  classes.push(savasana ? 'wake-callout--savasana' : 'wake-callout--lower');
+  const classes = ['wake-callout', 'wake-callout--savasana'];
   if (props.wakeFade) classes.push('wake-callout--fade');
 
   return el('p', {
@@ -543,7 +553,15 @@ function authoredWakeMessage(props: LiveProps): string {
 }
 
 function setSavasanaCloseLine(node: HTMLElement, props: LiveProps, now: EventSample): void {
-  const wake = deriveWakeState(now.wallEpochMs, props.hardCloseAtEpochMs, props.hardCloseLocal, props.events);
+  // Only `atHardClose` / `hardCloseIndicator` are read here — both clock-only, and
+  // deliberately NOT gated on Savasana (this line renders inside Savasana anyway).
+  const wake = deriveWakeState(
+    now.wallEpochMs,
+    props.hardCloseAtEpochMs,
+    props.hardCloseLocal,
+    props.events,
+    true,
+  );
   if (wake.atHardClose && wake.hardCloseIndicator) {
     node.textContent = '';
     node.appendChild(el('span', { class: 'savasana__hardclose', text: wake.hardCloseIndicator }));

@@ -66,6 +66,13 @@ jobs:
       - name: "PWA suite (production build: offline, persistence, update deferral)"
         run: npm run test:e2e:pwa
 
+      - name: "Strict-production layout suite (real CSP, stylesheet-applied guard)"
+        # The July 25, 2026 verification repair gate. The dev-server flow harness
+        # above cannot re-prove layout: it is the suite whose results were voided.
+        # This one measures the built artifact under the shipped CSP and refuses to
+        # measure anything until the stylesheet is proven applied.
+        run: npm run test:e2e:strict
+
       - name: Rebuild a pristine dist for publishing
         # The PWA update test mutates dist/sw.js and restores it; rebuild so the
         # published artifact is always a clean, audited shell regardless of test runs.

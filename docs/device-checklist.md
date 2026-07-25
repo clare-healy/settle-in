@@ -8,14 +8,14 @@ Record each run of this checklist at the bottom with date, app version, and Andr
 
 ## Setup
 
-- [ ] Pixel 6, current stable Chrome, gesture navigation enabled
-- [ ] Production URL `https://clare-healy.github.io/settle-in/` reachable
-- [ ] A verified whole-library backup exists if any real data is present (required before the pilot)
+- [x] Pixel 6, current stable Chrome, gesture navigation enabled
+- [x] Production URL `https://clare-healy.github.io/settle-in/` reachable
+- [x] A verified whole-library backup exists if any real data is present (required before the pilot)
 
 ## A — Installation and offline (A1–A5)
 
-- [ ] **A1**: Install from Chrome. App name "Settle In", taper icon, dark theme color, portrait, standalone (no browser chrome).
-- [ ] **A2**: Enable airplane mode. Force-stop the app (system settings). Cold-launch from the launcher icon. Full app renders with Hanken Grotesk/Spectral (no fallback fonts — compare a known glyph), correct icons, no browser offline page.
+- [x] **A1**: Install from Chrome. App name "Settle In", taper icon, dark theme color, portrait, standalone (no browser chrome).
+- [x] **A2**: Enable airplane mode. Force-stop the app (system settings). Cold-launch from the launcher icon. Full app renders with Hanken Grotesk/Spectral (no fallback fonts — compare a known glyph), correct icons, no browser offline page.
 - [ ] **A3**: Still in airplane mode: import a class (paste), open Prep, begin, navigate the entire run including expanded references and savasana steps, finish, write a note, export the as-taught record and a backup. Every step works.
 - [ ] **A4**: With DevTools remote debugging (USB), reload and run the core workflow. Network panel shows zero requests to any non-app origin.
 - [ ] **A5**: Deploy a trivial new version while a run is active on the device. No update prompt appears mid-run and the version does not change until after the run ends. Then: kill the app process mid-run with the update still waiting, relaunch — Run Recovery appears (possibly on the new version) and resumes to the exact segment.
@@ -87,3 +87,11 @@ In the actual studio, lights at class levels, phone at Clare's normal placement:
 
 | Date | App version | Android / Chrome | Result | Notes |
 |---|---|---|---|---|
+
+## Open question — does Android font scaling reach the app at all?
+
+`html { -webkit-text-size-adjust: 100% }` with an all-pixel type scale may mean Chrome never enlarges Settle In's text. If so, every "125% font scale" check above is measuring nothing, and Clare's system font preference is being ignored.
+
+- [ ] Note the app's text size on a live pose screen at the default Android font size (photograph it).
+- [ ] Raise the system font size to its largest standard step. Reopen the app and photograph the same screen.
+- [ ] **Did the text change size at all?** Record yes/no. This answer resolves the open triangulate node in the decision log; do not change the type scale before it is known.

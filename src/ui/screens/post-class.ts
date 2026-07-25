@@ -1,66 +1,65 @@
-// Post-Class Notes (screen-states.md § 12).
+// Post-Class Reflection (screen-states.md § 12).
 //
-// Rows are DERIVED from the run's event log via the model's deriveActuals — Clare
-// is never asked to restate timing the app already knows (I1). She may correct a
-// segment to Skipped, mark Substituted with a short name, add one room note, and
-// Save or Skip — both complete the run. Corrections write the run record only;
-// they never mutate the immutable class definition (H5 — enforced by the store's
-// put-if-absent class API, exercised here through RunController.skip/substitute).
+// ONE generous native multiline textarea and nothing to curate. Clare will not
+// review a class segment by segment after teaching; what she will realistically do
+// is pick up her phone, speak into Gboard voice-to-text, and say what she noticed
+// (field evidence, July 25, 2026 — Q5c). So there are no per-segment rows and no
+// manual Skipped/Substituted controls here.
+//
+// Plan-versus-actual timing is not lost: it is derived from the run's event log and
+// travels in the as-taught export, which is what feeds next week's authoring. The
+// app already knows the timing and never asks Clare to restate it.
+//
+// The field is a plain `<textarea>` — no rich editor and no keystroke interception,
+// so dictation behaves exactly as the platform intends. The draft persists on every
+// `input` event, not merely on `change`/blur, so a dictation interrupted by
+// backgrounding, a lock, or process death is recovered intact (I1). There is no
+// character limit.
 
 import { el } from '../dom.js';
-import { sideLabel } from '../format.js';
-import { deriveActuals, formatElapsed, type SegmentActual, type SegmentStatus } from '../../model/index.js';
+import { wallClock12h } from '../format.js';
+import type { RunEvent } from '../../schema/index.js';
 import type { PostClassProps } from '../view-types.js';
 
-const STATUS_TEXT: Record<SegmentStatus, string> = {
-  skipped: 'skipped',
-  substituted: 'substituted',
-  revisited: 'revisited',
-  long: 'long',
-  short: 'short',
-  'on-plan': 'on plan',
-};
-
 export function renderPostClass(props: PostClassProps): HTMLElement {
-  const { def, events, draftNote, actions } = props;
-  const actuals = deriveActuals(def, events);
+  const { def, events, draftNote, offsetMinutes, actions } = props;
 
-  const scroll = el('div', {
-    class: 'post__scroll',
-    children: actuals.map((row) => renderRow(row, actions)),
-  });
-
-  const note = el('textarea', {
-    class: 'post__note-field',
+  const reflection = el('textarea', {
+    class: 'post__reflection',
     attrs: {
       'data-testid': 'room-note',
-      placeholder: 'One room note (optional)',
-      'aria-label': 'Room note',
+      placeholder: 'What did you notice? (optional)',
+      'aria-label': 'Reflection on this class',
     },
   }) as HTMLTextAreaElement;
-  note.value = draftNote;
-  note.addEventListener('change', () => actions.saveNote(note.value));
+  reflection.value = draftNote;
+  // Every keystroke and every dictated phrase, immediately durable.
+  reflection.addEventListener('input', () => actions.saveNote(reflection.value));
 
   return el('section', {
-    class: 'screen',
+    class: 'screen post',
     attrs: { 'data-screen': 'post-class' },
     children: [
       el('p', { class: 'eyebrow', text: 'After class' }),
-      el('h1', { class: 'class-card__title', text: 'How it ran' }),
-      scroll,
-      note,
+      el('h1', { class: 'class-card__title', text: def.title }),
+      el('p', {
+        class: 'post__meta tabular',
+        attrs: { 'data-testid': 'post-meta' },
+        text: metaLine(def.date, events, offsetMinutes),
+      }),
+      reflection,
       el('div', {
         class: 'post__actions',
         children: [
           el('button', {
             class: 'btn btn--quiet',
-            text: 'Skip notes',
+            text: 'Skip and complete',
             attrs: { 'data-testid': 'skip-notes' },
             on: { click: () => actions.skipNotes() },
           }),
           el('button', {
             class: 'btn btn--primary',
-            text: 'Save & complete',
+            text: 'Save and complete',
             attrs: { 'data-testid': 'save-notes' },
             on: { click: () => actions.finalizeNotes() },
           }),
@@ -70,58 +69,24 @@ export function renderPostClass(props: PostClassProps): HTMLElement {
   });
 }
 
-function renderRow(row: SegmentActual, actions: PostClassProps['actions']): HTMLElement {
-  const nameText = row.side ? `${row.name} · ${sideLabel(row.side)}` : row.name;
-  const subLabelName = nameText;
-  const statusText = row.substitutedWith
-    ? `substituted → ${row.substitutedWith}`
-    : STATUS_TEXT[row.status];
+/** `2026-07-28 · 7:02 PM – 7:59 PM` — the class date and the ACTUAL start/finish. */
+function metaLine(classDate: string, events: readonly RunEvent[], offsetMinutes: number): string {
+  const started = firstEpoch(events, 'run_started');
+  const ended = lastEpoch(events, 'run_finished', 'run_abandoned');
+  const start = started === null ? '—' : wallClock12h(started, offsetMinutes);
+  const finish = ended === null ? '—' : wallClock12h(ended, offsetMinutes);
+  return `${classDate} · ${start} – ${finish}`;
+}
 
-  const subInput = el('input', {
-    class: 'post__sub-input',
-    attrs: {
-      type: 'text',
-      'aria-label': `Substitute name for ${subLabelName}`,
-      placeholder: 'Substitute',
-      maxlength: '60',
-    },
-  }) as HTMLInputElement;
+function firstEpoch(events: readonly RunEvent[], type: RunEvent['type']): number | null {
+  for (const e of events) if (e.type === type) return e.wallEpochMs;
+  return null;
+}
 
-  const controls = el('div', {
-    class: 'post__row-controls',
-    children: [
-      el('button', {
-        class: 'btn btn--quiet',
-        text: 'Mark skipped',
-        attrs: { 'data-testid': `skip-${row.id}` },
-        on: { click: () => actions.correctSkip(row.id) },
-      }),
-      subInput,
-      el('button', {
-        class: 'btn btn--quiet',
-        text: 'Substitute',
-        attrs: { 'data-testid': `substitute-${row.id}` },
-        on: {
-          click: () => {
-            const name = subInput.value.trim();
-            if (name.length > 0) actions.correctSubstitute(row.id, name);
-          },
-        },
-      }),
-    ],
-  });
-
-  return el('div', {
-    class: 'post__row',
-    attrs: { 'data-testid': `actual-${row.id}` },
-    children: [
-      el('span', { class: 'post__row-name', text: nameText }),
-      el('span', {
-        class: 'post__row-times tabular',
-        text: `${formatElapsed(row.plannedSec)} / ${formatElapsed(row.actualSec)}`,
-      }),
-      el('span', { class: 'post__row-status', attrs: { 'data-testid': `status-${row.id}` }, text: statusText }),
-      controls,
-    ],
-  });
+function lastEpoch(events: readonly RunEvent[], ...types: RunEvent['type'][]): number | null {
+  for (let i = events.length - 1; i >= 0; i--) {
+    const e = events[i];
+    if (e && types.includes(e.type)) return e.wallEpochMs;
+  }
+  return null;
 }

@@ -6,7 +6,7 @@ The log operates on the yes/no/triangulate primitive. Each entry records a quest
 
 ## Open triangulate nodes
 
-- None currently open. (The build-plan architecture review node, opened July 22, 2026, resolved the same day — see the adversarial-review entries below.)
+- **Android font scaling may not reach the app at all** (opened July 25, 2026). `html { -webkit-text-size-adjust: 100% }` plus an all-pixel type scale means Chrome on Android may not enlarge Settle In's text when Clare raises her system font size. If so, acceptance J1/J2/J10's "125% font scale" checks are measuring something the device never actually does, and a real accessibility need goes unserved. Triangulate against Principle 2 (glance, do not read) and Principle 4 (legibility outranks decoration) before changing the type scale, since a relative-unit scale would alter every screen Clare has already learned to read. Needs a Pixel observation first: does raising the system font size move the app's text at all? Route to Codex with that evidence.
 
 ## July 21, 2026 — Context-package scope
 
@@ -189,6 +189,14 @@ Consequences ratified with it:
 - A segment with **zero visits on a completed run now derives `skipped`**, not `short`. This reverses the July 22 M2 ruling, whose stated justification was that "Post-Class invites the correction" — with the correction retired, that reasoning no longer holds. Entered-but-brief segments still derive `short`.
 - Export Schema v1 is **unchanged**. Derived actuals, statuses, and `substituted_with` are retained for honest history and for runs recorded before the correction UI existed; nothing in the current app sets `substituted_with`. Because no schema changed, no version bump and no integrated-system schema migration are owed — though the Yin Flow State instructions were still updated to describe statuses as derived/legacy and to weight Clare's dictated reflection above the timing rows.
 - Acceptance **I2 is retired**; **I1** is rewritten around the persistent reflection UI and retained export actuals; **I4** is strengthened with fixtures for automatic skip, entered-but-brief, and historic substitution.
+
+## July 25, 2026 — Q5 implementation questions resolved
+
+Three questions raised by the implementing agent, resolved by the orchestrator:
+
+- Does an **abandoned** run derive automatic skips too? **No.** The treaty says "completed", and the reading is right on its merits: an abandoned run did not skip its remaining poses — it ended. Marking them `skipped` would put a teaching claim in the record that never happened, which Principle 6 forbids. Auto-skip derivation gates on `run_finished` only; abandoned runs behave exactly as before.
+- Should the **strict-production suite** reach Savasana and the wake message deterministically? **Yes, as a follow-up, and not via a new fixture.** The production build correctly has no dev clock seam, but Playwright's own clock emulation (`page.clock`) works against the built artifact without one. Until that lands, the strict suite's wake coverage is incidental (it happens to be exercised when the suite runs after 20:00); E3 and E8 are proven deterministically in the dev-server flow suite, which does have the seam.
+- Does Android font scaling actually reach the app? **Unresolved — recorded as an open triangulate node above.** It is a pre-existing condition, named in no treaty, and it decides whether the 125% checks mean anything on device. It needs a Pixel observation before anyone changes the type scale.
 
 ## July 25, 2026 — Verification repair gate
 

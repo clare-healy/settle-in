@@ -121,3 +121,29 @@ export async function advanceSegments(page: Page, n: number): Promise<void> {
 export function segmentType(page: Page) {
   return page.locator('.live').getAttribute('data-segment-type');
 }
+
+/**
+ * Count DURABLE events of a type across every run in IndexedDB. E3/E8 assert not
+ * just that nothing is on screen but that nothing was written — a rendering-only
+ * gate would still persist `wake_message_shown` and silently burn the fade.
+ */
+export async function persistedEventCount(page: Page, type: string): Promise<number> {
+  return page.evaluate(
+    (t) =>
+      new Promise<number>((resolve, reject) => {
+        const open = indexedDB.open('settle-in');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const db = open.result;
+          const req = db.transaction('events', 'readonly').objectStore('events').getAll();
+          req.onerror = () => reject(req.error);
+          req.onsuccess = () => {
+            const rows = req.result as { type: string }[];
+            db.close();
+            resolve(rows.filter((r) => r.type === t).length);
+          };
+        };
+      }),
+    type,
+  );
+}

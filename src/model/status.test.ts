@@ -35,27 +35,53 @@ describe('timing status boundary — "exceeds the greater of"', () => {
 
 describe('status precedence — skipped > substituted > revisited > timing', () => {
   const planned = 240;
+  const base = { plannedSec: planned, skipped: false, substituted: false, runCompleted: true };
+
   it('skipped wins over everything', () => {
     expect(
-      deriveStatus({ plannedSec: planned, actualSec: 999, visits: 3, skipped: true, substituted: true }),
+      deriveStatus({ ...base, actualSec: 999, visits: 3, skipped: true, substituted: true }),
     ).toBe('skipped');
   });
   it('substituted beats revisited and timing', () => {
-    expect(
-      deriveStatus({ plannedSec: planned, actualSec: 999, visits: 3, skipped: false, substituted: true }),
-    ).toBe('substituted');
+    expect(deriveStatus({ ...base, actualSec: 999, visits: 3, substituted: true })).toBe('substituted');
   });
   it('revisited beats timing', () => {
-    expect(
-      deriveStatus({ plannedSec: planned, actualSec: 999, visits: 2, skipped: false, substituted: false }),
-    ).toBe('revisited');
+    expect(deriveStatus({ ...base, actualSec: 999, visits: 2 })).toBe('revisited');
   });
   it('timing applies when nothing else does', () => {
+    expect(deriveStatus({ ...base, actualSec: planned + 100, visits: 1 })).toBe('long');
+    expect(deriveStatus({ ...base, actualSec: planned, visits: 1 })).toBe('on-plan');
+  });
+});
+
+describe('Q5c — automatic skip on a completed run (no manual correction)', () => {
+  const planned = 240;
+  const base = { plannedSec: planned, skipped: false, substituted: false };
+
+  it('zero visits on a COMPLETED run derives skipped, not short', () => {
+    expect(deriveStatus({ ...base, actualSec: 0, visits: 0, runCompleted: true })).toBe('skipped');
+  });
+
+  it('zero visits while the run is still ACTIVE infers nothing — the segment is simply not yet taught', () => {
+    // Mid-run, "never entered" only means "has not come up yet".
+    expect(deriveStatus({ ...base, actualSec: 0, visits: 0, runCompleted: false })).toBe('short');
+  });
+
+  it('entered but brief still derives short — one visit is not a skip', () => {
+    expect(deriveStatus({ ...base, actualSec: 5, visits: 1, runCompleted: true })).toBe('short');
+  });
+
+  it('a historic substitution still wins over the automatic skip', () => {
+    // Runs recorded before the correction UI was retired carry `substitution_noted`
+    // on a segment that was never itself visited: it must still export `substituted`.
     expect(
-      deriveStatus({ plannedSec: planned, actualSec: planned + 100, visits: 1, skipped: false, substituted: false }),
-    ).toBe('long');
+      deriveStatus({ ...base, actualSec: 0, visits: 0, substituted: true, runCompleted: true }),
+    ).toBe('substituted');
+  });
+
+  it('an explicit historic skip still wins over everything', () => {
     expect(
-      deriveStatus({ plannedSec: planned, actualSec: planned, visits: 1, skipped: false, substituted: false }),
-    ).toBe('on-plan');
+      deriveStatus({ ...base, actualSec: 0, visits: 1, skipped: true, runCompleted: true }),
+    ).toBe('skipped');
   });
 });

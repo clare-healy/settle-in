@@ -75,9 +75,13 @@ export interface SegmentActual {
 
 /**
  * Derive one summary per expanded runtime segment, in canonical expanded-plan
- * order — the input to Post-Class Notes and the as-taught export. A skipped
- * segment reports `actual_sec: 0`; status precedence is skipped > substituted >
- * revisited > timing.
+ * order — the input to the as-taught export. A skipped segment reports
+ * `actual_sec: 0`; status precedence is skipped > substituted > revisited > timing.
+ *
+ * On a COMPLETED run (one carrying a `run_finished` event), a segment that was
+ * never entered derives `skipped` with `actual_sec: 0` without anyone saying so —
+ * Post-Class no longer asks (Q5c). While a run is still active nothing is inferred:
+ * a segment that has not come up yet is simply not yet taught.
  */
 export function deriveActuals(definition: ClassDefinition, events: readonly RunEvent[]): SegmentActual[] {
   const visits = deriveVisits(events);
@@ -85,9 +89,11 @@ export function deriveActuals(definition: ClassDefinition, events: readonly RunE
 
   const skippedIds = new Set<string>();
   const substitutedWithById = new Map<string, string>();
+  let runCompleted = false;
   for (const e of ordered) {
     if (e.type === 'segment_skipped') skippedIds.add(e.segmentId);
     else if (e.type === 'substitution_noted') substitutedWithById.set(e.segmentId, e.substitutedWith);
+    else if (e.type === 'run_finished') runCompleted = true;
   }
 
   return definition.expandedRuntimeSegments.map((seg) => {
@@ -103,6 +109,7 @@ export function deriveActuals(definition: ClassDefinition, events: readonly RunE
       visits: segVisits.length,
       skipped,
       substituted,
+      runCompleted,
     });
 
     return {

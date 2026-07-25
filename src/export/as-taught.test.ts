@@ -1,12 +1,25 @@
 // As-taught export golden files (Export Schema v1, docs/class-format.md).
 //
-// Two golden runs on the minimal valid class: (a) a clean straight-through run,
-// on-plan throughout; (b) a run exhibiting a revisit, a skip, a substitution, and
-// a room note — covering the status precedence skipped > substituted > revisited >
-// timing. Runs are driven through the REAL store + run machine with a controllable
-// clock, so the planned/actual seconds and finishing instant are exact. The source
-// hash is deterministic (SHA of normalized source) and the run id is pinned, so the
-// whole document is byte-exact. A determinism check re-exports the same run.
+// Three golden runs on the minimal valid class:
+//   (a) a clean straight-through run, on-plan throughout;
+//   (b) a HISTORIC run exhibiting a revisit, an explicit skip, a substitution, and
+//       a room note — the shape recorded before the manual Post-Class correction UI
+//       was retired (Q5c). It proves backward compatibility: a stored
+//       `substitution_noted` event still exports `substituted` with its
+//       `substituted_with` name, and the precedence skipped > substituted >
+//       revisited > timing is unchanged;
+//   (c) a run finished early, covering the two derivations Post-Class no longer
+//       asks about — AUTOMATIC SKIP (a segment never entered on a completed run
+//       exports `status: skipped` with `actual_sec: 0`, with no correction ever
+//       made) and ENTERED BUT BRIEF (a segment visited for seconds still exports
+//       `short`, never `skipped`).
+//
+// Export Schema v1 is UNCHANGED by any of this — only the derivation feeding it.
+//
+// Runs are driven through the REAL store + run machine with a controllable clock,
+// so the planned/actual seconds and finishing instant are exact. The source hash is
+// deterministic (SHA of normalized source) and the run id is pinned, so the whole
+// document is byte-exact. A determinism check re-exports each run.
 
 import { describe, it, expect } from 'vitest';
 import { RunController } from '../run/index.js';
@@ -129,7 +142,7 @@ describe('as-taught export — golden (a) clean straight-through run', () => {
   });
 });
 
-describe('as-taught export — golden (b) revisit + skip + substitution + note', () => {
+describe('as-taught export — golden (b) HISTORIC revisit + skip + substitution + note', () => {
   it('produces the exact document with the derived statuses', async () => {
     const { store, def } = await setup();
     const { clock, env } = makeEnv({ wallEpochMs: jul28(19, 0) });
@@ -144,7 +157,10 @@ describe('as-taught export — golden (b) revisit + skip + substitution + note',
     clock.advance(60_000); await c.nextSegment(); // savasana @19:14 (transition v1 = 60)
     clock.advance(900_000); await c.finish(); // finish @19:29 (savasana = 900)
 
-    // Post-class corrections (as Post-Class Notes drives them).
+    // The historic manual corrections. Nothing in the current app writes these —
+    // Post-Class is one reflection now (Q5c) — but runs recorded before that change
+    // carry the events, and the run machine retains the capability so they still
+    // export honestly. This is the I4 "historic substitution" fixture.
     await c.skip('transition-to-savasana');
     await c.substitute('test-pose', 'Reclined Twist');
     await c.finalizeNotes('Warm room; ran long.');
@@ -216,6 +232,101 @@ describe('as-taught export — golden (b) revisit + skip + substitution + note',
     ].join('\n');
     expect(md).toBe(expected);
     expect(await exportRun(store, def, 'run-b')).toBe(md);
+    store.close();
+  });
+
+  it('golden (c): automatic skip and entered-but-brief, with no correction made (I4)', async () => {
+    const { store, def } = await setup();
+    const { clock, env } = makeEnv({ wallEpochMs: jul28(19, 0) });
+    const begun = await RunController.begin(store, env, def, { runId: 'run-d' });
+    const c = begun.ok ? begun.controller : null;
+    if (!c) throw new Error('begin failed');
+
+    // Grounding entered and left after 8 seconds (planned 600 → short).
+    clock.advance(8_000);
+    await c.nextSegment();
+    // Test Pose entered and left after 7 seconds (planned 2040 → short).
+    clock.advance(7_000);
+    await c.finish();
+    // The transition and Savasana were NEVER entered, and Clare corrected nothing.
+    await c.finalizeNotes('Cut short; studio had to close.');
+
+    const md = await exportRun(store, def, 'run-d');
+    const expected = [
+      '---',
+      'export_schema_version: 1',
+      'kind: as-taught-run',
+      'class_id: safety-test',
+      'class_title: Safety Test',
+      'class_date: 2026-07-28',
+      `revision_source_hash: "${def.sourceHash}"`,
+      'run_id: "run-d"',
+      'run_local_date: 2026-07-28',
+      'run_started_at: "2026-07-28T19:00:00-05:00"',
+      'run_finished_at: "2026-07-28T19:00:15-05:00"',
+      'hard_close_at: "2026-07-28T20:00:00-05:00"',
+      `app_version: "${APP_VERSION}"`,
+      '---',
+      '',
+      '# As Taught — Safety Test — 2026-07-28',
+      '',
+      '## Segments',
+      '',
+      '```yaml',
+      // Entered but brief: one visit, so `short` — never `skipped`.
+      '- id: grounding',
+      '  parent_id: grounding',
+      '  type: grounding',
+      '  name: Grounding',
+      '  planned_sec: 600',
+      '  actual_sec: 8',
+      '  status: short',
+      '  visits: 1',
+      '  substituted_with: null',
+      '- id: test-pose',
+      '  parent_id: test-pose',
+      '  type: pose',
+      '  name: Test Pose',
+      '  planned_sec: 2040',
+      '  actual_sec: 7',
+      '  status: short',
+      '  visits: 1',
+      '  substituted_with: null',
+      // Automatic skip: zero visits on a completed run, no correction made.
+      '- id: transition-to-savasana',
+      '  parent_id: transition-to-savasana',
+      '  type: transition',
+      '  name: "Transition: To Savasana"',
+      '  planned_sec: 60',
+      '  actual_sec: 0',
+      '  status: skipped',
+      '  visits: 0',
+      '  substituted_with: null',
+      '- id: savasana',
+      '  parent_id: savasana',
+      '  type: savasana',
+      '  name: Savasana',
+      '  planned_sec: 900',
+      '  actual_sec: 0',
+      '  status: skipped',
+      '  visits: 0',
+      '  substituted_with: null',
+      '```',
+      '',
+      '## Room note',
+      '',
+      'Cut short; studio had to close.',
+      '',
+    ].join('\n');
+    expect(md).toBe(expected);
+
+    // The skips are DERIVED: no manual correction event exists in the log.
+    const events = await store.getEvents('run-d');
+    expect(events.some((e) => e.type === 'segment_skipped')).toBe(false);
+    expect(events.some((e) => e.type === 'substitution_noted')).toBe(false);
+
+    // Byte-deterministic: re-exporting the same completed run is identical.
+    expect(await exportRun(store, def, 'run-d')).toBe(md);
     store.close();
   });
 

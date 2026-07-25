@@ -1,8 +1,11 @@
 // @vitest-environment happy-dom
 //
-// Two-minute wake message (screen-states § 8): authored text verbatim (E7), one
-// fade the first time it appears, and — from the durable `wake_message_shown`
-// latch — no replayed fade on recovery (E6). Essential info is never obscured.
+// Two-minute wake message (screen-states § 8). It is gated on BOTH the clock and
+// the segment: eligible at hard close − 2 min, displayed only while the current
+// segment is Savasana (Q5a). Covers the authored text verbatim (E7), one fade the
+// first time it appears, no callout or persisted event outside Savasana (E3), the
+// post-hard-close rehearsal path (E8), and — from the durable `wake_message_shown`
+// latch — no replayed fade on recovery (E6).
 
 import { describe, it, expect } from 'vitest';
 import {
@@ -20,6 +23,15 @@ import { loadValidClass } from '../store/test-support.js';
 async function toSavasana(h: Harness): Promise<void> {
   await beginRun(h);
   await advanceSegments(h, 14);
+}
+
+/** Does the durable event log carry `wake_message_shown` yet? */
+async function shownEventPersisted(h: Harness): Promise<boolean> {
+  const runs = await h.store.getAllRuns();
+  const run = runs[0];
+  if (!run) return false;
+  const events = await h.store.getEvents(run.runId);
+  return events.some((e) => e.type === 'wake_message_shown');
 }
 
 describe('two-minute wake message', () => {
@@ -58,6 +70,74 @@ describe('two-minute wake message', () => {
     const callout = byId(h.root, 'wake-callout');
     expect(callout.textContent).toBeTruthy();
     expect(callout.className).not.toContain('wake-callout--fade');
+  });
+
+  it('E3: at 7:58 on a POSE there is no callout and no persisted event', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(19, 0) });
+    await beginRun(h);
+    await advanceSegments(h, 1); // Supported Butterfly — a pose, not Savasana
+
+    h.clock.advance(jul28(19, 58) - h.clock.now().getTime());
+    h.app.tick();
+    await h.app.idle();
+
+    expect(h.root.querySelector('.live')?.getAttribute('data-segment-type')).toBe('pose');
+    expect(maybeId(h.root, 'wake-callout')).toBeNull();
+    expect(await shownEventPersisted(h)).toBe(false);
+  });
+
+  it('E3: advancing into Savasana after 7:58 then shows it once, and only then writes the event', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(19, 0) });
+    await beginRun(h);
+    await advanceSegments(h, 1);
+    h.clock.advance(jul28(19, 58) - h.clock.now().getTime());
+    h.app.tick();
+    await h.app.idle();
+    expect(await shownEventPersisted(h)).toBe(false);
+
+    await advanceSegments(h, 13); // on to Savasana
+    await h.app.idle();
+
+    expect(h.root.querySelector('.live')?.getAttribute('data-segment-type')).toBe('savasana');
+    const callout = byId(h.root, 'wake-callout');
+    expect(callout.textContent).toBeTruthy();
+    expect(callout.className).toContain('wake-callout--fade');
+    expect(await shownEventPersisted(h)).toBe(true);
+
+    // Exactly one appearance: no second write on a later render.
+    await zone(h.app, h.root, 'next');
+    await h.app.idle();
+    const runs = await h.store.getAllRuns();
+    const events = await h.store.getEvents(runs[0]!.runId);
+    expect(events.filter((e) => e.type === 'wake_message_shown')).toHaveLength(1);
+  });
+
+  it('E8: a run begun AFTER the hard close shows nothing until Savasana, then once', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(20, 15) });
+    await beginRun(h);
+
+    // Grounding, well past 8:00: nothing on screen, nothing written…
+    expect(maybeId(h.root, 'wake-callout')).toBeNull();
+    expect(await shownEventPersisted(h)).toBe(false);
+
+    // …and nothing on the poses and transitions in between.
+    for (let i = 0; i < 13; i++) {
+      await zone(h.app, h.root, 'next');
+      expect(maybeId(h.root, 'wake-callout')).toBeNull();
+    }
+    expect(await shownEventPersisted(h)).toBe(false);
+
+    // Entering Savasana shows it immediately, once.
+    await zone(h.app, h.root, 'next');
+    await h.app.idle();
+    expect(h.root.querySelector('.live')?.getAttribute('data-segment-type')).toBe('savasana');
+    expect(byId(h.root, 'wake-callout').textContent).toBeTruthy();
+    const runs = await h.store.getAllRuns();
+    const events = await h.store.getEvents(runs[0]!.runId);
+    expect(events.filter((e) => e.type === 'wake_message_shown')).toHaveLength(1);
+
+    // The hard-close indicator is unchanged throughout: present from the start.
+    expect(byId(h.root, 'savasana-close').textContent).toContain('hard close');
   });
 
   it('recovers after 7:58 with the message present and no replayed fade (E6)', async () => {

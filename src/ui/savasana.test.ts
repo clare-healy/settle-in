@@ -88,6 +88,12 @@ describe('Savasana', () => {
     expect(label).toContain('8:00');
     expect(label).toContain('hard close');
 
+    // Rendering in Savasana past the wake-eligibility time issues the durable
+    // `wake_message_shown` write (Q5a: persisted immediately before the first
+    // Savasana render). Settle it before tapping, or the single-flight guard would
+    // reject the tap as `busy` — the F9 behavior, not a navigation failure.
+    await h.app.idle();
+
     // Navigation stays open after 8:00.
     const stepBefore = peek(h).controller.snapshot().savasanaStep;
     await zone(h.app, h.root, 'next');

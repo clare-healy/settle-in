@@ -108,6 +108,54 @@ describe('skipped and substituted precedence in derivation', () => {
     expect(seg.substitutedWith).toBe('Reclined figure four');
   });
 
+  it('on a COMPLETED run, a segment never entered derives skipped with actual 0 (Q5c)', async () => {
+    const def = await desirePaths();
+    // Only grounding is ever entered; the run then finishes. Nobody corrected
+    // anything — the app knows the rest were not taught.
+    const events = begunLog()
+      .entered('grounding', jul28(19, 0))
+      .finished(jul28(19, 10))
+      .all();
+    const actuals = deriveActuals(def, events);
+
+    const grounding = actuals.find((s) => s.id === 'grounding')!;
+    expect(grounding.visits).toBe(1);
+    expect(grounding.status).toBe('on-plan'); // 10 min planned, 10 min taught
+
+    const untaught = actuals.filter((s) => s.id !== 'grounding');
+    expect(untaught.length).toBeGreaterThan(0);
+    for (const seg of untaught) {
+      expect(seg.visits, `${seg.id} visits`).toBe(0);
+      expect(seg.actualSec, `${seg.id} actual`).toBe(0);
+      expect(seg.status, `${seg.id} status`).toBe('skipped');
+    }
+    // No segment_skipped event was ever written: the status is purely derived.
+    expect(events.some((e) => e.type === 'segment_skipped')).toBe(false);
+  });
+
+  it('entered but brief still derives short, never skipped (Q5c)', async () => {
+    const def = await desirePaths();
+    const events = begunLog()
+      .entered('grounding', jul28(19, 0))
+      .entered('supported-butterfly', jul28(19, 0, 8)) // grounding visited for 8 seconds
+      .finished(jul28(19, 1))
+      .all();
+    const grounding = deriveActuals(def, events).find((s) => s.id === 'grounding')!;
+    expect(grounding.visits).toBe(1);
+    expect(grounding.actualSec).toBe(8);
+    expect(grounding.status).toBe('short');
+  });
+
+  it('while a run is still ACTIVE, unvisited segments are not called skipped', async () => {
+    const def = await desirePaths();
+    const events = begunLog()
+      .entered('grounding', jul28(19, 0))
+      .entered('supported-butterfly', jul28(19, 10))
+      .all(); // no finish: the class is still being taught
+    const actuals = deriveActuals(def, events);
+    expect(actuals.some((s) => s.status === 'skipped')).toBe(false);
+  });
+
   it('every expanded segment gets exactly one summary, in plan order', async () => {
     const def = await desirePaths();
     const events = begunLog().entered('grounding', jul28(19, 0)).finished(jul28(19, 5)).all();

@@ -217,13 +217,11 @@ export class AppController {
   tick(): void {
     if (this.route.kind !== 'run' || !this.controller) return;
     const now = this.sampleNow();
-    const ctx = this.runContext();
-    const wakeVisible =
-      deriveWakeState(now.wallEpochMs, ctx.hardCloseAtEpochMs, this.hardCloseLocal(), this.controller.eventLog())
-        .wakeMessageVisible;
 
-    if (wakeVisible !== this.wakeVisibleRendered) {
-      this.syncWakeAppend(wakeVisible);
+    // The message appearing (or disappearing) is a STRUCTURAL change, so rebuild.
+    // The durable `wake_message_shown` write is issued by buildLiveProps, on the
+    // render path itself — never here on the clock alone (Q5a).
+    if (this.wakeVisibleNow(now) !== this.wakeVisibleRendered) {
       this.render();
       return;
     }
@@ -398,6 +396,7 @@ export class AppController {
               def: this.controller.definition,
               events: this.controller.eventLog(),
               draftNote: this.draftNote,
+              offsetMinutes: this.offsetMinutes,
               actions: this.actions,
             })
           : this.loadingScreen();
@@ -416,19 +415,20 @@ export class AppController {
     const now = this.sampleNow();
     const ctx = this.runContext();
     const events = controller.eventLog();
+    const snapshot = controller.snapshot();
 
-    const wakeVisible = deriveWakeState(
-      now.wallEpochMs,
-      ctx.hardCloseAtEpochMs,
-      this.hardCloseLocal(),
-      events,
-    ).wakeMessageVisible;
+    // Both halves of the gate: the clock has reached hard close − 2 min AND the
+    // current segment is Savasana (Q5a). Nothing shows outside Savasana.
+    const wakeVisible = this.wakeVisibleNow(now);
+    // Persist `wake_message_shown` immediately BEFORE the render that first shows
+    // the message — on the render path, so it can never be written on time alone
+    // while another segment is current (E3/E6/E8).
+    this.syncWakeAppend(wakeVisible);
     this.wakeVisibleRendered = wakeVisible;
 
     const wakeFade = wakeVisible && !this.wakeAlreadyShownAtBoot && !this.wakeFadePlayed;
     if (wakeFade) this.wakeFadePlayed = true;
 
-    const snapshot = controller.snapshot();
     const referenceOpen =
       snapshot.expandedReferenceSegmentId !== null &&
       snapshot.expandedReferenceSegmentId === snapshot.currentSegmentId;
@@ -520,8 +520,6 @@ export class AppController {
       requestEndRecovery: () => { this.dialog = { kind: 'recovery-end-confirm' }; this.render(); },
       confirmEndRecovery: () => this.endRun(),
 
-      correctSkip: (id) => this.dispatch(async () => { await this.controller?.skip(id); }),
-      correctSubstitute: (id, name) => this.dispatch(async () => { await this.controller?.substitute(id, name); }),
       saveNote: (value) => this.saveNote(value),
       finalizeNotes: () => this.finalize(this.draftNote),
       skipNotes: () => this.finalize(''),
@@ -917,6 +915,23 @@ export class AppController {
   }
 
   // --- Wake handling --------------------------------------------------------
+
+  /**
+   * Is the wake message displayable right now? Temporally eligible AND the current
+   * segment is Savasana. The single place the app answers this question, so the
+   * render path and the tick path can never disagree.
+   */
+  private wakeVisibleNow(now: EventSample): boolean {
+    if (!this.controller) return false;
+    const ctx = this.runContext();
+    return deriveWakeState(
+      now.wallEpochMs,
+      ctx.hardCloseAtEpochMs,
+      this.hardCloseLocal(),
+      this.controller.eventLog(),
+      this.controller.snapshot().currentSegment?.type === 'savasana',
+    ).wakeMessageVisible;
+  }
 
   private syncWakeAppend(wakeVisible: boolean): void {
     if (!wakeVisible || this.wakeAppendInFlight || !this.controller) return;
