@@ -90,13 +90,13 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 3. The live pose screen prioritizes wall clock, pose and side, planned window, elapsed time, drift, midpoint cue, and a quiet next-pose preview.
 4. A deliberate central action opens the expanded reference state without changing the teaching segment.
 5. Going back records a navigation correction without deleting history.
-6. Savasana remains manually staged, while the two-minute text appears automatically at 7:58 PM and remains until Clare advances.
+6. Savasana remains manually staged. The two-minute text appears automatically once the clock reaches 7:58 PM **and Clare is in Savasana**, and remains until she advances. It never appears on any other screen.
 7. Teaching ends at the 8:00 PM hard close; the run is finished through Clare's manual action, which may fall a few minutes after 8:00 as the room resolves. The app never advances or ends the class for her, and navigation never locks.
 
 ### After class
 
-1. The app derives actual segment and side durations from the run event history.
-2. Clare may mark a pose as skipped or substituted and add a brief room note.
+1. The app derives actual segment and side durations, and their statuses, from the run event history alone.
+2. Clare writes one free-form reflection — typically dictated — or skips it. She is never asked to curate the class segment by segment.
 3. Finishing saves the taught run separately from the class definition.
 4. The plan, one run, or the full library can be exported for reflection or backup.
 
@@ -109,7 +109,7 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 - Manual forward and back navigation
 - Minimal and expanded pose states
 - Re-anchored planned windows and informational drift
-- Hard-close savasana message at 7:58 PM
+- Hard-close savasana message, shown in Savasana only, from 7:58 PM
 - Screen wake-lock request, monitoring, and calm fallback
 - Automatic persistence and interrupted-run recovery
 - Immutable class definitions and multiple taught runs
@@ -136,7 +136,7 @@ V1 is successful when:
 - Every default live-state glance can answer its intended question in approximately two seconds.
 - A reload or accidental closure does not lose the active segment, timing history, or notes.
 - The app never makes a sound, vibrates, or posts a notification.
-- The 7:58 PM wake message appears silently and remains visible.
+- The 7:58 PM wake message appears silently in Savasana, and nowhere else, and remains visible.
 - The exported record distinguishes the authored plan from each taught run.
 - One real Tuesday class can be taught without returning to chat notes or paper.
 

@@ -35,7 +35,7 @@ Do not silently choose between conflicting requirements during implementation. R
 
 - The app never emits sound, vibration, or a system notification.
 - Clare advances every teaching segment manually.
-- The only automatic in-class signal is silent text appearing on screen two minutes before the hard 8:00 PM close.
+- The only automatic in-class signal is silent text appearing in Savasana two minutes before the hard 8:00 PM close. It appears on no other screen.
 - The app works after installation without a network connection.
 - A class plan remains immutable; each taught run is recorded separately.
 - The wall clock is primary. Timing informs rather than commands.

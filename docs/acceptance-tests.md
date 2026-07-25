@@ -110,7 +110,7 @@ For the valid fixture begun at 7:00 PM:
 
 ### D3 — Late begin re-anchor
 
-When Begin Class occurs at 7:03 PM, Grounding is planned for 7:03–7:13 and initial drift is `on plan`. The hard close remains 8:00 PM and the wake message remains scheduled for 7:58 PM.
+When Begin Class occurs at 7:03 PM, Grounding is planned for 7:03–7:13 and initial drift is `on plan`. The hard close remains 8:00 PM and the wake message remains eligible from 7:58 PM (displayed only once Savasana is current).
 
 ### D4 — Drift on segment entry
 
@@ -138,17 +138,19 @@ At 8:00 PM the app displays `8:00 · hard close`, never a negative countdown, an
 
 ## E. Wake message
 
+The message is gated on BOTH the clock and the segment: eligible at `hard_close_at − 2 min`, displayed only while the current segment is Savasana.
+
 ### E1 — Normal savasana
 
-When the valid fixture begins at 7:00 and remains in Savasana at 7:58, the wake message fades in once and stays visible.
+When the valid fixture begins at 7:00 and Clare is in Savasana at 7:58, the wake message fades in once and stays visible.
 
 ### E2 — Late savasana entry
 
-When Savasana is entered after 7:58, the wake message is already visible.
+When Savasana is entered after 7:58, the wake message is present immediately on entry.
 
-### E3 — Not yet in savasana
+### E3 — Never outside Savasana
 
-When the active run is still in another live segment at 7:58, the two-minute callout appears without changing or covering the current segment's essential information.
+When the active run is still in Grounding, a pose, or a transition at 7:58, **no callout renders and no `wake_message_shown` event is persisted**. Advancing into Savasana then shows the message once, and only then is the event written.
 
 ### E4 — No loop
 
@@ -160,11 +162,15 @@ The wake message produces no audio, vibration, haptic, or notification.
 
 ### E6 — Durable fade-once
 
-`wake_message_shown` persists before the message first renders. A reload or process death after 7:58 recovers with the authored message present and no replayed fade animation.
+`wake_message_shown` persists immediately before the message's first Savasana render. A reload or process death afterwards recovers with the authored message present and no replayed fade animation.
 
 ### E7 — Authored text
 
 The message displays the class's authored `wake_message` verbatim.
+
+### E8 — Post-hard-close rehearsal
+
+A run begun at or after `hard_close_at` shows no wake message on Grounding, poses, or transitions, and no `wake_message_shown` event exists while those segments are current. Entering Savasana shows the message immediately, once. The `8:00 · hard close` indicator behavior is unchanged throughout.
 
 ## F. Navigation and state
 
@@ -250,13 +256,13 @@ Running the same class twice creates two run IDs and preserves both histories.
 
 ## I. Post-class and export
 
-### I1 — Automatic actuals
+### I1 — Reflection is the only post-class input
 
-Post-Class Notes displays actual durations derived from events; Clare is not asked to classify long or short manually.
+Post-Class shows one multiline reflection box and no per-segment rows or manual status controls. The draft persists on every input event, so a dictation interrupted by backgrounding, a lock, or process death is recovered intact. Derived actuals and statuses are not shown here; they are retained and appear in the as-taught export.
 
-### I2 — Skip and substitution
+### I2 — Retired
 
-Clare can mark a segment skipped or substituted and enter a short replacement name without changing the authored plan.
+Manual skip and substitution correction was retired on July 25, 2026 (Post-Class became a single reflection). Automatic skip derivation is covered by I4.
 
 ### I3 — Optional notes
 
@@ -264,7 +270,13 @@ Clare can complete a run with or without a room note.
 
 ### I4 — As-taught export
 
-An exported run conforms to the as-taught export schema in `docs/class-format.md`: it identifies its class revision and contains planned and actual durations, statuses, revisits, skips, substitutions, and notes.
+An exported run conforms to the as-taught export schema in `docs/class-format.md`: it identifies its class revision and contains planned and actual durations, derived statuses, revisits, and the reflection.
+
+Fixture coverage must include:
+
+- **Automatic skip:** a completed run where a segment was never entered exports `status: skipped` with `actual_sec: 0`, without any manual correction having been made.
+- **Entered but brief:** a segment entered and left quickly still exports `short`, never `skipped`.
+- **Historic substitution:** a run whose stored events contain a `substitution_noted` event still exports `status: substituted` with its `substituted_with` name, proving backward compatibility with runs recorded before the correction UI was retired.
 
 ### I5 — Whole-library round trip
 
@@ -275,6 +287,17 @@ Exporting a library, clearing a test profile, and restoring with merge reproduce
 Restore never replaces an existing library without explicit destructive confirmation.
 
 ## J. Layout, access, and dim-room use
+
+**Verification status (July 25, 2026).** Every J-series result recorded before this date is void. The production CSP blocked Vite's dev-server style injection, so the Playwright suites — the only tests with a real layout engine — were asserting against an unstyled document. The Vitest DOM tests use happy-dom, which has no layout engine at all.
+
+Consequently **J1–J4, J6, the layout portion of J5, the §14 indicator geometry, the live 20/60/20 zone ratios and gesture insets, safe-area behavior, and all prior scroll-reachability evidence are demoted to unproven** until re-established. J7 and J8 were always device-only and remain unproven.
+
+Re-proof comes from two places, and nothing else counts:
+
+1. **Strict-production browser coverage** — a Playwright project running against the actual built artifact under the real production CSP (`playwright.strict.config.ts`), asserting the stylesheet is present and applied before any geometry is measured.
+2. **The physical Pixel 6**, per `docs/device-checklist.md`, which remains the acceptance authority for font scaling, safe areas, gestures, keyboard-open Import, dialogs, browser versus installed mode, tap highlight, wake lock, and dim-room use.
+
+A CI result may never be reported as satisfying a J-series criterion on its own.
 
 ### J1 — No critical clipping
 
@@ -294,7 +317,7 @@ Live navigation remains reliable on the Pixel 6 with Android gesture navigation 
 
 ### J5 — Meaning without color
 
-Peak, drift, validation error, warning, current savasana step, and disabled state remain understandable without relying on hue alone.
+Peak, drift, validation error, warning, current savasana step, and disabled state remain understandable without relying on hue alone. The layout portion of this check (that the distinguishing structure actually renders) is part of the strict-production coverage; the perceptual judgment is device-only.
 
 ### J6 — Reduced motion
 
@@ -307,6 +330,14 @@ In the actual studio, from Clare's normal phone placement and viewing distance, 
 ### J8 — Student quietness test
 
 From a student's ordinary position, the screen does not read as a bright, flashing, or urgent source in the room.
+
+### J9 — No blue platform tap highlight
+
+No tap anywhere in the app produces the Android default blue highlight. The live zones instead show a static, subtle warm pressed state (a low-alpha Candlelight Amber inset edge and slight affordance brightening) — never a full-zone fill and never an animation. Text selection remains enabled. Verified in strict-production browser coverage for the CSS cascade and pressed style, and on the Pixel for the actual platform flash.
+
+### J10 — Live surface does not clip
+
+`.live` and `.live__stage` are `overflow: hidden`, so the `.screen` scroll safety net cannot rescue a live screen that overflows. At 100% and 125% font scale, with the longest pose title, the wake-lock indicator present, and on Savasana, no live content is clipped or unreachable. Any demonstrated clipping is fixed by reflowing the live hierarchy, never by making the live tap surface generically scrollable.
 
 ## Release gate
 

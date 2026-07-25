@@ -235,15 +235,17 @@ Transition navigation is manual. Expiration of its planned minute changes no sta
 
 ## 8. Two-minute hard-close message
 
-At 7:58 PM during any active live screen:
+The message appears **only on the Savasana screen**, and only once the clock has reached two minutes before the hard close. It never appears on Grounding, a pose, or a transition — at any time, including a rehearsal begun after 8:00.
 
-- Fade in the class's authored `wake_message` once, verbatim.
-- Persist `wake_message_shown` before first render; after a reload or recovery the message is simply present, with no replayed fade.
+On Savasana, once eligible:
+
+- Fade in the class's authored `wake_message` once, verbatim, in the dedicated lower message area.
+- Persist `wake_message_shown` immediately before that first render — not when the clock passes 7:58 on some other screen.
 - Keep it visible until the next teaching-state action or Finish Class.
-- Do not obscure the wall clock, current pose, or navigation affordances.
+- Do not obscure the wall clock, current step, or navigation affordances.
 - Do not animate it again.
 
-In Savasana the message occupies the dedicated lower message area. Outside Savasana it uses a quiet persistent lower callout.
+There is no lower callout on non-Savasana screens. Entering Savasana after the eligibility time shows the message immediately, without animation replay if it has already been shown.
 
 ## 9. Savasana
 
@@ -288,24 +290,26 @@ Shows:
 
 It does not automatically resume and request wake lock before Clare acts.
 
-## 12. Post-Class Notes
+## 12. Post-Class Reflection
 
-Shows automatically derived plan-versus-actual rows:
+One generous multiline text box for a free-form reflection, and nothing else to curate.
 
-- Segment or pose side
-- Planned duration
-- Actual duration
-- Derived status: on plan, long, short, revisited, or skipped
+Shows:
 
-Clare may:
+- Class title and date, and the actual start and finish times
+- A single native `textarea` for the reflection, given most of the screen
+- `Save and complete`
+- `Skip and complete`
 
-- Correct a segment to `Skipped`
-- Mark `Substituted` and enter a short replacement name
-- Add one room note
-- Save and complete
-- Skip notes and complete
+Clare will not review a class segment by segment after teaching. What she will realistically do is pick up her phone, use voice-to-text on the Gboard keyboard, and speak whatever she noticed. The screen is shaped for that and asks for nothing else (field evidence, July 25, 2026).
 
-The chips do not ask Clare to manually restate timing the app already knows.
+Therefore this screen shows **no per-segment rows and no manual Skipped or Substituted controls**. Plan-versus-actual timing is not lost: it is derived from the run's events and travels in the as-taught export, which is what feeds the next week's authoring. The app already knows the timing and never asks Clare to restate or curate it.
+
+Requirements for the reflection box:
+
+- A plain native multiline `textarea` — no rich editor, no keystroke interception, so Gboard voice dictation behaves normally.
+- Persist the draft on every `input` event, not only on `change` or blur, so a dictation survives backgrounding, a lock, or process death mid-sentence.
+- Generous height, comfortable text size, and no character limit.
 
 ## 13. Library
 

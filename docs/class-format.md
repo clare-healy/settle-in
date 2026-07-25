@@ -190,7 +190,7 @@ Rules:
 
 - `id` must be `savasana`.
 - Schema v1 requires exactly six nonempty steps.
-- `wake_message` is required and authored per class; it is the exact text shown on screen at 7:58. Keep it glanceable — a warning appears above 90 characters.
+- `wake_message` is required and authored per class; it is the exact text shown, verbatim, on the Savasana screen once the clock reaches two minutes before the hard close. It appears on no other screen. Keep it glanceable — a warning appears above 90 characters.
 
 ## Sequence validation
 
@@ -326,7 +326,7 @@ Rules:
 - `planned_sec` and `actual_sec` are integer seconds. `actual_sec` is the sum of the segment's completed visits.
 - `status` is one of `on-plan`, `long`, `short`, `revisited`, `skipped`, `substituted`, with precedence `skipped` > `substituted` > `revisited` > timing status.
 - Timing status: a segment is `long` or `short` when the difference between actual and planned exceeds the greater of 30 seconds and 15% of planned duration; otherwise `on-plan`. These thresholds are the v1 default; field evidence may tune them under the field-learning rule, recorded in the decision log.
-- A skipped segment has `actual_sec: 0`.
+- A skipped segment has `actual_sec: 0`. On a completed run, a segment with zero recorded visits derives `skipped` automatically — the app knows it was never taught and never asks Clare to say so. `substituted_with` is retained in the schema for honest history and for runs recorded before manual correction was retired; nothing in the current app sets it.
 - `substituted_with` carries the short replacement name Clare entered, otherwise `null`.
 
 A `## Room note` section containing Clare's note verbatim, or the single line `None recorded.`

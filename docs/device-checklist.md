@@ -2,6 +2,8 @@
 
 Status: canonical scripted passes for the acceptance tests that only physical hardware can prove. CI emulation is smoke coverage only; the tests below are marked passed HERE or not at all (adversarial review, node 4).
 
+**Standing as of July 25, 2026.** Every layout result recorded before this date is void — the production CSP blocked Vite's dev-server styles, so the Playwright suites were asserting against an unstyled document (decision log, "Verification repair gate"). J1–J4, J6, the layout portion of J5, §14 indicator geometry, live zone ratios and insets, safe-area behavior, and prior scroll-reachability evidence are all **unproven** until this checklist and the strict-production browser project re-establish them. Nothing below has been run on the Pixel yet.
+
 Record each run of this checklist at the bottom with date, app version, and Android/Chrome versions. A release candidate needs a fully green run; the first live-class pilot additionally needs the studio rehearsal section.
 
 ## Setup
@@ -39,9 +41,34 @@ Record each run of this checklist at the bottom with date, app version, and Andr
 - [ ] Mid-pose, swipe the app away from Recents. Relaunch from the icon. Run Recovery shows the correct class, segment, side, and start time; Resume returns exactly there with correct elapsed time.
 - [ ] Repeat once from a savasana middle step (verifies step-level recovery incl. backward steps if used).
 
+## Q5 field-evidence re-checks (July 25, 2026)
+
+These exist because Clare found all three in her first practice run. Run them before anything else — they are what stands between her and teaching from the app.
+
+- [ ] **J9 — no blue tap flash.** In the installed app, tap the Previous zone, the Reference zone, the Next zone, and a Savasana step, in a dim room. **No blue highlight of any kind appears.** The zones instead show a quiet warm edge while pressed, which disappears on release. Nothing animates.
+- [ ] Long-press and double-tap on cue text: if a blue selection highlight appears and reads as intrusive in the room, record it — `::selection` recoloring is conditional on this observation.
+- [ ] **E3/E8 — wake message is Savasana-only.** Begin a rehearsal run *after* 8:00 PM. Walk Grounding → pose → transition: **no two-minute message appears on any of them.** Advance into Savasana: the message appears immediately, once, and does not re-animate. The `8:00 · hard close` indicator behaves as before throughout.
+- [ ] Repeat during real class hours if possible: at 7:58 while still in a pose, confirm nothing appears; on entering Savasana, it appears once.
+- [ ] **I1 — reflection box.** Finish a run. Post-Class shows one large text box and no per-pose rows. Tap the microphone on the Gboard keyboard and dictate a few sentences. Text lands correctly. Background the app mid-dictation, reopen: **the draft is still there.** Save and complete.
+- [ ] Export that run and confirm the reflection appears in the `## Room note` section, and that a pose you skipped shows `status: skipped` without you having marked anything.
+
+## J10 — Live surface does not clip
+
+`.live` and `.live__stage` are `overflow: hidden`, so a live screen that overflows cannot be rescued by scrolling. Check each of these at **both** 100% and 125% font scale:
+
+- [ ] Grounding with the wake-lock indicator visible — theme anchor fully readable, nothing cut off.
+- [ ] The longest pose title in the class, minimal state — title, clock, planned window, drift, midpoint cue, and next-pose preview all fully visible.
+- [ ] Savasana with all six steps and the two-minute message present — no step or control clipped.
+- [ ] Transition screen with the longest setup narration.
+
+If anything clips, record exactly which screen and scale. The fix is to reflow the live hierarchy — never to make the live tap surface scrollable.
+
 ## J — Dim room, scaling, and gestures (J1–J8)
 
+- [ ] **Keyboard-open Import**: open Import, tap into the paste field so the Android keyboard opens. The `Validate class` action remains reachable and nothing is clipped behind the keyboard. Repeat with a dialog open.
+- [ ] **Browser vs installed**: run the Prep-scroll and live-screen checks once in Chrome (with its dynamic toolbar) and once in the installed standalone app — `height: 100dvh` behaves differently between them.
 - [ ] **J1/J2**: Import `valid-boundary-content.md`. At 100% Android font size, walk every live screen incl. the long-title pose minimal and expanded: nothing clipped, everything scrollable that should be.
+- [ ] **Prep reachability** (the July 25 blocker): Prep scrolls under the finger and `Begin Class` stays visible and pinned at both font scales, in both browser and installed mode.
 - [ ] Repeat at 125% (or nearest larger) font size.
 - [ ] **J3**: Every core control (Previous/Reference/Next, Begin, Finish, Resume, dialogs) is comfortably tappable without precision.
 - [ ] **J4**: With gesture navigation, live-screen zone taps near the edges never trigger system back/home; system back from a live screen opens the Leave Class guard, never exits silently.

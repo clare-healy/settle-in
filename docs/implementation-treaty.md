@@ -119,17 +119,24 @@ A visit that begins via Previous (`segment_back`) displays `revisited` in place 
 
 ### Hard close and savasana signal
 
-The wake message becomes eligible at exactly two minutes before `hard_close_at`, normally 7:58 PM.
+The wake message becomes **temporally eligible** at exactly two minutes before `hard_close_at`, normally 7:58 PM. Temporal eligibility alone never shows anything.
 
-It appears only while a run is active. If Clare reaches Savasana before 7:58, it appears at 7:58. If she enters Savasana after 7:58, it is immediately present. If she has not yet reached Savasana, a quiet two-minute message appears in the current live screen without changing the segment.
+**The message displays only while the current segment is Savasana.** Both conditions must hold: the run is active, the clock has reached `hard_close_at - 120s`, and Clare is in Savasana. On Grounding, a pose, or a transition the message never appears, at any time. It is a signal to begin the gentle awakening, and it belongs only where that awakening happens; on any other screen it is a distraction in the room (field evidence, July 25, 2026).
+
+Consequences:
+
+- If Clare is already in Savasana when the clock reaches 7:58, the message appears then.
+- If she enters Savasana after 7:58, it is present immediately on entry.
+- If she is still teaching elsewhere at 7:58, nothing appears; the message waits for Savasana.
+- A run begun at or after `hard_close_at` — a rehearsal later in the evening — shows no message on Grounding, poses, or transitions; entering Savasana shows it immediately, once. The message is not suppressed for rehearsals: it is simply gated on Savasana like every other run.
 
 The message text is the class's authored `wake_message`, shown verbatim.
 
-The message fades in once over approximately three seconds and remains visible until Clare advances or finishes. It never cycles, fades away on its own, makes sound, vibrates, or posts a notification. The `wake_message_shown` event is persisted before the message is first rendered; the fade-once guarantee derives from that durable event, so a reload or process death after 7:58 recovers with the message simply present — no replayed fade.
+The message fades in once over approximately three seconds and remains visible until Clare advances or finishes. It never cycles, fades away on its own, makes sound, vibrates, or posts a notification. The `wake_message_shown` event is persisted immediately before the message's **first render in Savasana** — never merely because the clock passed 7:58 while another segment was current. The fade-once guarantee derives from that durable event, so a reload or process death after the message has shown recovers with it simply present — no replayed fade.
 
 At 8:00 PM the app does not advance or end the class. It changes the quiet close indicator to `8:00 · hard close` and leaves the action with Clare.
 
-A run begun at or after `hard_close_at` — for example a rehearsal later in the evening — shows the wake message and the `8:00 · hard close` indicator immediately. This is defined behavior, not an error. There is no separate rehearsal or practice mode; the re-anchored planned windows still shift with the actual start, and nothing blocks running the class.
+A run begun at or after `hard_close_at` — for example a rehearsal later in the evening — shows the `8:00 · hard close` indicator immediately. This is defined behavior, not an error. There is no separate rehearsal or practice mode; the re-anchored planned windows still shift with the actual start, and nothing blocks running the class. The wake message follows the Savasana gate above and therefore does not appear until Savasana.
 
 8:00 PM ends teaching, not the record. After the hard close, forward and back navigation and Finish remain fully available so Clare can stage the room's actual ending — even a few minutes past 8:00 while students roll up mats — and finalize the record at her pace. Nothing locks and nothing advances.
 

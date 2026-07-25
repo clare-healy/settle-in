@@ -162,6 +162,44 @@ Decision: `docs/yin-flow-state-instructions.md` v2 merges Clare's existing proje
 
 Decision: the Phase 1 review prompt for GPT-5.6 lives at `docs/adversarial-review-prompt.md` (six attack surfaces, evidence-citation rules, [UNVERIFIED] discipline, severity-ranked deliverable). Reusable at later review gates; review verdicts return here as Y/N entries before M1.
 
+## July 25, 2026 — Q5a: the two-minute message lives only in Savasana
+
+Question: should the wake message appear on any live screen at 7:58? **No.** Question: should both eligibility and rendering change, rather than rendering alone? **Yes.** Question: should a rehearsal begun after 8:00 suppress the message entirely? **No.**
+
+Decision: the message is gated on two conditions — temporally eligible at `hard_close_at − 120s`, and displayed only while the current segment is Savasana. It never appears on Grounding, a pose, or a transition, at any time. `wake_message_shown` persists immediately before the first Savasana render, not when the clock passes 7:58 on another screen; rendering-only gating was insufficient because `app.ts` wrote the event on time alone. A post-hard-close rehearsal therefore shows nothing until Savasana, then shows it once. Hard-close indicator behavior is unchanged.
+
+Origin: Clare's first practice run on the Pixel — "the text at the bottom is distracting." Because she practised after 8:00 PM, the message was visible from the first segment onward, which is the ratified after-hard-close behavior colliding with an always-visible callout. Field evidence outranks the prior screen contract (product spec, field-learning rule). Reviewed and confirmed by GPT-5.6/Codex.
+
+Reconciled: product spec (During class 6, invariants, capabilities, success measures), README invariant, implementation treaty (§ Hard close and savasana signal), screen-states §8 and §9, class-format `wake_message` wording, Yin Flow State instructions, acceptance E1–E8 (E3 rewritten to prove no callout *and no event* outside Savasana; E8 added for the rehearsal path).
+
+## July 25, 2026 — Q5b: no blue platform tap highlight
+
+Question: is the blue flash the Android default tap highlight? **Yes**, confirmed. Question: suppress it globally? **Yes.**
+
+Decision: `-webkit-tap-highlight-color: transparent` is applied globally. Because `.zone` had no `:active` state at all, suppression alone would have left the full-height live zones with no feedback, so a static warm pressed state is added — a low-alpha Candlelight Amber inset edge with slight affordance brightening, never a full-zone fill and never an animation (design system § States and feedback; Principle 4 keeps indigo drift as the system's only cool note). Text selection stays enabled; `::selection` is treated as a separate potential blue source and only recolored if Pixel testing shows it matters. New acceptance J9; strict-production browser coverage asserts the cascade and pressed style, and the device checklist proves the actual platform flash is gone.
+
+## July 25, 2026 — Q5c: Post-Class becomes a single reflection
+
+Question: remove the per-segment rows and the manual Skipped/Substituted controls? **Yes.** Question: bump the export schema version? **No.**
+
+Decision: Post-Class renders one generous native multiline `textarea` and nothing to curate. The draft persists on every `input` event — not merely `change` — so a Gboard dictation survives backgrounding, a lock, or process death mid-sentence; no keystroke interception. Clare's reasoning is a realistic account of her own behavior after teaching: she will speak a reflection into her phone, and will not review fifteen segments line by line.
+
+Consequences ratified with it:
+
+- A segment with **zero visits on a completed run now derives `skipped`**, not `short`. This reverses the July 22 M2 ruling, whose stated justification was that "Post-Class invites the correction" — with the correction retired, that reasoning no longer holds. Entered-but-brief segments still derive `short`.
+- Export Schema v1 is **unchanged**. Derived actuals, statuses, and `substituted_with` are retained for honest history and for runs recorded before the correction UI existed; nothing in the current app sets `substituted_with`. Because no schema changed, no version bump and no integrated-system schema migration are owed — though the Yin Flow State instructions were still updated to describe statuses as derived/legacy and to weight Clare's dictated reflection above the timing rows.
+- Acceptance **I2 is retired**; **I1** is rewritten around the persistent reflection UI and retained export actuals; **I4** is strengthened with fixtures for automatic skip, entered-but-brief, and historic substitution.
+
+## July 25, 2026 — Verification repair gate
+
+Question: may prior dev-server geometry results stand as evidence? **No.**
+
+Decision: every layout-dependent result recorded before July 25, 2026 is void, because the production CSP blocked Vite's dev-server style injection and the Playwright suites — the only tests with a real layout engine — were asserting against an unstyled document. Demoted to unproven: J1–J4, J6, the layout portion of J5, the §14 indicator geometry, the live 20/60/20 zone ratios and gesture insets, safe-area behavior, and all prior scroll-reachability evidence. J7/J8 were always device-only and remain unproven.
+
+The dev CSP relaxation stays, but only as Vite flow wiring — it is never evidence. Re-proof comes from a new strict-production Playwright project running against the actual built artifact under the real production CSP, which asserts the stylesheet is present and applied before measuring anything, and covers: Prep and reference reachability with no dead contained scroller, touch-target sizes, zone ratios and gesture insets, indicator non-overlap, and the long boundary fixture. The Pixel 6 remains the acceptance authority for font scaling, safe areas, gestures, keyboard-open Import, dialogs, browser versus installed mode, tap highlight, wake lock, and dim-room use.
+
+New acceptance **J10** covers a risk Codex raised: `.live` and `.live__stage` are `overflow: hidden`, so the `.screen` scroll safety net cannot rescue a live screen that overflows at 125% font scale, with a long title, with the wake-lock indicator present, or on Savasana. Any demonstrated clipping is to be fixed by reflowing the live hierarchy, never by making the live tap surface generically scrollable.
+
 ## July 22, 2026 — Adversarial review verdicts
 
 The Phase 1 review (`docs/phase-1-adversarial-review.md`) ruled on the four open nodes:
