@@ -6,10 +6,15 @@ documentation and its Phase 1 adversarial review; `AGENTS.md` binds you as befor
 
 ## The game signal
 
-This is a second-opinion request on a fix that has already shipped, plus one finding that
-retroactively weakens a large part of our verification record. Clare teaches from this app.
-The fix is live because she needed to practice tonight; that urgency is why a review pass is
-worth running now rather than before.
+This is a second-opinion request carrying three things: a fix that has already shipped, a finding
+that retroactively weakens a large part of our verification record, and — added after Clare's first
+real practice run on the Pixel — three pieces of field evidence about how the app actually behaves
+in her hands (Q5). Clare teaches from this app. The fix is live because she needed to practice
+tonight; that urgency is why a review pass is worth running now rather than before.
+
+Read Q5 first if you are short on context. It is the only section grounded in someone actually
+using the instrument, and `docs/product-spec.md`'s field-learning rule says that evidence outranks
+our speculative design.
 
 ## What happened (moment-time)
 
@@ -90,10 +95,99 @@ Generalize the failure mode: assertions whose oracle is structurally blind (happ
 CI offline is smoke-only. Which other claims deserve the same demotion, and where is the cheapest
 real oracle?
 
+**Q5 — Three findings from Clare's first real practice run on the Pixel.**
+
+These arrived after the sections above were written. Two of them are **product decisions Clare
+has already made** — she is the teaching-domain authority and `README.md` puts her ends and
+principles above every other document. Your job on 5a and 5c is not to re-open *whether*, but to
+find the cleanest *how* and to catch every ripple through the treaties, tests, and export schema.
+5b is a straight defect.
+
+**5a — The two-minute message must live only in Savasana.**
+Observed: "the text at the bottom is distracting." Clare wants the wake message to appear **only
+in Savasana**, at two minutes before the hard close — not on any other live screen.
+
+This contradicts the current treaties, which is why it needs your pass rather than a quick edit:
+`docs/screen-states.md` §8 says the callout appears "during any active live screen," the
+implementation treaty's *Hard close and savasana signal* section says a quiet two-minute message
+appears in the current live screen if Savasana has not been reached, and acceptance **E3** asserts
+exactly that behavior. `src/ui/screens/live.ts` appends `wakeCallout(props)` to the stage on every
+live screen (~line 81).
+
+One diagnostic worth weighing, because it may be doing most of the damage: `deriveWakeState`
+returns `wakeMessageVisible: true` from the very first segment whenever a run begins at or after
+`hard_close_at`. Clare was practising outside class hours, so the message would have sat at the
+bottom of **every screen for the entire run** — the ratified "run begun after hard close" behavior
+(decision log, July 22) colliding with the always-visible callout. I reproduced this at 9:19 PM:
+the message was on the Grounding screen from the start.
+
+So there are two candidate changes, and I want your read on whether Clare's decision alone is
+sufficient or whether both are needed: (i) render the callout only on the Savasana screen, and
+(ii) suppress it entirely for a run begun after the hard close, since a rehearsal has no 7:58.
+Name the treaty edits, the E-series test changes (E3 in particular), and whether the *eligibility*
+model in `src/model/wake.ts` should change or only the rendering.
+
+**5b — A blue flash when tapping the side zones and the reference.**
+Observed: "a blue flash on the screen when switching between reference screens and tapping the
+side to go back and forth between the postures."
+
+My diagnosis, from the CSS: there is **no `-webkit-tap-highlight-color` declaration anywhere in the
+stylesheet**, so Android Chrome paints its default translucent blue highlight on every tap. The
+live tap zones are full-height buttons occupying 20% / 60% / 20% of the screen, so that default
+lands as a large blue rectangle across most of the display — in a dim studio, with students in the
+room. This violates `docs/design-system.md` § "What the app never looks or feels like" ("No neon,
+clinical blue chrome"), Principle 4 (the only cool note in the system is the indigo drift surface),
+and arguably Principle 1's spirit of perceptual quiet.
+
+Second, related gap: `.zone` has **no `:active` state at all** (verified — the only pressed styling
+is `.btn:active`). The design system requires "Pressed state: immediate subtle luminance change."
+So suppressing the blue would leave the zones with no feedback whatsoever unless a warm pressed
+state is added at the same time.
+
+Confirm the diagnosis, then specify the smallest correct fix: where `-webkit-tap-highlight-color:
+transparent` belongs (globally, or scoped), what the warm pressed affordance should be for a
+full-height zone without becoming attention-seeking motion, and whether text selection
+(`::selection`, double-tap) is a second blue source on the cue text. Note that no existing test
+could catch this — add the one that would.
+
+**5c — Post-Class becomes a single reflection box.**
+Clare's decision: **remove every per-pose row** — the plan-versus-actual list, the Skipped
+correction, and the Substituted name field — and leave Post-Class as **one large text box for a
+free-form reflection**. Her reasoning is a realistic account of her own behavior after teaching:
+she will pick up her phone, hit voice-to-text on the Gboard keyboard, and speak whatever she
+noticed. She will not review fifteen segments line by line, and a screen that asks her to will
+simply go unused.
+
+This is the change with the longest tail, which is why I want your audit rather than my guess:
+
+- `docs/screen-states.md` §12 specifies the derived rows and the correction chips; acceptance
+  **I1** ("Post-Class Notes displays actual durations derived from events") and **I2** ("Clare can
+  mark a segment skipped or substituted") both assert the UI being removed. Which of these become
+  obsolete, and which should be rewritten rather than deleted?
+- The M2 ruling in the decision log (July 22) says a segment never entered derives `short` rather
+  than `skipped` *specifically because* "Post-Class invites the correction." Remove the correction
+  and that reasoning collapses. Should a never-entered segment now derive `skipped` automatically?
+- Export Schema v1 keeps `substituted_with` and the `skipped` / `substituted` statuses. If nothing
+  can set them manually, do they stay as derivable-only fields (my inclination — the schema is a
+  treaty and the fields are harmless when null), or does the export schema need a version bump?
+  If the schema changes at all, `docs/yin-flow-state-instructions.md` must change in the same
+  commit, and the Yin Flow State project's "Honest history" section currently tells the assistant
+  to read those statuses.
+- The derived actuals do not disappear — they still belong in the **as-taught export**, which is
+  the artifact that feeds next week's authoring. Confirm that removing the on-screen table costs
+  nothing in the export.
+- Practical: the reflection box must work with Gboard voice input (plain multiline `textarea`, no
+  keystroke interception, generous height, and the existing draft-note persistence so a dictation
+  survives a backgrounded app).
+
 ## What I am NOT asking for
 
 - Do not re-litigate the four Phase 1 architecture verdicts (`yaml`, `idb`, no framework, CI
   fidelity). They are settled in `docs/decision-log.md`.
+- Do not argue Clare out of 5a or 5c. She has taught this class for years and has now used the app
+  in the room; that evidence outranks the screen contracts those items contradict. If you believe a
+  change carries a cost she has not seen, name the cost in one or two sentences and then design the
+  change anyway.
 - Do not propose a UI framework migration or a redesign of the screen contracts.
 - Do not edit files. This is a review pass; verdicts return as prose and I will resolve them into
   the decision log as Y/N entries.
@@ -109,8 +203,10 @@ result — say so explicitly.
 
 ## Cognitive lineage
 
-- The bug was found by Clare, on her own device, doing the thing the app exists for. Field evidence
-  outranks our test suites; this is the product spec's field-learning rule doing its job.
+- The bug, and all three Q5 findings, were found by Clare on her own device, doing the thing the
+  app exists for. Field evidence outranks our test suites; this is the product spec's
+  field-learning rule doing its job. Q5a and Q5c are her product decisions, recorded here verbatim
+  in intent; Q5b is a defect she noticed and I diagnosed from the stylesheet.
 - Diagnosis and fix: Claude Opus 4.8, orchestrating, July 25, 2026 — reproduced against the live
   deployed origin via CSSOM injection rather than reasoning from the source.
 - The repo's canonical docs, schema, and the Phase 1 adversarial review are yours (GPT-5.6/Codex,
@@ -125,3 +221,8 @@ Clare carries your response back to me. Verdicts and blockers land in `docs/deci
 yes/no entries before further code changes. If Q1 shows the contamination is broad, the next
 milestone is a verification-repair pass, not new features — and that should happen before the
 studio rehearsal, not after.
+
+Sequencing note: **Q5 is the shortest path to a usable instrument** and Clare has a class coming.
+If you have to prioritize, rule on Q5 first — its three items are what stand between her and
+teaching from this app — then Q1, which governs how much of our verification record we are
+entitled to trust. Q2 through Q4 can follow.
