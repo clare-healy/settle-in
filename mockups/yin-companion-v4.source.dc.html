@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#14181A"/><circle cx="50" cy="42" r="20" fill="#D6A66A" opacity="0.9"/><text x="50" y="49" font-family="Georgia,serif" font-size="20" fill="#14181A" text-anchor="middle" font-weight="bold">YC</text><text x="50" y="80" font-family="sans-serif" font-size="9" letter-spacing="1" fill="#C6B79E" text-anchor="middle">YIN v4</text></svg></template>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0a0c0d; color:#C6B79E; -webkit-font-smoothing:antialiased; }
+  *::-webkit-scrollbar { width:0; height:0; display:none; }
+  * { scrollbar-width:none; -ms-overflow-style:none; }
+  a { color:#D6A66A; } a:hover { color:#C68C7F; }
+  @keyframes wakeArrive { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { *{ animation:none !important; } }
+</style>
+</helmet>
+
+<section style="padding:60px 60px 30px; font-family:'Hanken Grotesk',system-ui,sans-serif;">
+  <div style="font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:14px;">Raw Emerald Yoga · canonical v4</div>
+  <h1 style="font-weight:600; font-size:34px; color:#EADFC8; margin:0 0 14px; letter-spacing:-0.015em;">Yin Class Companion — v4 wireframe set</h1>
+  <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.6; color:#C6B79E; max-width:680px; margin:0 0 22px;">Every screen drawn at <strong style="color:#EADFC8; font-weight:600;">412 × 915 CSS px</strong> — Pixel 6 portrait, no device bezel, with realistic top (status bar) and bottom (gesture) safe areas shown. Content and timing come from <code style="font-family:monospace; font-size:13px; color:#A98C64;">fixtures/valid-desire-paths.md</code>. Live clocks assume a 7:00 PM begin unless a frame states otherwise. This board demonstrates hierarchy and intent; the canonical docs govern behavior.</p>
+  <div style="display:flex; flex-wrap:wrap; gap:10px; max-width:900px;">
+    <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#C6B79E;"><span style="width:13px;height:13px;border-radius:3px;background:#14181A;border:1px solid rgba(169,140,100,.4);"></span>Pond Charcoal · bg</span>
+    <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#C6B79E;"><span style="width:13px;height:13px;border-radius:3px;background:#232E38;"></span>Deep Water Slate · surface</span>
+    <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#C6B79E;"><span style="width:13px;height:13px;border-radius:3px;background:#EADFC8;"></span>Taper Wax · clock/text</span>
+    <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#C6B79E;"><span style="width:13px;height:13px;border-radius:3px;background:#D6A66A;"></span>Candlelight Amber · live/action</span>
+    <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#C6B79E;"><span style="width:13px;height:13px;border-radius:3px;background:#C68C7F;"></span>Lotus Blush · next/alt</span>
+    <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#C6B79E;"><span style="width:13px;height:13px;border-radius:3px;background:#8586B0;"></span>Legible Indigo · drift</span>
+    <span style="display:flex; align-items:center; gap:7px; font-size:12px; color:#C6B79E;"><span style="width:13px;height:13px;border-radius:3px;background:#A98C64;"></span>Raw Pine · dividers/labels</span>
+  </div>
+</section>
+
+<section id="secA" style="padding:24px 60px 40px; font-family:'Hanken Grotesk',system-ui,sans-serif;">
+  <div style="margin-bottom:28px;">
+    <div style="font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:700;">A · Setup, import &amp; library</div>
+    <p style="font-family:'Spectral',Georgia,serif; font-size:15px; color:rgba(198,183,158,.8); margin:6px 0 0;">Getting a class into the app and finding tonight's. Denser than live screens; scrolls where needed.</p>
+  </div>
+  <div style="display:flex; flex-wrap:wrap; gap:46px; align-items:flex-start;">
+
+    <!-- A1 Empty library -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">A1</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">First launch / empty library</span><span style="font-size:11.5px; color:#A98C64;">§1</span></div>
+      <div id="frame-a1" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(120% 60% at 50% 30%, rgba(214,166,106,.05), rgba(20,24,26,0) 60%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:12</span><span>84%</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:40px 34px 28px; min-height:0;">
+          <div style="margin-top:64px;">
+            <div style="font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:16px;">Raw Emerald Yoga</div>
+            <div style="font-weight:600; font-size:30px; color:#EADFC8; letter-spacing:-0.01em; line-height:1.1;">Yin Class<br>Companion</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-size:17px; line-height:1.5; color:#C6B79E; margin:18px 0 0;">An instrument for carrying one class into the room. Import a class to begin.</p>
+          </div>
+          <div style="margin-top:auto; display:flex; flex-direction:column; gap:14px;">
+            <div style="padding:18px; border-radius:14px; background:rgba(214,166,106,.09); border:1px solid rgba(214,166,106,.5); box-shadow:0 0 30px -10px rgba(214,166,106,.3); text-align:center; font-weight:600; font-size:17px; color:#EADFC8;">Import a class</div>
+            <div style="padding:15px; border-radius:12px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:15px; color:#C6B79E;">Restore library backup</div>
+            <div style="font-size:12px; color:rgba(169,140,100,.85); text-align:center; margin-top:6px;">Not yet installed · add to Home screen to use offline</div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- A2 Import input -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">A2</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Import input</span><span style="font-size:11.5px; color:#A98C64;">§2</span></div>
+      <div id="frame-a2" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:12</span><span>84%</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:26px 26px 22px; min-height:0;">
+          <div style="font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:600;">Import</div>
+          <div style="font-weight:600; font-size:23px; color:#EADFC8; margin:8px 0 6px;">Import a class</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:15px; line-height:1.5; color:#C6B79E; margin:0 0 16px;">Paste the class Markdown, or choose the <code style="font-family:monospace; font-size:13px; color:#A98C64;">.md</code> file.</p>
+          <div style="flex:1; min-height:0; border-radius:12px; background:#232E38; border:1px solid rgba(169,140,100,.24); padding:16px; overflow:hidden; font-family:monospace; font-size:12.5px; line-height:1.6; color:rgba(198,183,158,.55);">---<br>schema_version: 1<br>class_id: desire-paths-2026-07-28<br>title: Desire Paths<br>date: 2026-07-28<br>scheduled_start_local: "19:00"<br>hard_close_local: "20:00"<br>...<span style="color:rgba(198,183,158,.3);">▏</span></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px;">
+            <div style="padding:12px 16px; border-radius:11px; border:1px solid rgba(169,140,100,.28); font-size:14px; color:#C6B79E;">Choose Markdown file</div>
+            <a href="#" style="font-size:13px; color:#C68C7F;">Schema-v1 example</a>
+          </div>
+          <div style="margin-top:14px; padding:16px; border-radius:13px; background:rgba(214,166,106,.09); border:1px solid rgba(214,166,106,.5); text-align:center; font-weight:600; font-size:16px; color:#EADFC8;">Validate class</div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- A3 Import blocking errors -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">A3</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Import blocking errors</span><span style="font-size:11.5px; color:#A98C64;">§2 · invalid-bilateral-duration</span></div>
+      <div id="frame-a3" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:13</span><span>84%</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:26px 26px 22px; min-height:0;">
+          <div style="font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:600;">Import · needs changes</div>
+          <div style="font-weight:600; font-size:21px; color:#EADFC8; margin:8px 0 4px;">Two things to fix</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.5; color:#C6B79E; margin:0 0 16px;">Fix these in the assistant, then paste again. Your source is kept below.</p>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="border-radius:11px; background:#232E38; border-left:3px solid #D6A66A; padding:13px 15px;">
+              <div style="font-weight:600; font-size:13px; color:#D6A66A; margin-bottom:5px;">Bilateral Test · duration_per_side_min &nbsp;<span style="color:rgba(169,140,100,.8); font-weight:400;">line 39</span></div>
+              <div style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.5; color:#C6B79E;">This bilateral pose needs <code style="font-family:monospace; font-size:12.5px;">duration_per_side_min</code>. Add <code style="font-family:monospace; font-size:12.5px;">duration_per_side_min: 4</code>.</div>
+            </div>
+            <div style="border-radius:11px; background:#232E38; border-left:3px solid #D6A66A; padding:13px 15px;">
+              <div style="font-weight:600; font-size:13px; color:#D6A66A; margin-bottom:5px;">Bilateral Test · duration_min &nbsp;<span style="color:rgba(169,140,100,.8); font-weight:400;">line 38</span></div>
+              <div style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.5; color:#C6B79E;"><code style="font-family:monospace; font-size:12.5px;">duration_min</code> isn't allowed on a bilateral pose. Four minutes must be declared as <code style="font-family:monospace; font-size:12.5px;">duration_per_side_min: 4</code> — four minutes on each side.</div>
+            </div>
+          </div>
+          <div style="flex:1; min-height:40px; margin-top:14px; border-radius:11px; background:#232E38; border:1px solid rgba(169,140,100,.2); padding:13px 15px; overflow:hidden; font-family:monospace; font-size:11.5px; line-height:1.55; color:rgba(198,183,158,.45);">## Pose: Bilateral Test<br><br>```yaml<br>id: bilateral-test<br>bilateral: true<br>duration_min: 4<br>side_order:</div>
+          <div style="display:flex; gap:12px; margin-top:14px;">
+            <div style="flex:1; padding:14px; border-radius:12px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:14px; color:#C6B79E;">Copy errors</div>
+            <div style="flex:1; padding:14px; border-radius:12px; background:rgba(214,166,106,.09); border:1px solid rgba(214,166,106,.5); text-align:center; font-weight:600; font-size:14px; color:#EADFC8;">Check again</div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- A4 Import confirmation -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">A4</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Import confirmation</span><span style="font-size:11.5px; color:#A98C64;">§2 · valid-desire-paths</span></div>
+      <div id="frame-a4" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:13</span><span>84%</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:26px 26px 22px; min-height:0;">
+          <div style="font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:600;">Import · ready</div>
+          <div style="font-weight:600; font-size:27px; color:#EADFC8; margin:8px 0 2px;">Desire Paths</div>
+          <div style="font-size:14px; color:#C6B79E; margin-bottom:18px;">Tuesday, July 28, 2026 · 7:00–8:00 PM</div>
+          <div style="display:flex; flex-direction:column;">
+            <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(169,140,100,.14);"><span style="font-size:14px; color:#C6B79E;">Planned duration</span><span style="font-size:14px; color:#EADFC8; font-weight:600; font-variant-numeric:tabular-nums;">60 min</span></div>
+            <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(169,140,100,.14);"><span style="font-size:14px; color:#C6B79E;">Authored poses</span><span style="font-size:14px; color:#EADFC8; font-weight:600;">5</span></div>
+            <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(169,140,100,.14);"><span style="font-size:14px; color:#C6B79E;">Teaching sides</span><span style="font-size:14px; color:#EADFC8; font-weight:600;">8</span></div>
+            <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(169,140,100,.14);"><span style="font-size:14px; color:#C6B79E;">Transitions</span><span style="font-size:14px; color:#EADFC8; font-weight:600;">5</span></div>
+            <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(169,140,100,.14);"><span style="font-size:14px; color:#C6B79E;">Peak pose</span><span style="font-size:14px; color:#D6A66A; font-weight:600;">Supported Caterpillar</span></div>
+            <div style="display:flex; justify-content:space-between; padding:9px 0;"><span style="font-size:14px; color:#C6B79E;">Warnings</span><span style="font-size:14px; color:#C6B79E;">None</span></div>
+          </div>
+          <div style="margin-top:16px; padding:14px 16px; border-radius:12px; background:#232E38;">
+            <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:7px;">Props · room</div>
+            <div style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.55; color:#C6B79E;">1 bolster · 2 blocks · 1 blanket (per person). Preserve wall space along the mural side.</div>
+          </div>
+          <div style="margin-top:auto; display:flex; gap:12px; padding-top:16px;">
+            <div style="flex:1; padding:15px; border-radius:12px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:14px; color:#C6B79E;">Return to source</div>
+            <div style="flex:1.2; padding:15px; border-radius:12px; background:rgba(214,166,106,.09); border:1px solid rgba(214,166,106,.5); text-align:center; font-weight:600; font-size:15px; color:#EADFC8;">Import class</div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- A5 Home / upcoming -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">A5</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Home / upcoming class</span><span style="font-size:11.5px; color:#A98C64;">§3</span></div>
+      <div id="frame-a5" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(120% 55% at 50% 22%, rgba(214,166,106,.05), rgba(20,24,26,0) 60%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>6:41</span><span>84%</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:34px 30px 26px; min-height:0;">
+          <div style="margin-top:22px;">
+            <div style="font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:14px;">Upcoming</div>
+            <div style="font-weight:600; font-size:33px; color:#EADFC8; letter-spacing:-0.01em;">Desire Paths</div>
+            <div style="font-size:14px; color:#C6B79E; margin-top:6px;">Tuesday · July 28, 2026</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:17px; line-height:1.5; color:#C6B79E; margin:20px 0 0;">Where you place your attention is where the path forms.</p>
+            <div style="font-size:13.5px; color:rgba(169,140,100,.9); margin-top:18px; font-variant-numeric:tabular-nums;">60 min planned · hard close 8:00 PM</div>
+          </div>
+          <div style="margin-top:auto; display:flex; flex-direction:column; gap:13px;">
+            <div style="padding:19px; border-radius:14px; background:rgba(214,166,106,.1); border:1px solid rgba(214,166,106,.55); box-shadow:0 0 32px -10px rgba(214,166,106,.32); text-align:center; font-weight:600; font-size:18px; color:#EADFC8;">Open Prep</div>
+            <div style="display:flex; gap:12px;">
+              <div style="flex:1; padding:14px; border-radius:12px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:14px; color:#C6B79E;">Library</div>
+              <div style="flex:1; padding:14px; border-radius:12px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:14px; color:#C6B79E;">Import</div>
+            </div>
+            <div style="font-size:12px; color:rgba(169,140,100,.8); text-align:center; margin-top:4px;">Backup current · exported Jul 22</div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- A6 Library list -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">A6</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Library list</span><span style="font-size:11.5px; color:#A98C64;">§13</span></div>
+      <div id="frame-a6" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>6:38</span><span>84%</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:26px 24px 22px; min-height:0;">
+          <div style="font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:600;">Library</div>
+          <div style="font-weight:600; font-size:23px; color:#EADFC8; margin:8px 0 18px;">Classes</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="border-radius:12px; background:#232E38; padding:15px 16px; border:1px solid rgba(214,166,106,.3);">
+              <div style="display:flex; align-items:baseline; justify-content:space-between;"><span style="font-weight:600; font-size:17px; color:#EADFC8;">Desire Paths</span><span style="font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#14181A; background:#D6A66A; padding:2px 7px; border-radius:5px; font-weight:700;">Upcoming</span></div>
+              <div style="font-size:12.5px; color:rgba(198,183,158,.7); margin-top:6px;">Jul 28, 2026 · Peak Supported Caterpillar · 60 min · no runs yet</div>
+            </div>
+            <div style="border-radius:12px; background:#232E38; padding:15px 16px;">
+              <div style="font-weight:600; font-size:17px; color:#EADFC8;">Tending the Threshold</div>
+              <div style="font-size:12.5px; color:rgba(198,183,158,.7); margin-top:6px;">Jul 21, 2026 · Peak Dragonfly · 60 min · 1 taught run</div>
+            </div>
+            <div style="border-radius:12px; background:#232E38; padding:15px 16px;">
+              <div style="font-weight:600; font-size:17px; color:#EADFC8;">The Long Exhale</div>
+              <div style="font-size:12.5px; color:rgba(198,183,158,.7); margin-top:6px;">Jul 14, 2026 · Peak Supported Bridge · 60 min · 1 taught run</div>
+            </div>
+            <div style="border-radius:12px; background:#232E38; padding:15px 16px;">
+              <div style="font-weight:600; font-size:17px; color:#EADFC8;">Still Water</div>
+              <div style="font-size:12.5px; color:rgba(198,183,158,.7); margin-top:6px;">Jul 7, 2026 · Peak Sleeping Swan · 60 min · 2 taught runs</div>
+            </div>
+          </div>
+          <div style="margin-top:auto; padding-top:16px;">
+            <div style="padding:14px; border-radius:12px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:14px; color:#C6B79E;">Import a class</div>
+            <div style="font-size:12px; color:rgba(169,140,100,.8); text-align:center; margin-top:12px;">This device may clear local data · export a backup after class</div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- A7 Class detail -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">A7</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Class detail</span><span style="font-size:11.5px; color:#A98C64;">§13 · immutable plan + taught runs</span></div>
+      <div id="frame-a7" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>6:40</span><span>84%</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:24px 24px 22px; min-height:0; overflow:hidden;">
+          <div style="font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:600;">Class</div>
+          <div style="font-weight:600; font-size:25px; color:#EADFC8; margin:8px 0 2px;">Still Water</div>
+          <div style="font-size:12.5px; color:rgba(169,140,100,.9);">Revision 1 · imported Jul 1, 2026 · source 4f9c…</div>
+          <div style="margin-top:16px; padding:14px 16px; border-radius:12px; background:#232E38;">
+            <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:6px;">Authored plan · immutable</div>
+            <div style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.55; color:#C6B79E;">5 poses · 8 sides · 60 min · Peak Sleeping Swan. The plan never changes after import.</div>
+          </div>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin:20px 0 10px;">Taught runs</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="border-radius:11px; background:#232E38; padding:13px 15px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:14px; color:#EADFC8;">Jul 7 · 7:02 PM start</span><span style="font-size:12.5px; color:rgba(198,183,158,.7);">58 min · note ✓</span></div>
+            <div style="border-radius:11px; background:#232E38; padding:13px 15px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:14px; color:#EADFC8;">Jul 14 · 7:01 PM rerun</span><span style="font-size:12.5px; color:rgba(198,183,158,.7);">60 min</span></div>
+          </div>
+          <div style="margin-top:auto; display:flex; flex-direction:column; gap:11px; padding-top:16px;">
+            <div style="padding:15px; border-radius:12px; background:rgba(214,166,106,.09); border:1px solid rgba(214,166,106,.5); text-align:center; font-weight:600; font-size:15px; color:#EADFC8;">Run this class again</div>
+            <div style="display:flex; gap:11px;">
+              <div style="flex:1; padding:13px; border-radius:11px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:13px; color:#C6B79E;">Export original</div>
+              <div style="flex:1; padding:13px; border-radius:11px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:13px; color:#C6B79E;">Export as-taught</div>
+            </div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<section id="secB" style="padding:24px 60px 40px; font-family:'Hanken Grotesk',system-ui,sans-serif;">
+  <div style="margin-bottom:28px;">
+    <div style="font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:700;">B · Prep &amp; grounding</div>
+    <p style="font-family:'Spectral',Georgia,serif; font-size:15px; color:rgba(198,183,158,.8); margin:6px 0 0;">Staging the room, then opening the class. Prep scrolls but Begin Class is pinned and never clipped.</p>
+  </div>
+  <div style="display:flex; flex-wrap:wrap; gap:46px; align-items:flex-start;">
+
+    <!-- B1 Prep v4 -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">B1</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Prep</span><span style="font-size:11.5px; color:#A98C64;">§4 · scrolls · Begin pinned</span></div>
+      <div id="frame-b1" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>6:52</span><span>84%</span></div>
+        <div style="flex:1; min-height:0; overflow:auto; padding:22px 24px 8px; position:relative;">
+          <div style="font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:600;">Prep · Tue Jul 28</div>
+          <div style="font-weight:600; font-size:26px; color:#EADFC8; margin:7px 0 6px;">Desire Paths</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:16px; line-height:1.45; color:#C6B79E; margin:0 0 4px;">Where you place your attention is where the path forms.</p>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:13.5px; line-height:1.5; color:rgba(198,183,158,.85); margin:8px 0 0;"><span style="font-family:'Hanken Grotesk'; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#A98C64; font-weight:600;">Felt sense &nbsp;</span>Notice the route attention takes before asking it to change.</p>
+          <div style="margin:16px 0; padding:12px 14px; border-radius:11px; background:#232E38; font-size:13px; color:#C6B79E; font-variant-numeric:tabular-nums;">Do Not Disturb on · brightness set · battery comfortable</div>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin:0 0 8px;">Props</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <span style="font-size:13px; color:#C6B79E; background:#232E38; border:1px solid rgba(169,140,100,.18); padding:6px 11px; border-radius:9px;">1 bolster</span>
+            <span style="font-size:13px; color:#C6B79E; background:#232E38; border:1px solid rgba(169,140,100,.18); padding:6px 11px; border-radius:9px;">2 blocks</span>
+            <span style="font-size:13px; color:#C6B79E; background:#232E38; border:1px solid rgba(169,140,100,.18); padding:6px 11px; border-radius:9px;">1 blanket</span>
+            <span style="font-size:12px; color:rgba(169,140,100,.85); align-self:center;">per person</span>
+          </div>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin:16px 0 6px;">Room setup</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.5; color:#C6B79E; margin:0;">Preserve wall space along the mural side.</p>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin:16px 0 6px;">Arrival</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.5; color:#C6B79E; margin:0;">Bring everyone onto their backs and allow a few unstructured breaths before naming the theme.</p>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin:16px 0 6px;">Breathwork</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.5; color:#C6B79E; margin:0;">Slow nasal breathing with a longer exhale; become silent after three guided rounds.</p>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin:18px 0 8px;">Sequence</div>
+          <div style="display:flex; flex-direction:column; gap:2px; font-variant-numeric:tabular-nums;">
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Grounding</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:00</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Supported Butterfly</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:10</span></div>
+            <div style="padding:2px 0 2px 10px; font-size:11px; color:rgba(169,140,100,.55);">→ transition · 7:14</div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Sleeping Swan · Right</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:15</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Sleeping Swan · Left</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:19</span></div>
+            <div style="padding:2px 0 2px 10px; font-size:11px; color:rgba(169,140,100,.55);">→ transition · 7:23</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0;"><span style="display:flex; align-items:center; gap:8px;"><span style="width:6px;height:6px;border-radius:50%;background:#D6A66A;box-shadow:0 0 8px 1px rgba(214,166,106,.5);"></span><span style="font-size:14px; color:#D6A66A;">Supported Caterpillar</span></span><span style="font-size:12.5px; color:rgba(214,166,106,.85);">7:24</span></div>
+            <div style="padding:2px 0 2px 10px; font-size:11px; color:rgba(169,140,100,.55);">→ transition · 7:30</div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Saddle · Right</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:31</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Saddle · Left</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:34</span></div>
+            <div style="padding:2px 0 2px 10px; font-size:11px; color:rgba(169,140,100,.55);">→ transition · 7:37</div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Reclined Twist · Right</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:38</span></div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Reclined Twist · Left</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:41</span></div>
+            <div style="padding:2px 0 2px 10px; font-size:11px; color:rgba(169,140,100,.55);">→ transition · 7:44</div>
+            <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font-size:14px; color:#C6B79E;">Savasana</span><span style="font-size:12.5px; color:rgba(234,223,200,.7);">7:45</span></div>
+          </div>
+          <div style="margin:14px 0 4px; font-size:13px; color:rgba(169,140,100,.9); font-variant-numeric:tabular-nums;">Hard close · 8:00 PM</div>
+          <div style="margin:12px 0 8px; padding:12px 14px; border-radius:11px; background:#232E38; display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:13px; color:#C6B79E;">Display options · Next-pose preview</span>
+            <span style="display:flex; align-items:center; gap:6px; font-size:12px; color:#D6A66A;"><span style="width:30px;height:17px;border-radius:9px;background:rgba(214,166,106,.3);position:relative;"><span style="position:absolute;right:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#D6A66A;"></span></span>On</span>
+          </div>
+        </div>
+        <div style="flex:none; padding:12px 24px; border-top:1px solid rgba(169,140,100,.2); background:#14181A;">
+          <div style="padding:16px; border-radius:14px; background:rgba(214,166,106,.1); border:1px solid rgba(214,166,106,.55); box-shadow:0 0 30px -10px rgba(214,166,106,.32); text-align:center;">
+            <div style="font-weight:600; font-size:17px; color:#EADFC8;">Begin Class</div>
+            <div style="font-family:'Spectral',Georgia,serif; font-size:12px; color:#A98C64; margin-top:2px;">records tonight's start · requests screen wake lock</div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+      <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:12.5px; line-height:1.5; color:rgba(198,183,158,.7); max-width:412px; margin:0;">The sequence scrolls in the upper area; Begin Class is pinned in a fixed footer above the gesture bar, so it can never be clipped (acceptance J1).</p>
+    </div>
+
+    <!-- B2 Grounding minimal -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">B2</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Grounding · minimal</span><span style="font-size:11.5px; color:#A98C64;">§5</span></div>
+      <div id="frame-b2" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(110% 55% at 50% 42%, rgba(214,166,106,.07), rgba(20,24,26,0) 62%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:05</span><span>84%</span></div>
+        <div style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">‹</div>
+        <div style="position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">›</div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:30px 30px 22px; min-height:0; text-align:center;">
+          <div style="font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#A98C64; font-weight:600;">Grounding</div>
+          <div style="margin-top:26px;">
+            <div style="font-weight:700; font-size:96px; line-height:.9; color:#EADFC8; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; text-shadow:0 0 40px rgba(214,166,106,.13);">7:05</div>
+            <div style="font-size:13px; color:rgba(198,183,158,.72); margin-top:14px; font-variant-numeric:tabular-nums;">planned 7:00–7:10 · 5:02 elapsed</div>
+            <div style="display:inline-flex; align-items:center; gap:7px; margin-top:14px; padding:6px 13px; border-radius:20px; background:rgba(62,63,107,.35); border:1px solid rgba(133,134,176,.3);"><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:rgba(133,134,176,.85);">drift</span><span style="font-weight:600; font-size:13px; color:#8586B0;">on plan</span></div>
+          </div>
+          <div style="margin-top:auto;">
+            <p style="font-family:'Spectral',Georgia,serif; font-size:18px; line-height:1.5; color:#C6B79E; margin:0 4px;">Attention makes a path by returning. Tonight we notice the return before we try to redirect it.</p>
+            <div style="margin-top:26px; padding-top:14px; border-top:1px solid rgba(169,140,100,.16); font-size:14px;"><span style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600;">Next &nbsp;</span><span style="color:#C68C7F;">Supported Butterfly</span><span style="color:rgba(198,183,158,.55); font-variant-numeric:tabular-nums;"> · 7:10</span></div>
+            <div style="font-size:11.5px; color:rgba(169,140,100,.65); margin-top:12px;">tap center for reference · right to continue</div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- B3 Grounding expanded -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">B3</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Grounding · expanded</span><span style="font-size:11.5px; color:#A98C64;">§5 · scrolls</span></div>
+      <div id="frame-b3" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:06</span><span>84%</span></div>
+        <div style="flex:none; padding:12px 24px; border-bottom:1px solid rgba(169,140,100,.2); display:flex; align-items:baseline; justify-content:space-between; background:#14181A;">
+          <span style="font-weight:600; font-size:16px; color:#EADFC8;">Grounding</span>
+          <span style="font-size:12.5px; color:rgba(198,183,158,.7); font-variant-numeric:tabular-nums;">7:06 · 7:00–7:10 · 6:10</span>
+        </div>
+        <div style="flex:1; min-height:0; overflow:auto; padding:20px 24px 16px;">
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:6px;">Theme anchor</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.55; color:#C6B79E; margin:0 0 18px;">Attention makes a path by returning. Tonight we notice the return before we try to redirect it.</p>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:8px;">Three yin principles</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14.5px; line-height:1.5; color:#C6B79E; margin:0 0 6px;">1 · Find the first workable edge rather than the deepest shape.</p>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14.5px; line-height:1.5; color:#C6B79E; margin:0 0 6px;">2 · Let sensation remain in the 2–5 range out of 10.</p>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14.5px; line-height:1.5; color:#C6B79E; margin:0 0 18px;">3 · Give stillness time to become informative.</p>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:6px;">Sensation scale</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14.5px; line-height:1.5; color:#C6B79E; margin:0 0 18px;">Aim for 2–5 of 10 — a clear, workable stretch, never a grip.</p>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:6px;">Guided / silent ratio</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14.5px; line-height:1.5; color:#C6B79E; margin:0 0 18px;">Guide the first four minutes, then leave longer stretches of silence.</p>
+          <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:6px;">Arrival · breathwork</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:14.5px; line-height:1.5; color:#C6B79E; margin:0;">Onto the back, a few unstructured breaths before naming the theme. Slow nasal breathing, longer exhale; silent after three guided rounds.</p>
+        </div>
+        <div style="flex:none; padding:12px 24px; border-top:1px solid rgba(169,140,100,.2);">
+          <div style="padding:13px; border-radius:12px; border:1px solid rgba(169,140,100,.3); text-align:center; font-size:14px; color:#C6B79E;">Close reference</div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="secC" style="padding:24px 60px 40px; font-family:'Hanken Grotesk',system-ui,sans-serif;">
+  <div style="margin-bottom:28px;">
+    <div style="font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:700;">C · Live teaching</div>
+    <p style="font-family:'Spectral',Georgia,serif; font-size:15px; color:rgba(198,183,158,.8); margin:6px 0 0;">Sparse, two-second glance. Wall clock is the hero; drift is cool and calm; the next destination is never mistaken for a skip.</p>
+  </div>
+  <div style="display:flex; flex-wrap:wrap; gap:46px; align-items:flex-start;">
+
+    <!-- C1 Transition -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">C1</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Transition</span><span style="font-size:11.5px; color:#A98C64;">§7 · to Sleeping Swan</span></div>
+      <div id="frame-c1" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(110% 50% at 50% 40%, rgba(214,166,106,.06), rgba(20,24,26,0) 62%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:15</span><span>84%</span></div>
+        <div style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">‹</div>
+        <div style="position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">›</div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:30px 30px 22px; min-height:0; text-align:center;">
+          <div style="font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#A98C64; font-weight:600;">Transition</div>
+          <div style="margin-top:8px; font-size:15px; color:#C68C7F;">Next · Sleeping Swan · Side 1 (Right)</div>
+          <div style="margin-top:22px;">
+            <div style="font-weight:700; font-size:88px; line-height:.9; color:#EADFC8; letter-spacing:-0.02em; font-variant-numeric:tabular-nums;">7:15</div>
+            <div style="font-size:13px; color:rgba(198,183,158,.72); margin-top:12px; font-variant-numeric:tabular-nums;">planned 7:14–7:15 · 0:38 elapsed</div>
+            <div style="display:inline-flex; align-items:center; gap:7px; margin-top:12px; padding:6px 13px; border-radius:20px; background:rgba(62,63,107,.35); border:1px solid rgba(133,134,176,.3);"><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:rgba(133,134,176,.85);">drift</span><span style="font-weight:600; font-size:13px; color:#8586B0;">on plan</span></div>
+          </div>
+          <div style="margin-top:auto; text-align:left;">
+            <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:6px;">Setup</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.5; color:#C6B79E; margin:0 0 16px;">Roll to one side and come to all fours; bring the bolster lengthwise near the top of the mat.</p>
+            <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#C68C7F; font-weight:600; margin-bottom:6px;">Offer before settling</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-size:15px; line-height:1.5; color:#C6B79E; margin:0;">Offer reclined figure four before anyone settles into the forward shape.</p>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- C2 Pose minimal · long title -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">C2</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Pose · minimal · long-title stress</span><span style="font-size:11.5px; color:#A98C64;">§6 · 36-char title</span></div>
+      <div id="frame-c2" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(110% 55% at 50% 40%, rgba(214,166,106,.08), rgba(20,24,26,0) 62%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:18</span><span>84%</span></div>
+        <div style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">‹</div>
+        <div style="position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">›</div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:26px 28px 22px; min-height:0; text-align:center;">
+          <div>
+            <div style="font-weight:600; font-size:28px; line-height:1.12; color:#EADFC8; letter-spacing:-0.01em;">Reclined Half Butterfly Forward Fold</div>
+            <div style="font-size:13px; color:#A98C64; letter-spacing:.06em; text-transform:uppercase; margin-top:9px;">Side 1 of 2 · Right</div>
+          </div>
+          <div style="margin-top:20px;">
+            <div style="font-weight:700; font-size:90px; line-height:.9; color:#EADFC8; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; text-shadow:0 0 40px rgba(214,166,106,.13);">7:18</div>
+            <div style="font-size:13px; color:rgba(198,183,158,.72); margin-top:12px; font-variant-numeric:tabular-nums;">planned 7:15–7:19 · 2:03 elapsed</div>
+            <div style="display:inline-flex; align-items:center; gap:7px; margin-top:12px; padding:6px 13px; border-radius:20px; background:rgba(62,63,107,.35); border:1px solid rgba(133,134,176,.3);"><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:rgba(133,134,176,.85);">drift</span><span style="font-weight:600; font-size:13px; color:#8586B0; font-variant-numeric:tabular-nums;">+1 min</span></div>
+          </div>
+          <div style="margin-top:auto;">
+            <p style="font-family:'Spectral',Georgia,serif; font-size:17px; line-height:1.45; color:#C6B79E; margin:0 2px 18px;">Let the extended-leg hip stay heavy while the folded knee drifts open on its own time; if the low back rounds sharply, sit up onto more height.</p>
+            <div style="padding:12px 14px; border-radius:12px; background:rgba(198,140,127,.1); border:1px solid rgba(198,140,127,.4); text-align:left;">
+              <div style="font-size:14px; color:#EADFC8;"><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#C68C7F; font-weight:600;">Next &nbsp;</span>same pose · <strong style="color:#C68C7F; font-weight:600;">Side 2 (Left)</strong><span style="color:rgba(198,183,158,.6); font-variant-numeric:tabular-nums;"> · 7:19</span></div>
+              <div style="font-size:12px; color:rgba(169,140,100,.85); margin-top:5px;">then Supported Caterpillar · 7:24</div>
+            </div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+      <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:12.5px; line-height:1.5; color:rgba(198,183,158,.7); max-width:412px; margin:0;">36-char title wraps to two lines without collision. The immediate destination (Side 2, Left) is bold and separated from the following authored pose, so Side 2 can never read as skipped (F3, §6).</p>
+    </div>
+
+    <!-- C3 Pose expanded · overflow -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">C3</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Pose · expanded · overflow stress</span><span style="font-size:11.5px; color:#A98C64;">§6 · scrolls, never clipped</span></div>
+      <div id="frame-c3" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:27</span><span>84%</span></div>
+        <div style="flex:none; padding:11px 24px; border-bottom:1px solid rgba(169,140,100,.2); display:flex; align-items:baseline; justify-content:space-between; background:#14181A;">
+          <span style="font-weight:600; font-size:16px; color:#EADFC8;">Supported Caterpillar</span>
+          <span style="font-size:12px; color:rgba(198,183,158,.7); font-variant-numeric:tabular-nums;">7:27 · 7:24–7:30 · 2:52</span>
+        </div>
+        <div style="flex:1; min-height:0; overflow:auto; padding:18px 24px 14px;">
+          <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:5px;">Entry</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.55; color:#C6B79E; margin:0 0 15px;">Extend both legs forward and soften the knees until the backs of them release toward the floor; let the spine round gradually toward the bolster, leading with the crown rather than reaching with the hands, and take three unhurried breaths before deciding how far to travel.</p>
+          <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:5px;">Target</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.55; color:#C6B79E; margin:0 0 15px;">The whole back body — heels, calves, hamstrings, and the long line of the spine.</p>
+          <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:5px;">Settling</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.55; color:#C6B79E; margin:0 0 15px;">Choose enough height under the chest and forehead that the abdomen stays soft and the breath moves freely; the sensation should sit between 2 and 5 out of 10, and if the breath shortens or the jaw grips, add height rather than insisting on depth.</p>
+          <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:5px;">Midpoint</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.55; color:#C6B79E; margin:0 0 15px;">Feel where gravity has made a path that effort no longer needs to hold.</p>
+          <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:5px;">Props &amp; setup</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.55; color:#C6B79E; margin:0 0 15px;">Sit on the folded blanket to tip the pelvis forward; stack the bolster and blocks to meet the forehead or chest wherever they land.</p>
+          <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#C68C7F; font-weight:600; margin-bottom:5px;">Functional alternative</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.55; color:#C6B79E; margin:0 0 15px;">Bend both knees generously and support them with the rolled blanket, letting the fold happen over bent legs — an equal shape, not a lesser one.</p>
+          <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:5px;">Exit</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.55; color:#C6B79E; margin:0 0 15px;">Roll the spine upright slowly and pause with the hands behind you before the next transition.</p>
+          <div style="border-radius:11px; background:rgba(214,166,106,.06); border-left:2px solid #A98C64; padding:12px 14px;">
+            <div style="font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#D6A66A; font-weight:600; margin-bottom:5px;">Instructor note</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:15px; line-height:1.5; color:#C6B79E; margin:0;">Peak of the sequence; allow the longest silence here.</p>
+          </div>
+        </div>
+        <div style="flex:none; padding:11px 24px; border-top:1px solid rgba(169,140,100,.2);">
+          <div style="padding:12px; border-radius:12px; border:1px solid rgba(169,140,100,.3); text-align:center; font-size:14px; color:#C6B79E;">Close reference</div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+      <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:12.5px; line-height:1.5; color:rgba(198,183,158,.7); max-width:412px; margin:0;">Header stays compact and sticky; all eight cue fields scroll in an <code style="font-family:monospace;font-size:11px;">overflow:auto</code> area — no <code style="font-family:monospace;font-size:11px;">overflow:hidden</code> on authored copy (J1, §6).</p>
+    </div>
+
+    <!-- C4 Two-minute callout outside Savasana -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">C4</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Two-minute callout · in a pose</span><span style="font-size:11.5px; color:#A98C64;">§8 · 7:58, Reclined Twist S2</span></div>
+      <div id="frame-c4" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(110% 50% at 50% 38%, rgba(214,166,106,.07), rgba(20,24,26,0) 60%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:58</span><span>84%</span></div>
+        <div style="position:absolute; left:14px; top:44%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">‹</div>
+        <div style="position:absolute; right:14px; top:44%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">›</div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:24px 28px 12px; min-height:0; text-align:center;">
+          <div>
+            <div style="font-weight:600; font-size:27px; color:#EADFC8;">Reclined Twist</div>
+            <div style="font-size:13px; color:#A98C64; letter-spacing:.06em; text-transform:uppercase; margin-top:8px;">Side 2 · Left</div>
+          </div>
+          <div style="margin-top:16px;">
+            <div style="font-weight:700; font-size:82px; line-height:.9; color:#EADFC8; letter-spacing:-0.02em; font-variant-numeric:tabular-nums;">7:58</div>
+            <div style="font-size:13px; color:rgba(198,183,158,.72); margin-top:10px; font-variant-numeric:tabular-nums;">planned 7:41–7:44 · 6:12 elapsed</div>
+            <div style="display:inline-flex; align-items:center; gap:7px; margin-top:10px; padding:6px 13px; border-radius:20px; background:rgba(62,63,107,.35); border:1px solid rgba(133,134,176,.3);"><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:rgba(133,134,176,.85);">drift</span><span style="font-weight:600; font-size:13px; color:#8586B0; font-variant-numeric:tabular-nums;">+14 min</span></div>
+          </div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.45; color:#C6B79E; margin:16px 6px 0;">Let the opposite shoulder be heavy without insisting that it touch the floor.</p>
+          <div style="margin-top:12px; font-size:13px;"><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#A98C64; font-weight:600;">Next &nbsp;</span><span style="color:#C68C7F;">Transition to Savasana</span></div>
+        </div>
+        <div style="flex:none; margin:0 16px 10px; padding:16px 18px; border-radius:14px; background:rgba(214,166,106,.12); border:1px solid rgba(214,166,106,.42); box-shadow:0 0 34px -8px rgba(214,166,106,.4); text-align:center; animation:wakeArrive 3s ease-out both;">
+          <p style="font-family:'Spectral',Georgia,serif; font-size:17px; line-height:1.4; color:#D6A66A; margin:0; text-shadow:0 0 22px rgba(214,166,106,.3);">Two minutes. Time to begin the gentle awakening.</p>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+      <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:12.5px; line-height:1.5; color:rgba(198,183,158,.7); max-width:412px; margin:0;">Persistent lower callout arriving like candlelight (one 3s fade, then static). It sits below the clock, cue, and next line — nothing essential is obscured (E3, §8).</p>
+    </div>
+
+    <!-- C5 Savasana -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">C5</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Savasana</span><span style="font-size:11.5px; color:#A98C64;">§9 · 7:58 · wake static</span></div>
+      <div id="frame-c5" style="position:relative; width:412px; height:915px; background:#111417; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(130% 80% at 50% 80%, rgba(214,166,106,.07), rgba(17,20,23,0) 60%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.34); font-variant-numeric:tabular-nums;"><span>7:58</span><span>84%</span></div>
+        <div style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.22); z-index:3;">‹</div>
+        <div style="position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.22); z-index:3;">›</div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:34px 30px 16px; min-height:0;">
+          <div style="text-align:center;">
+            <div style="font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:rgba(169,140,100,.75); font-weight:600;">Savasana</div>
+            <div style="font-weight:600; font-size:58px; color:rgba(234,223,200,.92); font-variant-numeric:tabular-nums; margin-top:12px; letter-spacing:-0.01em;">7:58</div>
+            <div style="font-size:13px; color:rgba(198,183,158,.55); margin-top:6px; font-variant-numeric:tabular-nums;">hard close 8:00 · 2 min to close</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:34px; align-items:center;">
+            <div style="font-family:'Spectral',Georgia,serif; font-size:14px; color:rgba(198,183,158,.4);">Settle</div>
+            <div style="font-family:'Spectral',Georgia,serif; font-size:14px; color:rgba(198,183,158,.4);">Body scan</div>
+            <div style="font-family:'Spectral',Georgia,serif; font-size:14px; color:rgba(198,183,158,.4);">Breath softens</div>
+            <div style="font-family:'Spectral',Georgia,serif; font-size:14px; color:rgba(198,183,158,.4);">Stillness</div>
+            <div style="font-family:'Spectral',Georgia,serif; font-size:14px; color:rgba(198,183,158,.4);">Return of breath</div>
+            <div style="display:flex; align-items:center; gap:10px;"><span style="width:5px;height:5px;border-radius:50%;background:#D6A66A;box-shadow:0 0 8px 1px rgba(214,166,106,.55);"></span><span style="font-family:'Spectral',Georgia,serif; font-size:16.5px; color:#EADFC8;">Gentle awakening</span></div>
+          </div>
+          <div style="margin-top:auto; padding:15px 18px; border-radius:14px; background:rgba(214,166,106,.1); border:1px solid rgba(214,166,106,.38); text-align:center;">
+            <p style="font-family:'Spectral',Georgia,serif; font-size:17px; line-height:1.4; color:#D6A66A; margin:0; text-shadow:0 0 20px rgba(214,166,106,.28);">Two minutes. Time to begin the gentle awakening.</p>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.2);"></div></div>
+      </div>
+      <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:12.5px; line-height:1.5; color:rgba(198,183,158,.7); max-width:412px; margin:0;">Wake message shown in its resting state — already faded in, now static (no loop, no pulse). Past steps dimmed; the active step is marked, not animated. After the 6th step, Next reveals Finish Class (E4, §9).</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="secD" style="padding:24px 60px 40px; font-family:'Hanken Grotesk',system-ui,sans-serif;">
+  <div style="margin-bottom:28px;">
+    <div style="font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:700;">D · Recovery, exit &amp; post-class</div>
+    <p style="font-family:'Spectral',Georgia,serif; font-size:15px; color:rgba(198,183,158,.8); margin:6px 0 0;">Calm failure and honest record. Nothing here alarms; destructive paths take a second, deliberate step.</p>
+  </div>
+  <div style="display:flex; flex-wrap:wrap; gap:46px; align-items:flex-start;">
+
+    <!-- D1 Run Recovery -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">D1</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Run Recovery</span><span style="font-size:11.5px; color:#A98C64;">§11</span></div>
+      <div id="frame-d1" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(120% 55% at 50% 26%, rgba(214,166,106,.05), rgba(20,24,26,0) 60%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:41</span><span>84%</span></div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:34px 30px 26px; min-height:0;">
+          <div style="margin-top:20px;">
+            <div style="font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:14px;">A class is still running</div>
+            <div style="font-weight:600; font-size:29px; color:#EADFC8; letter-spacing:-0.01em;">Desire Paths</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-size:16px; line-height:1.5; color:#C6B79E; margin:16px 0 0;">Your class is safe. Nothing was lost — pick up exactly where you left off.</p>
+            <div style="margin-top:22px; padding:16px 18px; border-radius:12px; background:#232E38; display:flex; flex-direction:column; gap:10px; font-variant-numeric:tabular-nums;">
+              <div style="display:flex; justify-content:space-between;"><span style="font-size:13.5px; color:#C6B79E;">Started</span><span style="font-size:13.5px; color:#EADFC8;">7:03 PM</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="font-size:13.5px; color:#C6B79E;">Last segment</span><span style="font-size:13.5px; color:#EADFC8;">Saddle · Left</span></div>
+              <div style="display:flex; justify-content:space-between;"><span style="font-size:13.5px; color:#C6B79E;">Now</span><span style="font-size:13.5px; color:#EADFC8;">7:41 PM</span></div>
+            </div>
+          </div>
+          <div style="margin-top:auto; display:flex; flex-direction:column; gap:13px;">
+            <div style="padding:18px; border-radius:14px; background:rgba(214,166,106,.1); border:1px solid rgba(214,166,106,.55); box-shadow:0 0 30px -10px rgba(214,166,106,.3); text-align:center; font-weight:600; font-size:17px; color:#EADFC8;">Resume class</div>
+            <div style="padding:14px; border-radius:12px; border:1px solid rgba(169,140,100,.24); text-align:center; font-size:14px; color:rgba(198,183,158,.85);">End without resuming</div>
+            <div style="font-size:12px; color:rgba(169,140,100,.75); text-align:center;">Ending asks once more before anything is closed</div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- D2 Leave Class guard -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">D2</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Leave Class guard</span><span style="font-size:11.5px; color:#A98C64;">§10 · sheet over run</span></div>
+      <div id="frame-d2" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.3); font-variant-numeric:tabular-nums;"><span>7:26</span><span>84%</span></div>
+        <div style="flex:1; position:relative; min-height:0; overflow:hidden;">
+          <!-- dimmed live background -->
+          <div style="position:absolute; inset:0; opacity:.28; filter:saturate(.8); text-align:center; padding:30px;">
+            <div style="font-weight:600; font-size:26px; color:#EADFC8;">Supported Caterpillar</div>
+            <div style="font-weight:700; font-size:82px; color:#EADFC8; font-variant-numeric:tabular-nums; margin-top:24px;">7:26</div>
+          </div>
+          <div style="position:absolute; inset:0; background:rgba(10,12,13,.55);"></div>
+          <!-- bottom sheet -->
+          <div style="position:absolute; left:0; right:0; bottom:0; background:#1B2129; border-top:1px solid rgba(169,140,100,.28); border-radius:18px 18px 0 0; padding:24px 24px 20px; box-shadow:0 -20px 50px -20px rgba(0,0,0,.7);">
+            <div style="width:40px; height:4px; border-radius:2px; background:rgba(169,140,100,.4); margin:0 auto 18px;"></div>
+            <div style="font-weight:600; font-size:21px; color:#EADFC8; text-align:center;">Leave class?</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-size:14.5px; line-height:1.5; color:#C6B79E; text-align:center; margin:10px 0 20px;">Locking the screen or leaving the app won't end your run. It keeps going.</p>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="padding:16px; border-radius:13px; background:rgba(214,166,106,.1); border:1px solid rgba(214,166,106,.55); text-align:center; font-weight:600; font-size:16px; color:#EADFC8;">Return to class</div>
+              <div style="padding:14px; border-radius:12px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:14px; color:#C6B79E;">Leave open to resume later</div>
+              <div style="padding:14px; border-radius:12px; text-align:center; font-size:14px; color:rgba(198,183,158,.7);">End this run <span style="font-size:12px; color:rgba(169,140,100,.75);">· confirms again</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center; background:#1B2129;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+    </div>
+
+    <!-- D3 Wake lock unavailable -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">D3</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Wake lock unavailable</span><span style="font-size:11.5px; color:#A98C64;">§14 · live variant</span></div>
+      <div id="frame-d3" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E; background-image:radial-gradient(110% 55% at 50% 40%, rgba(214,166,106,.07), rgba(20,24,26,0) 62%);">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:21</span><span>84%</span></div>
+        <div style="position:absolute; left:14px; top:48%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">‹</div>
+        <div style="position:absolute; right:14px; top:48%; transform:translateY(-50%); font-size:26px; color:rgba(169,140,100,.26); z-index:3;">›</div>
+        <div style="flex:1; display:flex; flex-direction:column; padding:26px 28px 14px; min-height:0; text-align:center;">
+          <div>
+            <div style="font-weight:600; font-size:27px; color:#EADFC8;">Sleeping Swan</div>
+            <div style="font-size:13px; color:#A98C64; letter-spacing:.06em; text-transform:uppercase; margin-top:8px;">Side 2 · Left</div>
+          </div>
+          <div style="margin-top:20px;">
+            <div style="font-weight:700; font-size:90px; line-height:.9; color:#EADFC8; letter-spacing:-0.02em; font-variant-numeric:tabular-nums;">7:21</div>
+            <div style="font-size:13px; color:rgba(198,183,158,.72); margin-top:12px; font-variant-numeric:tabular-nums;">planned 7:19–7:23 · 1:40 elapsed</div>
+            <div style="display:inline-flex; align-items:center; gap:7px; margin-top:12px; padding:6px 13px; border-radius:20px; background:rgba(62,63,107,.35); border:1px solid rgba(133,134,176,.3);"><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:rgba(133,134,176,.85);">drift</span><span style="font-weight:600; font-size:13px; color:#8586B0;">on plan</span></div>
+          </div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:17px; line-height:1.45; color:#C6B79E; margin:18px 6px auto;">Let the top hip roll gently open without forcing the front knee.</p>
+          <div style="flex:none; margin-bottom:6px; display:flex; align-items:center; justify-content:center; gap:8px; font-size:13px; color:rgba(169,140,100,.9);">
+            <span style="width:6px;height:6px;border-radius:50%;border:1px solid rgba(169,140,100,.8);"></span>
+            <span>Screen may sleep · <span style="color:#C6B79E; text-decoration:underline; text-underline-offset:2px;">tap to retry</span></span>
+          </div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+      <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:12.5px; line-height:1.5; color:rgba(198,183,158,.7); max-width:412px; margin:0;">A small inline line above the gesture bar — not a banner, not red, not covering the cue. Tapping re-requests the lock (G3, §14).</p>
+    </div>
+
+    <!-- D4 Post-Class Notes -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">D4</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Post-Class Notes</span><span style="font-size:11.5px; color:#A98C64;">§12 · derived actuals</span></div>
+      <div id="frame-d4" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>8:02</span><span>84%</span></div>
+        <div style="flex:1; min-height:0; overflow:auto; padding:22px 22px 10px;">
+          <div style="font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:600;">After class · Desire Paths</div>
+          <div style="font-weight:600; font-size:22px; color:#EADFC8; margin:7px 0 4px;">How it ran</div>
+          <p style="font-family:'Spectral',Georgia,serif; font-size:13.5px; line-height:1.5; color:rgba(198,183,158,.85); margin:0 0 14px;">Timing is measured for you. Fix a skip or substitution if needed.</p>
+          <div style="display:flex; flex-direction:column; gap:2px; font-variant-numeric:tabular-nums;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(169,140,100,.12);"><span style="font-size:13.5px; color:#C6B79E;">Grounding</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.6);">10:00 → 9:41</span><span style="font-size:11px; color:#A98C64;">· on plan</span></span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(169,140,100,.12);"><span style="font-size:13.5px; color:#C6B79E;">Supported Butterfly</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.6);">4:00 → 4:12</span><span style="font-size:11px; color:#A98C64;">· on plan</span></span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(169,140,100,.12);"><span style="font-size:13.5px; color:#C6B79E;">Sleeping Swan · Right</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.6);">4:00 → 4:30</span><span style="font-size:11px; color:#D6A66A;">▲ long</span></span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(169,140,100,.12);"><span style="font-size:13.5px; color:#C6B79E;">Sleeping Swan · Left</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.6);">4:00 → 3:20</span><span style="font-size:11px; color:#8586B0;">▼ short</span></span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(169,140,100,.12);"><span style="font-size:13.5px; color:#D6A66A;">Supported Caterpillar</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.6);">6:00 → 7:10</span><span style="font-size:11px; color:#D6A66A;">▲ long</span></span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(169,140,100,.12);"><span style="font-size:13.5px; color:#C6B79E;">Saddle · Right</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.6);">3:00 → 3:40</span><span style="font-size:11px; color:#A98C64;">↺ revisited</span></span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(169,140,100,.12);"><span style="font-size:13.5px; color:#C6B79E;">Saddle · Left</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.5);">3:00 → —</span><span style="font-size:11px; color:#C68C7F;">— skipped</span></span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(169,140,100,.12);"><span style="font-size:13.5px; color:#C6B79E;">Reclined Twist · both</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.6);">6:00 → 6:30</span><span style="font-size:11px; color:#A98C64;">· on plan</span></span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0;"><span style="font-size:13.5px; color:#C6B79E;">Savasana</span><span style="display:flex; gap:10px; align-items:center;"><span style="font-size:12px; color:rgba(198,183,158,.6);">15:00 → 12:20</span><span style="font-size:11px; color:#8586B0;">▼ short</span></span></div>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+            <span style="font-size:12px; color:#C6B79E; border:1px solid rgba(169,140,100,.3); border-radius:8px; padding:6px 10px;">Correct a skip</span>
+            <span style="font-size:12px; color:#C6B79E; border:1px solid rgba(169,140,100,.3); border-radius:8px; padding:6px 10px;">Substituted → Supported Bridge</span>
+          </div>
+          <div style="margin-top:14px; padding:13px 14px; border-radius:11px; background:#232E38; border:1px solid rgba(169,140,100,.18); font-family:'Spectral',Georgia,serif; font-style:italic; font-size:14px; color:rgba(198,183,158,.6);">One note about the room…</div>
+        </div>
+        <div style="flex:none; padding:12px 22px; border-top:1px solid rgba(169,140,100,.2); display:flex; gap:12px;">
+          <div style="flex:1; padding:14px; border-radius:12px; border:1px solid rgba(169,140,100,.28); text-align:center; font-size:13.5px; color:#C6B79E;">Skip notes &amp; complete</div>
+          <div style="flex:1; padding:14px; border-radius:12px; background:rgba(214,166,106,.1); border:1px solid rgba(214,166,106,.55); text-align:center; font-weight:600; font-size:13.5px; color:#EADFC8;">Save &amp; complete</div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+      <p style="font-family:'Spectral',Georgia,serif; font-style:italic; font-size:12.5px; line-height:1.5; color:rgba(198,183,158,.7); max-width:412px; margin:0;">Status (on plan / long / short / revisited / skipped) carries a glyph <em>and</em> word, never hue alone (J5). Clare never restates timing the app measured (§12).</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="secE" style="padding:24px 60px 90px; font-family:'Hanken Grotesk',system-ui,sans-serif;">
+  <div style="margin-bottom:28px;">
+    <div style="font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:#A98C64; font-weight:700;">E · Handoff annotations</div>
+    <p style="font-family:'Spectral',Georgia,serif; font-size:15px; color:rgba(198,183,158,.8); margin:6px 0 0;">Not user-facing screens — references for the builder. The zone overlay appears only here, never in an ordinary frame.</p>
+  </div>
+  <div style="display:flex; flex-wrap:wrap; gap:56px; align-items:flex-start;">
+
+    <!-- E1 Interaction map -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:412px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">E1</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Live-screen interaction map</span></div>
+      <div id="frame-e1" style="position:relative; width:412px; height:915px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; color:#C6B79E;">
+        <div style="height:30px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:12px; color:rgba(198,183,158,.4); font-variant-numeric:tabular-nums;"><span>7:16</span><span>84%</span></div>
+        <!-- underlying minimal pose (dimmed) -->
+        <div style="flex:1; position:relative; min-height:0; display:flex; flex-direction:column; padding:26px 28px 20px; text-align:center;">
+          <div style="opacity:.5;">
+            <div style="font-weight:600; font-size:26px; color:#EADFC8;">Sleeping Swan</div>
+            <div style="font-size:12px; color:#A98C64; text-transform:uppercase; letter-spacing:.06em; margin-top:6px;">Side 1 · Right</div>
+            <div style="font-weight:700; font-size:80px; color:#EADFC8; font-variant-numeric:tabular-nums; margin-top:20px;">7:16</div>
+          </div>
+          <!-- zone overlay -->
+          <div style="position:absolute; inset:0; display:flex;">
+            <div style="width:20%; border-right:1px dashed rgba(133,134,176,.6); background:rgba(133,134,176,.1); display:flex; align-items:center; justify-content:center;"><span style="writing-mode:vertical-rl; transform:rotate(180deg); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8586B0; font-weight:600;">Previous · 20%</span></div>
+            <div style="width:60%; background:rgba(214,166,106,.07); display:flex; align-items:flex-end; justify-content:center; padding-bottom:120px;"><span style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#D6A66A; font-weight:600; text-align:center; line-height:1.5;">Reference · 60%<br><span style="font-weight:400; text-transform:none; letter-spacing:0; color:rgba(198,183,158,.8);">opens expanded state</span></span></div>
+            <div style="width:20%; border-left:1px dashed rgba(198,140,127,.6); background:rgba(198,140,127,.1); display:flex; align-items:center; justify-content:center;"><span style="writing-mode:vertical-rl; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#C68C7F; font-weight:600;">Next · 20%</span></div>
+          </div>
+          <!-- edge inset marker -->
+          <div style="position:absolute; inset:12px; border:1px dashed rgba(169,140,100,.4); border-radius:4px; pointer-events:none;"></div>
+          <div style="position:absolute; left:0; right:0; bottom:58px; text-align:center;"><span style="font-size:10.5px; color:rgba(169,140,100,.95); background:#14181A; padding:3px 8px; border-radius:5px;">12px inset from gesture edges · targets ≥ 48 × 48 px</span></div>
+        </div>
+        <div style="height:24px; flex:none; display:flex; align-items:center; justify-content:center;"><div style="width:120px; height:4px; border-radius:2px; background:rgba(198,183,158,.22);"></div></div>
+      </div>
+      <div style="max-width:412px; padding:14px 16px; border-radius:11px; background:#232E38;">
+        <div style="font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#A98C64; font-weight:600; margin-bottom:6px;">Android system Back</div>
+        <p style="font-family:'Spectral',Georgia,serif; font-size:13.5px; line-height:1.55; color:#C6B79E; margin:0;">Closes an open dialog first, then an expanded reference, then opens the guarded Leave Class sheet. It <strong style="color:#EADFC8; font-weight:600;">never</strong> means Previous Pose — that belongs only to the visible left zone.</p>
+      </div>
+    </div>
+
+    <!-- E2 Visual system sheet -->
+    <div style="display:flex; flex-direction:column; gap:11px; width:860px;">
+      <div style="display:flex; align-items:baseline; gap:9px;"><span style="font-weight:700; font-size:12px; color:#14181A; background:#D6A66A; padding:3px 8px; border-radius:6px;">E2</span><span style="font-weight:600; font-size:15px; color:#EADFC8;">Visual-system sheet</span></div>
+      <div id="frame-e2" style="width:860px; background:#14181A; border:1px solid rgba(169,140,100,.22); border-radius:10px; padding:34px 36px; color:#C6B79E; display:flex; flex-direction:column; gap:28px;">
+
+        <div>
+          <div style="font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#A98C64; font-weight:700; margin-bottom:14px;">Palette</div>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#14181A;border:1px solid rgba(169,140,100,.4); flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Pond Charcoal</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#14181A · background</span></span></div>
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#232E38; flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Deep Water Slate</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#232E38 · surfaces</span></span></div>
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#EADFC8; flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Taper Wax</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#EADFC8 · clock / text</span></span></div>
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#C6B79E; flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Curtain Linen</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#C6B79E · pose / cue text</span></span></div>
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#D6A66A; flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Candlelight Amber</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#D6A66A · live / action / wake</span></span></div>
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#C68C7F; flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Lotus Blush</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#C68C7F · next / alternative</span></span></div>
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#3E3F6B; flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Mandala Indigo</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#3E3F6B · drift surface only</span></span></div>
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#8586B0; flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Legible Indigo</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#8586B0 · drift text</span></span></div>
+            <div style="display:flex; gap:11px; align-items:center;"><span style="width:34px;height:34px;border-radius:7px;background:#A98C64; flex:none;"></span><span><span style="display:block; font-size:13px; color:#EADFC8;">Raw Pine</span><span style="font-size:11.5px; color:rgba(198,183,158,.65); font-variant-numeric:tabular-nums;">#A98C64 · dividers / labels</span></span></div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:36px; border-top:1px solid rgba(169,140,100,.16); padding-top:24px;">
+          <div style="flex:1.1;">
+            <div style="font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#A98C64; font-weight:700; margin-bottom:14px;">Type hierarchy</div>
+            <div style="font-weight:700; font-size:64px; line-height:1; color:#EADFC8; font-variant-numeric:tabular-nums; letter-spacing:-0.02em;">7:24</div>
+            <div style="font-size:11px; color:rgba(169,140,100,.85); margin:4px 0 16px;">Hanken Grotesk · clock · clamp(72–104px), tabular</div>
+            <div style="font-weight:600; font-size:29px; color:#EADFC8;">Supported Caterpillar</div>
+            <div style="font-size:11px; color:rgba(169,140,100,.85); margin:4px 0 16px;">Hanken 600 · pose name · 26–32px, two lines allowed</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-size:18px; line-height:1.5; color:#C6B79E; margin:0;">Feel where gravity has made a path that effort no longer needs to hold.</p>
+            <div style="font-size:11px; color:rgba(169,140,100,.85); margin:4px 0 0;">Spectral · midpoint cue · 17–19px</div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#A98C64; font-weight:700; margin-bottom:14px;">Surfaces · dividers · density</div>
+            <div style="padding:14px 16px; border-radius:12px; background:#232E38; margin-bottom:10px; font-size:13px;">Raised surface · Deep Water Slate · radius 10–14px</div>
+            <div style="height:1px; background:rgba(169,140,100,.3); margin:14px 0;"></div>
+            <div style="font-size:12px; color:rgba(169,140,100,.9); margin-bottom:14px;">↑ Divider = low-contrast Raw Pine, never neutral gray</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.55; color:#C6B79E; margin:0;"><strong style="color:#EADFC8; font-weight:600;">Density:</strong> live screens stay sparse (one question per glance); Prep, expanded reference, Post-Class, and Library carry the detail.</p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:36px; border-top:1px solid rgba(169,140,100,.16); padding-top:24px;">
+          <div style="flex:1;">
+            <div style="font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#A98C64; font-weight:700; margin-bottom:12px;">Permitted motion</div>
+            <p style="font-family:'Spectral',Georgia,serif; font-size:14px; line-height:1.6; color:#C6B79E; margin:0;">Segment change: cross-fade + 2–4px settle, 600–800ms, <code style="font-family:monospace; font-size:12px; color:#A98C64;">cubic-bezier(.25,.10,.25,1)</code>. Wake message: one 3s fade to full, then static. Savasana marker: static. Honor <code style="font-family:monospace; font-size:12px; color:#A98C64;">prefers-reduced-motion</code>.</p>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#C68C7F; font-weight:700; margin-bottom:12px;">Never do</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <span style="font-size:12.5px; color:rgba(198,183,158,.85); border:1px solid rgba(198,140,127,.4); border-radius:8px; padding:6px 11px; text-decoration:line-through; text-decoration-color:rgba(198,140,127,.7);">white screen</span>
+              <span style="font-size:12.5px; color:rgba(198,183,158,.85); border:1px solid rgba(198,140,127,.4); border-radius:8px; padding:6px 11px; text-decoration:line-through; text-decoration-color:rgba(198,140,127,.7);">glass card</span>
+              <span style="font-size:12.5px; color:rgba(198,183,158,.85); border:1px solid rgba(198,140,127,.4); border-radius:8px; padding:6px 11px; text-decoration:line-through; text-decoration-color:rgba(198,140,127,.7);">neon status</span>
+              <span style="font-size:12.5px; color:rgba(198,183,158,.85); border:1px solid rgba(198,140,127,.4); border-radius:8px; padding:6px 11px; text-decoration:line-through; text-decoration-color:rgba(198,140,127,.7);">mandala / lotus UI</span>
+              <span style="font-size:12.5px; color:rgba(198,183,158,.85); border:1px solid rgba(198,140,127,.4); border-radius:8px; padding:6px 11px; text-decoration:line-through; text-decoration-color:rgba(198,140,127,.7);">blinking alert</span>
+              <span style="font-size:12.5px; color:rgba(198,183,158,.85); border:1px solid rgba(198,140,127,.4); border-radius:8px; padding:6px 11px; text-decoration:line-through; text-decoration-color:rgba(198,140,127,.7);">looping wake animation</span>
+              <span style="font-size:12.5px; color:rgba(198,183,158,.85); border:1px solid rgba(198,140,127,.4); border-radius:8px; padding:6px 11px; text-decoration:line-through; text-decoration-color:rgba(198,140,127,.7);">dashboard chrome</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section></x-dc>
+</body>
+</html>

@@ -36,7 +36,16 @@ body {
   background-attachment: fixed;
 }
 
+/* A DEFINITE height, not just min-height: a screen's inner scroll region (the Prep
+   sequence, Post-Class rows, expanded reference) can only become a real scroll
+   viewport if its ancestors are height-bounded. With min-height alone those regions
+   grow to fit their content, stop being scrollable, and — because they are still
+   registered scroll containers with overscroll-behavior: contain — swallow the touch
+   drag instead of chaining it to the document. That left Begin Class unreachable
+   below the fold on the Pixel. */
 #app {
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -48,6 +57,12 @@ body {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+  /* Allow the screen to shrink to the bounded height so inner regions can scroll. */
+  min-height: 0;
+  /* Safety net: a screen with no dedicated inner scroll region (Home, Run Recovery)
+     still scrolls rather than clipping — content is never silently unreachable,
+     including at 125% Android font scale (acceptance J1). */
+  overflow-y: auto;
   padding: calc(env(safe-area-inset-top) + var(--space-5))
     calc(env(safe-area-inset-right) + var(--space-5))
     calc(env(safe-area-inset-bottom) + var(--space-5))
@@ -245,6 +260,7 @@ button {
 }
 .prep__scroll {
   flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   display: flex;
@@ -535,6 +551,7 @@ button {
 /* Cue fields scroll; authored content is NEVER clipped (screen-states § 6). */
 .reference__body {
   flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -749,6 +766,7 @@ button {
 
 .post__scroll {
   flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -856,6 +874,7 @@ button {
 
 .import {
   gap: var(--space-4);
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -994,6 +1013,7 @@ button {
 
 .library {
   gap: var(--space-4);
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }

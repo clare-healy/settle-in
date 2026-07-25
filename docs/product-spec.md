@@ -57,7 +57,7 @@ The visual language comes from Raw Emerald Yoga's actual palette, light, and mat
 
 The same actions have the same meaning throughout a run. Clare never searches for navigation or wonders whether a tap will change timing.
 
-### 6. The record tells the truth
+### 6. Self-nourishing, anti-fragile utility
 
 The authored class definition never changes after import. Each live teaching creates a separate run record derived from actual timestamped actions and supplemented by optional human notes.
 
