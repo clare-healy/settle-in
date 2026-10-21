@@ -14,11 +14,13 @@ Field evidence: after two months of use, Clare reported that Settle In materiall
 
 - Question: are classes always tied to Tuesday 7:00–8:00 PM? **No.** They are always exactly one scheduled hour, at any authored local start. `hard_close_local` must be one hour after `scheduled_start_local`, including across midnight.
 - Question: should Begin Class re-anchor the planned hour to the tap time? **No.** The scheduled hour is the anchor. A 7:00 class begun at 7:03 retains a 7:00–7:10 Grounding window, begins at `+3 min`, and still closes at 8:00. Rationale from Clare: “start on time to honor the teacher and end on time to honor the student.” A consciously late start for catching up and community-building is relational infrastructure, but it does not move the student-facing end.
+- Question: if Prep reveals that the authored scheduled hour is wrong, must Clare leave the app and repair the class upstream before she can teach? **No.** Prep shows the full scheduled window and offers `Change scheduled time`. One screen accepts a new start, calculates the one-hour close immediately, and saves with one `Change Schedule` action. The correction creates a new immutable class revision; the prior revision and every taught run remain unchanged. There is no second confirmation screen. The corrected source must be carried back to the integrated authoring project so it does not regress later.
+- Question: does the integrated Claude authoring project retain the name “Yin Flow State”? **No.** Clare renamed it “Settle In,” matching the app. The canonical deployment source is now `docs/settle-in-authoring-instructions.md`; a written pass/handoff accompanies this iteration because the external Claude project must still be updated manually.
 - Question: may a designed movement transition sit between Grounding and the first held pose? **Yes.** One optional opening Transition uses the existing transition schema and timing/history behavior. It supports waking the body and previewing the muscle groups and movement directions used later in the sequence.
 - Question: should Savasana cues remain a manually advanced checklist? **No.** The six authored cues display together as a static reminder list. One Next reveals Finish Class; no new Savasana-step events are written. Historic step events remain readable for backward compatibility.
 - Question: should Clare be able to export all reflections as one analysis artifact? **Yes.** Library adds a chronological human-readable Markdown reflection corpus containing every non-empty final reflection and saved draft, with class/run identity. The lossless JSON backup remains separate and unchanged.
 
-These rulings update the product, implementation, class-format, screen-state, acceptance, and Yin Flow State instructions together. Existing 7:00–8:00 class files and taught-run history remain valid.
+These rulings update the product, implementation, class-format, screen-state, acceptance, and Settle In authoring instructions together. Existing 7:00–8:00 class files and taught-run history remain valid.
 
 Application version advances from `0.1.0` to `0.2.0`. Class input, as-taught export, backup, and database schema versions do not change because their stored shapes remain backward compatible.
 
@@ -104,7 +106,7 @@ Decision: the as-taught export is a versioned schema (Export Schema v1 in `docs/
 
 Question: is the Claude Chat project "Yin Flow State" part of this product? **Yes.**
 
-Decision: the app and the authoring project form one integrated system. The project's instructions live canonically in `docs/yin-flow-state-instructions.md`; any schema change updates both sides in the same change, even when the chat side is applied manually by Clare. The project carries `class-format.md` and the valid fixture as project knowledge.
+Decision: the app and the authoring project form one integrated system. The project's instructions now live canonically in `docs/settle-in-authoring-instructions.md`; any schema change updates both sides in the same change, even when the chat side is applied manually by Clare. The project carries `class-format.md` and the valid fixture as project knowledge.
 
 ## July 21, 2026 — Run begun after hard close
 
@@ -170,7 +172,7 @@ Decision: `docs/build-plan.md` proposes the v1 architecture — vanilla strict T
 
 Question: do the Yin Flow State project instructions carry Clare's full teaching framework, not just the schema rules? **Yes, now.**
 
-Decision: `docs/yin-flow-state-instructions.md` v2 merges Clare's existing project instructions (four-phase cueing architecture, accessibility principles, sequence-building workflow, Bethany's Monday review, cueing style, key learnings) with the app system. Material triangulations: the four-phase cueing architecture maps onto the schema's cue fields (entry/target, settling, midpoint, exit); Clare's nine-beat savasana arc maps into the schema's six steps without a schema change; the instructor guide remains the full script for design, rehearsal, and Bethany review while Settle In replaces it as the in-class reference; Clare's 5–6 pose ceiling is carried as a stricter authoring rule than the schema warning; the relational late start is honored by re-anchoring. Nothing from Clare's teaching instructions was dropped.
+Decision: `docs/settle-in-authoring-instructions.md` v2 merges Clare's existing project instructions (four-phase cueing architecture, accessibility principles, sequence-building workflow, Bethany's Monday review, cueing style, key learnings) with the app system. Material triangulations: the four-phase cueing architecture maps onto the schema's cue fields (entry/target, settling, midpoint, exit); Clare's nine-beat savasana arc maps into the schema's six steps without a schema change; the instructor guide remains the full script for design, rehearsal, and Bethany review while Settle In replaces it as the in-class reference; Clare's 5–6 pose ceiling is carried as a stricter authoring rule than the schema warning; the relational late start was then honored by re-anchoring. That timing decision is superseded by the October 20, 2026 field-learning decision: the authored scheduled hour now remains fixed. Nothing from Clare's teaching instructions was dropped.
 
 ## July 22, 2026 — Adversarial review prompt canonized
 

@@ -80,6 +80,26 @@ for (const scale of [1, 1.25]) {
   });
 }
 
+test('the one-screen schedule correction remains complete and reachable in production', async ({
+  page,
+}) => {
+  await openWith(page, 'valid-desire-paths.md');
+  await page.getByTestId('open-prep').click();
+  await setFontScale(page, 1.25);
+  await page.getByTestId('change-schedule').click();
+
+  await expect(page.locator('[data-dialog="schedule-change"]')).toBeVisible();
+  await assertStylesheetApplied(page);
+  await page.getByTestId('schedule-start').fill('18:30');
+  await expect(page.getByTestId('schedule-close')).toHaveText('7:30');
+  await expect(page.locator('.sheet > [data-testid="confirm-schedule-change"]:last-child')).toBeVisible();
+  await expectActionOnScreen(page, /Change Schedule/);
+
+  await page.getByTestId('confirm-schedule-change').click();
+  await expect(page.locator('[data-dialog]')).toHaveCount(0);
+  await expect(page.getByTestId('prep-schedule')).toHaveText('Scheduled class · 6:30–7:30');
+});
+
 test('the expanded reference scrolls rather than trapping the gesture, at both scales', async ({
   page,
 }) => {

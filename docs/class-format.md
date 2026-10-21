@@ -338,7 +338,7 @@ Pose recency is derived from accumulated as-taught exports: each export carries 
 
 ## Versioning
 
-The as-taught export carries `export_schema_version`, versioned independently of the class-input `schema_version`. The authoring-side instructions in `docs/yin-flow-state-instructions.md` must be updated in the same change as any revision to either schema.
+The as-taught export carries `export_schema_version`, versioned independently of the class-input `schema_version`. The authoring-side instructions in `docs/settle-in-authoring-instructions.md` must be updated in the same change as any revision to either schema.
 
 The app must reject an unsupported future `schema_version` without partially importing it. The error should preserve the source and explain that the app must be updated before the class can be used.
 

@@ -14,7 +14,7 @@ Before proposing architecture or writing application code, read these files comp
 6. `docs/design-system.md`
 7. `docs/acceptance-tests.md`
 8. `docs/decision-log.md`
-9. `docs/yin-flow-state-instructions.md`
+9. `docs/settle-in-authoring-instructions.md`
 10. `COGNITIVE-LINEAGE.md`
 
 Use the authority order in `README.md` when resolving apparent conflicts.
@@ -29,7 +29,7 @@ Use the authority order in `README.md` when resolving apparent conflicts.
 - Do not claim to control device brightness or guarantee wake lock.
 - Do not use remote production fonts or other studio-time network dependencies.
 - Do not render imported Markdown or YAML as executable HTML.
-- The app and the authoring project (Claude project "Yin Flow State") are one integrated system. A change to a class or export schema is incomplete until `docs/yin-flow-state-instructions.md` is updated in the same change.
+- The app and the authoring project (Claude project "Settle In") are one integrated system. A change to a class or export schema is incomplete until `docs/settle-in-authoring-instructions.md` is updated in the same change.
 
 ## Scope discipline
 

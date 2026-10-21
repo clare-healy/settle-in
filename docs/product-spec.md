@@ -31,9 +31,9 @@ The app exists to make these outcomes true:
 - Class library and taught-run history stored on the device, with explicit backup export and restore import.
 - Weekly classes authored with an AI assistant in the canonical Markdown format.
 - The app parses, normalizes, validates, and summarizes the file before import.
-- Classes are not edited inside the v1 app. Authoring corrections return to the AI-assisted workflow.
+- Teaching content is not edited inside the v1 app. Prep may correct only the scheduled start; the app calculates the one-hour close and saves the corrected Markdown as a new immutable revision. The correction returns to the AI-assisted workflow through the integrated-system handoff.
 - As-taught exports follow the versioned export schema in `docs/class-format.md`. Pose recency and honest history reach future class construction through those exports in the weekly authoring workflow, not through an in-app analytics view.
-- The app and the authoring assistant's project (currently the Claude project "Yin Flow State") form one integrated system. The project's instructions are maintained canonically in `docs/yin-flow-state-instructions.md`; any change to a class or export schema updates both sides of the system in the same change, even when the chat side must be applied manually.
+- The app and the authoring assistant's Claude project, also named "Settle In," form one integrated system. The project's instructions are maintained canonically in `docs/settle-in-authoring-instructions.md`; any change to a class or export schema updates both sides of the system in the same change, even when the chat side must be applied manually.
 
 ## Principles
 
@@ -59,7 +59,7 @@ The same actions have the same meaning throughout a run. Clare never searches fo
 
 ### 6. Self-nourishing, anti-fragile utility
 
-The authored class definition never changes after import. Each live teaching creates a separate run record derived from actual timestamped actions and supplemented by optional human notes.
+An imported class revision never changes. A schedule correction creates a new revision, leaving the prior source and taught runs intact. Each live teaching creates a separate run record derived from actual timestamped actions and supplemented by optional human notes.
 
 ### 7. Failure must be quiet and recoverable
 
@@ -81,7 +81,8 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 1. Clare opens the upcoming class.
 2. Prep shows props, staging assumptions, theme line, arrival, breath, and sequence.
 3. Preflight reminds Clare to enable Do Not Disturb and set device brightness.
-4. Begin Class records the actual start timestamp and requests a screen wake lock.
+4. Prep shows the complete scheduled hour. If it is wrong, one schedule-change screen accepts a new start, immediately calculates the close, and saves a new immutable revision with `Change Schedule`.
+5. Begin Class records the actual start timestamp and requests a screen wake lock.
 
 ### During class
 
@@ -113,6 +114,7 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 - Screen wake-lock request, monitoring, and calm fallback
 - Automatic persistence and interrupted-run recovery
 - Immutable class definitions and multiple taught runs
+- One-screen scheduled-start correction on Prep, saved as a new immutable revision
 - Human-readable Markdown export for a class or taught run
 - Versioned whole-library backup export and restore
 
@@ -121,7 +123,7 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 - Sound, vibration, haptics, or system notifications
 - Automatic pose, side, transition, or class advancement
 - Accounts, cloud sync, collaboration, or sharing services
-- In-app class authoring or full editing
+- In-app class authoring or editing beyond the narrow scheduled-start correction
 - Student-facing screens
 - Pose media, illustrations, video, or audio
 - Analytics or telemetry

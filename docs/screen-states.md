@@ -145,12 +145,15 @@ Shows in this order:
 - Arrival
 - Breathwork
 - Full sequence with expanded side-aware planned times and peak marker
-- Hard close
+- Complete scheduled hour
+- `Change scheduled time`
 - `Begin Class`
 
 The sequence may scroll. `Begin Class` remains reachable without content being clipped and is not obscured by browser or system UI.
 
 A quiet Display Options disclosure may toggle the next-pose preview. Its default is on. Display Options are not available accidentally during the run.
+
+`Change scheduled time` opens one sheet. It contains a local start-time field, a hard close that recalculates immediately to one hour later, Cancel, and one `Change Schedule` button as the bottom action. There is no follow-up confirmation. A successful change persists a new immutable revision and returns to Prep with the revised sequence windows and scheduled hour visible. Prior revisions and taught runs are unchanged.
 
 Activating Begin Class:
 

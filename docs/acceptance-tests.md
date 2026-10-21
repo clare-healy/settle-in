@@ -96,6 +96,12 @@ A valid file may use any local scheduled start without a schedule warning when `
 
 A class with one Transition directly after Grounding imports and expands in source order when that transition points to the first pose. A class without an opening transition remains valid.
 
+### C12 — One-screen schedule correction
+
+Prep shows the complete scheduled hour. `Change scheduled time` opens one screen with the current start, a hard close calculated live as exactly one hour later, and a primary `Change Schedule` button as the bottom action. Entering 6:30 shows a 7:30 hard close on that same screen. One activation of `Change Schedule` persists a new immutable revision and returns to Prep; there is no second confirmation. The original revision remains byte-identical and existing runs retain it.
+
+For a corrected 6:30–7:30 revision begun at 6:33, the live Grounding window is 6:30–6:40, drift is `+3 min`, and hard close remains 7:30.
+
 ## D. Timing
 
 Automated timing tests use a controllable clock.

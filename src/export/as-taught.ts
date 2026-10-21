@@ -5,7 +5,7 @@
 // fields and status precedence, and the `## Room note` section are fixed by
 // docs/class-format.md. If this file needs the schema to change, STOP and write a
 // Y/N question in M5-QUESTIONS.md — a schema change ripples into
-// docs/yin-flow-state-instructions.md and is the orchestrator's to make.
+// docs/settle-in-authoring-instructions.md and is the orchestrator's to make.
 //
 // The document is DERIVED entirely from the run's event history and post-class
 // note. It is generated, never hand-edited, and re-exporting the same completed

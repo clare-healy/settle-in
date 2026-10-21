@@ -78,6 +78,19 @@ function timeOfDayMinutes(hhmm: string): number {
   return (h ?? 0) * 60 + (m ?? 0);
 }
 
+/**
+ * Return the local clock time exactly one hour after a valid `HH:MM` start.
+ * Wraps across midnight; invalid input returns null so the schedule editor can
+ * keep its primary action unavailable until the native time field is complete.
+ */
+export function hardCloseForScheduledStart(hhmm: string): string | null {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(hhmm);
+  if (!match) return null;
+  const hour = (Number.parseInt(match[1] ?? '0', 10) + 1) % 24;
+  const minute = match[2] ?? '00';
+  return `${hour < 10 ? '0' : ''}${hour}:${minute}`;
+}
+
 // --- Scheduled plan ----------------------------------------------------------
 
 /** A single segment's scheduled planned window, in epoch ms. */

@@ -47,23 +47,28 @@ export function renderPrep(props: PrepProps): HTMLElement {
   // Full side-aware sequence with planned times and peak marker.
   scroll.appendChild(section('Sequence', renderSequence(props)));
 
-  // Hard close.
-  scroll.appendChild(
-    el('p', {
-      class: 'prep__hardclose',
-      children: [
-        textNode('Hard close '),
-        el('span', { class: 'tabular', text: format12hLabel(def.hardCloseLocal) }),
-      ],
-    }),
-  );
-
   // Display Options disclosure.
   scroll.appendChild(renderDisplayOptions(prefs.nextPosePreview, actions));
 
   const begin = el('div', {
     class: 'prep__begin',
     children: [
+      el('div', {
+        class: 'prep__schedule',
+        children: [
+          el('p', {
+            class: 'prep__schedule-window tabular',
+            attrs: { 'data-testid': 'prep-schedule' },
+            text: `Scheduled class · ${format12hLabel(def.scheduledStartLocal)}–${format12hLabel(def.hardCloseLocal)}`,
+          }),
+          el('button', {
+            class: 'btn btn--quiet prep__schedule-change',
+            text: 'Change scheduled time',
+            attrs: { 'data-testid': 'change-schedule' },
+            on: { click: () => actions.openScheduleChange() },
+          }),
+        ],
+      }),
       el('button', {
         class: 'btn btn--primary',
         text: 'Begin Class',

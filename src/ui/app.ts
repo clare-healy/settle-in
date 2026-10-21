@@ -18,6 +18,7 @@ import './styles/app.css';
 import {
   EXECUTION_ID,
   deriveWakeState,
+  hardCloseForScheduledStart,
   isoOffsetMinutes,
   sampleFrom,
   SystemClock,
@@ -495,6 +496,13 @@ export class AppController {
         this.route = { kind: 'prep' };
         this.render();
       },
+      openScheduleChange: () => {
+        const def = this.prepDef ?? this.upcomingDef;
+        if (!def || this.route.kind !== 'prep') return;
+        this.dialog = { kind: 'schedule-change', scheduledStartLocal: def.scheduledStartLocal };
+        this.render();
+      },
+      changeSchedule: (scheduledStartLocal) => this.changeSchedule(scheduledStartLocal),
       applyUpdate: () => {
         // A5: only ever apply an update outside a run. The pill is shown only on
         // idle screens, but guard here too so nothing can swap versions mid-class.
@@ -673,6 +681,59 @@ export class AppController {
     });
   }
 
+  /**
+   * Save a schedule-only correction as a new immutable class revision. The
+   * original Markdown is revised in exactly two front-matter fields, then sent
+   * through the normal parser and validator before it can become Prep's active
+   * definition. No taught run or earlier revision is changed.
+   */
+  private changeSchedule(scheduledStartLocal: string): void {
+    const current = this.prepDef ?? this.upcomingDef;
+    if (!current || this.route.kind !== 'prep') return;
+    const hardCloseLocal = hardCloseForScheduledStart(scheduledStartLocal);
+    if (!hardCloseLocal) {
+      this.dialog = {
+        kind: 'schedule-change',
+        scheduledStartLocal,
+        error: 'Enter a complete scheduled start time.',
+      };
+      this.render();
+      return;
+    }
+
+    this.dispatch(async () => {
+      const { importClass, reviseScheduleSource } = await import('../parser/index.js');
+      const revisedSource = reviseScheduleSource(
+        current.originalMarkdown,
+        scheduledStartLocal,
+        hardCloseLocal,
+      );
+      const result = await importClass(revisedSource);
+      if (!result.ok) {
+        this.dialog = {
+          kind: 'schedule-change',
+          scheduledStartLocal,
+          error: result.errors[0]?.message ?? 'The schedule could not be changed.',
+        };
+        return;
+      }
+
+      const def = result.classDefinition;
+      const record: StoredClassRevision = {
+        sourceHash: def.sourceHash,
+        classId: def.classId,
+        schemaVersion: def.schemaVersion,
+        warnings: result.warnings,
+        importedAt: this.nowIso(),
+        definition: def,
+      };
+      await this.store.putClassRevision(record);
+      this.prepDef = def;
+      this.dialog = null;
+      await this.loadLibrary();
+    });
+  }
+
   // --- Export / backup / restore implementation -----------------------------
 
   private exportOriginal(sourceHash: string): void {
@@ -778,7 +839,9 @@ export class AppController {
   }
 
   private beginClass(): void {
-    const def = this.upcomingDef;
+    // Begin the exact revision currently shown on Prep. This matters for reruns
+    // and for a schedule correction saved immediately before the class.
+    const def = this.prepDef ?? this.upcomingDef;
     if (!def) return;
     // Fire the wake-lock request synchronously inside the Begin gesture task, in
     // parallel with persistence (wake-lock treaty; risk carried from M4a). Some
@@ -1045,7 +1108,10 @@ export class AppController {
 
   private applyFocus(): void {
     if (this.dialog) {
-      const target = this.root.querySelector<HTMLElement>('.sheet .btn');
+      const selector = this.dialog.kind === 'schedule-change'
+        ? '[data-testid="schedule-start"]'
+        : '.sheet .btn';
+      const target = this.root.querySelector<HTMLElement>(selector);
       if (target) target.focus();
     }
   }

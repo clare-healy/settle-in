@@ -36,7 +36,12 @@ export type Dialog =
   | { readonly kind: 'end-run-confirm' }
   | { readonly kind: 'finish-confirm' }
   | { readonly kind: 'recovery-end-confirm' }
-  | { readonly kind: 'restore-replace-confirm' };
+  | { readonly kind: 'restore-replace-confirm' }
+  | {
+      readonly kind: 'schedule-change';
+      readonly scheduledStartLocal: string;
+      readonly error?: string;
+    };
 
 // --- Import flow (screen-states § 2) ----------------------------------------
 
@@ -87,6 +92,8 @@ export type RestoreView =
 /** Every side-effecting thing a screen can ask the controller to do. */
 export interface AppActions {
   openPrep(): void;
+  openScheduleChange(): void;
+  changeSchedule(scheduledStartLocal: string): void;
   applyUpdate(): void;
   beginClass(): void;
   next(): void;

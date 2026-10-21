@@ -17,7 +17,7 @@ The documents have distinct authority:
 
 [`docs/decision-log.md`](docs/decision-log.md) records when and why material decisions were made, operating on the yes/no/triangulate primitive; it does not outrank the canonical documents above.
 
-[`docs/yin-flow-state-instructions.md`](docs/yin-flow-state-instructions.md) is the canonical source of the Claude "Yin Flow State" project instructions. The app and that authoring project are one integrated system: schema changes update both sides in the same change.
+[`docs/settle-in-authoring-instructions.md`](docs/settle-in-authoring-instructions.md) is the canonical source of the Claude "Settle In" project instructions. The app and that authoring project are one integrated system: schema changes update both sides in the same change.
 
 Implementation agents must also follow [`AGENTS.md`](AGENTS.md).
 
@@ -89,7 +89,7 @@ The multi-file packaging is an implementation means. It may not broaden the prod
 ## Inputs still to be added
 
 - Wireframes from Claude Design in `mockups/`, prioritized for the four highest-visual-risk states (see `mockups/README.md`); wireframes refine the build, they do not gate it
-- One final, real class file generated through the Yin Flow State authoring workflow (this also validates the workflow itself)
+- One final, real class file generated through the Settle In authoring workflow (this also validates the workflow itself)
 
 Studio reference photographs arrived July 21, 2026, and live in `reference-photos/` with descriptive names. They refine the build; they do not reopen the core product decisions unless they expose a conflict with dim-room usability.
 

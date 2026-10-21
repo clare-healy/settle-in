@@ -8,6 +8,7 @@ import {
   elapsedSec,
   format12hLabel,
   formatElapsed,
+  hardCloseForScheduledStart,
   plannedWindowFor,
   scheduledPlan,
 } from './time.js';
@@ -67,6 +68,18 @@ describe('D3 — the scheduled hour anchors the plan; a late Begin does not move
     expect(hc.iso).toBe('2026-07-28T20:00:00-05:00');
     // Wake message eligible two minutes before, i.e. 7:58.
     expect(hc.epochMs - 120_000).toBe(jul28(19, 58));
+  });
+});
+
+describe('schedule correction close calculation', () => {
+  it('keeps the minute mark and advances exactly one hour', () => {
+    expect(hardCloseForScheduledStart('18:30')).toBe('19:30');
+  });
+
+  it('wraps across midnight and rejects incomplete input', () => {
+    expect(hardCloseForScheduledStart('23:30')).toBe('00:30');
+    expect(hardCloseForScheduledStart('6:30')).toBeNull();
+    expect(hardCloseForScheduledStart('')).toBeNull();
   });
 });
 

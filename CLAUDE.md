@@ -19,5 +19,5 @@ Decisions run on **yes/no/triangulate**:
 ## Hard rules (see AGENTS.md for the full set)
 
 - Never add audio, vibration, haptics, notifications, analytics, accounts, cloud dependencies, or automatic teaching advancement.
-- The app and the Claude project "Yin Flow State" are one integrated system: schema changes update `docs/yin-flow-state-instructions.md` in the same change.
+- The app and the Claude project "Settle In" are one integrated system: schema changes update `docs/settle-in-authoring-instructions.md` in the same change.
 - Never edit `archive/original-concept/` (checksummed provenance) and never remove `COGNITIVE-LINEAGE.md` — append to it.

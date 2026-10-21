@@ -84,6 +84,19 @@ hard_close_at = scheduled_start_at + 60 minutes
 
 If teaching runs behind the scheduled plan, the UI continues to show the scheduled windows and fixed hard close. The app does not compress, automatically recompute, or advance remaining segments.
 
+### Schedule correction before Begin
+
+Prep displays the complete authored scheduled hour beside Begin Class. `Change scheduled time` opens one screen with:
+
+- one editable local start-time field;
+- a read-only hard close recalculated immediately as exactly 60 minutes later, including across midnight;
+- Cancel; and
+- one primary `Change Schedule` action at the bottom of the screen.
+
+There is no second confirmation screen. Activating `Change Schedule` changes only the top-level `scheduled_start_local` and `hard_close_local` fields in the original Markdown, runs the complete ordinary import and validation pipeline, and persists the result as a new immutable class revision before Prep acknowledges the change. The earlier revision and every run linked to it remain untouched. Begin Class always starts the exact revision currently displayed on Prep.
+
+This is a narrow in-room recovery path, not a general class editor. No teaching content, date, identity, duration, or cue can be changed from Prep. The corrected source remains part of the integrated app/authoring-system contract and must be passed back upstream.
+
 ### Elapsed time
 
 On entry to a segment, record a `segment_entered` event. While it remains current:
