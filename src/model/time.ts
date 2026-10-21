@@ -1,11 +1,11 @@
-// Hard close, re-anchored plan, elapsed, and display formatting.
+// Hard close, scheduled plan, elapsed, and display formatting.
 //
-// Pure functions of durable timestamps. Beginning late shifts the plan with the
-// room; it does not create drift. The hard close never shifts and is constructed
-// exactly once (docs/implementation-treaty.md § Re-anchored plan, § Elapsed time,
+// Pure functions of durable timestamps. The authored scheduled hour anchors the
+// plan, so beginning late creates honest informational drift. The hard close never
+// shifts and is constructed exactly once (docs/implementation-treaty.md § Scheduled-hour plan, § Elapsed time,
 // § Hard close and savasana signal).
 
-import type { EventSample, ExpandedSegment } from '../schema/index.js';
+import { CLASS_DURATION_SEC, type EventSample, type ExpandedSegment } from '../schema/index.js';
 import { formatIsoWithOffset, localDateAt } from './clock.js';
 
 // --- Hard close --------------------------------------------------------------
@@ -16,7 +16,7 @@ export interface HardClose {
   readonly epochMs: number;
   /** ISO 8601 with offset — the same instant Begin Class showed and the export shows. */
   readonly iso: string;
-  /** Local date the hard close belongs to (the run's local date), YYYY-MM-DD. */
+  /** Local calendar date of the hard-close instant, YYYY-MM-DD. */
   readonly localDate: string;
   /** The `HH:MM` local hard-close time it was built from. */
   readonly hardCloseLocal: string;
@@ -39,25 +39,61 @@ export function constructHardClose(
   beginInstantEpochMs: number,
   offsetMinutes: number,
   hardCloseLocal: string,
+  scheduledStartLocal?: string,
 ): HardClose {
-  const localDate = localDateAt(beginInstantEpochMs, offsetMinutes);
-  const [y, mo, d] = localDate.split('-').map((x) => Number.parseInt(x, 10));
+  const runLocalDate = localDateAt(beginInstantEpochMs, offsetMinutes);
+  const [y, mo, d] = runLocalDate.split('-').map((x) => Number.parseInt(x, 10));
   const [hh, mm] = hardCloseLocal.split(':').map((x) => Number.parseInt(x, 10));
   // Wall values at a fixed offset → epoch: realEpoch = UTC(walls) - offset.
-  const epochMs =
+  let epochMs =
     Date.UTC(y ?? 1970, (mo ?? 1) - 1, d ?? 1, hh ?? 0, mm ?? 0, 0) - offsetMinutes * 60_000;
+  // A scheduled hour may cross midnight (for example 23:30–00:30). Two schedule
+  // occurrences then touch the Begin date: the one that began the prior evening
+  // and the one beginning that evening. Choose the occurrence whose scheduled
+  // start is closest to the Begin tap. This makes both a 23:00 early tap and a
+  // 00:01 late tap resolve to the humanly expected hour without a rehearsal mode.
+  if (scheduledStartLocal) {
+    const startMinute = timeOfDayMinutes(scheduledStartLocal);
+    const closeMinute = timeOfDayMinutes(hardCloseLocal);
+    if (closeMinute <= startMinute) {
+      const nextClose = epochMs + 24 * 60 * 60_000;
+      const priorStart = epochMs - CLASS_DURATION_SEC * 1000;
+      const nextStart = nextClose - CLASS_DURATION_SEC * 1000;
+      if (Math.abs(nextStart - beginInstantEpochMs) < Math.abs(beginInstantEpochMs - priorStart)) {
+        epochMs = nextClose;
+      }
+    }
+  }
   return {
     epochMs,
     iso: formatIsoWithOffset(epochMs, offsetMinutes),
-    localDate,
+    localDate: localDateAt(epochMs, offsetMinutes),
     hardCloseLocal,
     offsetMinutes,
   };
 }
 
-// --- Re-anchored plan --------------------------------------------------------
+function timeOfDayMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map((x) => Number.parseInt(x, 10));
+  return (h ?? 0) * 60 + (m ?? 0);
+}
 
-/** A single segment's re-anchored planned window, in epoch ms. */
+/**
+ * Return the local clock time exactly one hour after a valid `HH:MM` start.
+ * Wraps across midnight; invalid input returns null so the schedule editor can
+ * keep its primary action unavailable until the native time field is complete.
+ */
+export function hardCloseForScheduledStart(hhmm: string): string | null {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(hhmm);
+  if (!match) return null;
+  const hour = (Number.parseInt(match[1] ?? '0', 10) + 1) % 24;
+  const minute = match[2] ?? '00';
+  return `${hour < 10 ? '0' : ''}${hour}:${minute}`;
+}
+
+// --- Scheduled plan ----------------------------------------------------------
+
+/** A single segment's scheduled planned window, in epoch ms. */
 export interface PlannedWindow {
   readonly segmentId: string;
   readonly plannedStartEpochMs: number;
@@ -65,17 +101,17 @@ export interface PlannedWindow {
 }
 
 /**
- * Re-anchor the expanded plan to the actual Begin instant:
- *   planned_start = run_started_at + planned_offset
+ * Anchor the expanded plan to the scheduled-hour start:
+ *   planned_start = scheduled_start_at + planned_offset
  *   planned_end   = planned_start + planned_duration
  * Returned in canonical expanded-plan order.
  */
-export function reanchorPlan(
+export function scheduledPlan(
   expandedSegments: readonly ExpandedSegment[],
-  runStartedAtEpochMs: number,
+  plannedAnchorEpochMs: number,
 ): PlannedWindow[] {
   return expandedSegments.map((seg) => {
-    const plannedStartEpochMs = runStartedAtEpochMs + seg.plannedOffsetSec * 1000;
+    const plannedStartEpochMs = plannedAnchorEpochMs + seg.plannedOffsetSec * 1000;
     return {
       segmentId: seg.id,
       plannedStartEpochMs,
@@ -84,15 +120,15 @@ export function reanchorPlan(
   });
 }
 
-/** The re-anchored planned window for one segment, or null if it is not in the plan. */
+/** The scheduled planned window for one segment, or null if it is not in the plan. */
 export function plannedWindowFor(
   expandedSegments: readonly ExpandedSegment[],
   segmentId: string,
-  runStartedAtEpochMs: number,
+  plannedAnchorEpochMs: number,
 ): PlannedWindow | null {
   const seg = expandedSegments.find((s) => s.id === segmentId);
   if (!seg) return null;
-  const plannedStartEpochMs = runStartedAtEpochMs + seg.plannedOffsetSec * 1000;
+  const plannedStartEpochMs = plannedAnchorEpochMs + seg.plannedOffsetSec * 1000;
   return {
     segmentId: seg.id,
     plannedStartEpochMs,

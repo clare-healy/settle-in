@@ -138,12 +138,12 @@ for (const scale of [1, 1.25]) {
     expectNoClipping(await overflowState(page), context);
     await expectInsideStage(
       page,
-      ['.segment-label', '[data-testid="wall-clock"]', '.savasana__steps', '[data-testid="savasana-close"]'],
+      ['.segment-label', '[data-testid="wall-clock"]', '.savasana__prompts', '[data-testid="savasana-close"]'],
       context,
     );
     // All six steps are on screen, not just the ones that happened to fit.
-    expect(await page.locator('.savasana__step').count()).toBe(6);
-    for (const step of await page.locator('.savasana__step').all()) {
+    expect(await page.locator('.savasana__prompt').count()).toBe(6);
+    for (const step of await page.locator('.savasana__prompt').all()) {
       await expect(step).toBeVisible();
     }
   });

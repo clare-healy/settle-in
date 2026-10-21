@@ -73,7 +73,7 @@ export function renderLive(props: LiveProps): LiveHandle {
   }
 
   const entry = entrySample(props.events, seg.id);
-  const drift = currentDriftDisplay(props.def, props.events, props.runStartedAtEpochMs);
+  const drift = currentDriftDisplay(props.def, props.events, props.plannedAnchorEpochMs);
 
   if (props.referenceOpen && (seg.type === 'pose' || seg.type === 'grounding')) {
     stage.appendChild(referencePanel(props, seg, updaters, entry));
@@ -240,18 +240,13 @@ function transitionContent(
 
 function savasanaContent(props: LiveProps, seg: ExpandedSegment, updaters: Updater[]): HTMLElement {
   const steps = Array.isArray(seg.cues['steps']) ? (seg.cues['steps'] as readonly string[]) : [];
-  const activeStep = props.snapshot.savasanaStep;
 
-  const stepList = el('ol', {
-    class: 'savasana__steps',
-    children: steps.map((label, i) => {
-      const cls =
-        i < activeStep ? 'savasana__step savasana__step--past'
-          : i === activeStep ? 'savasana__step savasana__step--active'
-            : 'savasana__step savasana__step--future';
+  const stepList = el('ul', {
+    class: 'savasana__prompts',
+    attrs: { 'aria-label': 'Savasana cue reminders' },
+    children: steps.map((label) => {
       return el('li', {
-        class: cls,
-        attrs: { 'data-step': String(i), ...(i === activeStep ? { 'data-active': 'true' } : {}) },
+        class: 'savasana__prompt',
         children: [
           el('span', { class: 'savasana__marker', attrs: { 'aria-hidden': 'true' } }),
           el('span', { text: label }),
@@ -274,9 +269,8 @@ function savasanaContent(props: LiveProps, seg: ExpandedSegment, updaters: Updat
   const wake = wakeCallout(props);
   if (wake) children.push(wake);
 
-  // After the final step, Next has exposed Finish (never a silent finish).
-  const atLastStep = steps.length > 0 && activeStep >= steps.length - 1;
-  if (atLastStep && props.finishArmed) {
+  // One deliberate Next reveals Finish; the cue list itself is not interactive.
+  if (props.finishArmed) {
     children.push(
       el('button', {
         class: 'btn btn--primary savasana__finish',
@@ -314,7 +308,7 @@ function timingBlock(
   entry: EventSample | null,
   updaters: Updater[],
 ): HTMLElement {
-  const window = plannedWindowFor(props.def.expandedRuntimeSegments, seg.id, props.runStartedAtEpochMs);
+  const window = plannedWindowFor(props.def.expandedRuntimeSegments, seg.id, props.plannedAnchorEpochMs);
   const plannedText = window
     ? plannedWindowLabel(window.plannedStartEpochMs, window.plannedEndEpochMs, props.offsetMinutes)
     : '';
@@ -409,7 +403,7 @@ function referencePanel(
   updaters: Updater[],
   entry: EventSample | null,
 ): HTMLElement {
-  const window = plannedWindowFor(props.def.expandedRuntimeSegments, seg.id, props.runStartedAtEpochMs);
+  const window = plannedWindowFor(props.def.expandedRuntimeSegments, seg.id, props.plannedAnchorEpochMs);
   const plannedText = window
     ? plannedWindowLabel(window.plannedStartEpochMs, window.plannedEndEpochMs, props.offsetMinutes)
     : '';
@@ -576,7 +570,7 @@ function setSavasanaCloseLine(node: HTMLElement, props: LiveProps, now: EventSam
 }
 
 function nextStartLabel(props: LiveProps, segmentId: string): string {
-  const window = plannedWindowFor(props.def.expandedRuntimeSegments, segmentId, props.runStartedAtEpochMs);
+  const window = plannedWindowFor(props.def.expandedRuntimeSegments, segmentId, props.plannedAnchorEpochMs);
   return window ? wallClock12h(window.plannedStartEpochMs, props.offsetMinutes) : '';
 }
 

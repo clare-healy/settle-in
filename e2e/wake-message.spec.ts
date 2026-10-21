@@ -33,7 +33,7 @@ test('E4/E7: the callout fades in once with the authored text, then does not re-
   await expect(callout).toHaveText(WAKE_TEXT); // E7 authored text, verbatim
   await expect(callout).toHaveClass(/wake-callout--fade/);
 
-  // A later structural render (advancing a savasana step) keeps it, no re-fade (E4).
+  // A later structural render (revealing Finish) keeps it, no re-fade (E4).
   await next(page);
   const after = page.getByTestId('wake-callout');
   await expect(after).toHaveText(WAKE_TEXT);
@@ -68,7 +68,7 @@ test('E3: at 7:58 on a pose there is no callout and no persisted event; Savasana
   await idle(page);
   expect(await persistedEventCount(page, 'wake_message_shown')).toBe(1);
 
-  // Advancing a savasana step does not write a second one, nor replay the fade.
+  // Revealing Finish does not write a second one, nor replay the fade.
   await next(page);
   expect(await persistedEventCount(page, 'wake_message_shown')).toBe(1);
   await expect(page.getByTestId('wake-callout')).not.toHaveClass(/wake-callout--fade/);

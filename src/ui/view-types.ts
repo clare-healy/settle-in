@@ -36,7 +36,12 @@ export type Dialog =
   | { readonly kind: 'end-run-confirm' }
   | { readonly kind: 'finish-confirm' }
   | { readonly kind: 'recovery-end-confirm' }
-  | { readonly kind: 'restore-replace-confirm' };
+  | { readonly kind: 'restore-replace-confirm' }
+  | {
+      readonly kind: 'schedule-change';
+      readonly scheduledStartLocal: string;
+      readonly error?: string;
+    };
 
 // --- Import flow (screen-states § 2) ----------------------------------------
 
@@ -87,6 +92,8 @@ export type RestoreView =
 /** Every side-effecting thing a screen can ask the controller to do. */
 export interface AppActions {
   openPrep(): void;
+  openScheduleChange(): void;
+  changeSchedule(scheduledStartLocal: string): void;
   applyUpdate(): void;
   beginClass(): void;
   next(): void;
@@ -139,6 +146,7 @@ export interface AppActions {
 
   // Backup / restore (screen-states § 13).
   exportBackup(): void;
+  exportReflections(): void;
   restoreFileLoaded(text: string): void;
   restoreMerge(): void;
   requestRestoreReplace(): void;
@@ -203,7 +211,7 @@ export interface ClassDetailProps {
 /** Props for the prep screen. */
 export interface PrepProps {
   readonly def: ClassDefinition;
-  readonly runStartedPreviewEpochMs: number;
+  readonly plannedAnchorPreviewEpochMs: number;
   readonly offsetMinutes: number;
   readonly prefs: Preferences;
   readonly actions: AppActions;
@@ -214,7 +222,7 @@ export interface LiveProps {
   readonly def: ClassDefinition;
   readonly snapshot: RunSnapshot;
   readonly events: readonly RunEvent[];
-  readonly runStartedAtEpochMs: number;
+  readonly plannedAnchorEpochMs: number;
   readonly hardCloseAtEpochMs: number;
   readonly hardCloseLocal: string;
   readonly offsetMinutes: number;

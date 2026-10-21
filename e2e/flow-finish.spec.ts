@@ -1,18 +1,18 @@
-// F6 — no accidental finish or abandon. Finish is a deliberate two-step from the
-// last savasana step; abandoning from the Leave guard needs a second confirmation.
+// F6 — no accidental finish or abandon. Savasana presents a static cue list;
+// Finish is a deliberate reveal plus confirmation.
 // Regression/smoke only.
 
 import { test, expect } from '@playwright/test';
 import { openHome, begin, next, advanceSegments, jul28 } from './helpers.js';
 
-test('F6: Finish requires the last savasana step, a reveal, and a confirmation', async ({ page }) => {
+test('F6: Finish requires a reveal and a confirmation', async ({ page }) => {
   await openHome(page, jul28(19, 0));
   await begin(page);
-  await advanceSegments(page, 14); // through to Savasana (step 0)
+  await advanceSegments(page, 14); // through to Savasana
   await expect(page.locator('.live')).toHaveAttribute('data-segment-type', 'savasana');
 
-  // Finish is not offered until the sixth step is reached AND Next reveals it.
-  for (let i = 0; i < 5; i++) await next(page); // to the last step (index 5)
+  // The cue list is informational; one Next reveals Finish.
+  await expect(page.locator('.savasana__prompt')).toHaveCount(6);
   await expect(page.getByTestId('finish-class')).toHaveCount(0);
 
   await next(page); // reveals Finish; does NOT finish

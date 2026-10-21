@@ -8,8 +8,9 @@ import {
   elapsedSec,
   format12hLabel,
   formatElapsed,
+  hardCloseForScheduledStart,
   plannedWindowFor,
-  reanchorPlan,
+  scheduledPlan,
 } from './time.js';
 import { CDT_OFFSET_MIN, jul28, localEpoch, sampleAt } from './test-support.js';
 
@@ -39,7 +40,7 @@ describe('D2 — canonical planned windows for a 7:00 PM start', () => {
   it('Grounding 7:00–7:10, Supported Caterpillar 7:24–7:30, Savasana 7:45–8:00', async () => {
     const def = await desirePaths();
     const start = jul28(19, 0);
-    const plan = reanchorPlan(def.expandedRuntimeSegments, start);
+    const plan = scheduledPlan(def.expandedRuntimeSegments, start);
     const by = new Map(plan.map((w) => [w.segmentId, w]));
 
     expect(by.get('grounding')!.plannedStartEpochMs).toBe(jul28(19, 0));
@@ -53,19 +54,32 @@ describe('D2 — canonical planned windows for a 7:00 PM start', () => {
   });
 });
 
-describe('D3 — late begin re-anchors the plan; hard close does not move', () => {
-  it('begun at 7:03: Grounding 7:03–7:13, hard close still 8:00, wake at 7:58', async () => {
+describe('D3 — the scheduled hour anchors the plan; a late Begin does not move it', () => {
+  it('begun at 7:03: Grounding remains 7:00–7:10, hard close 8:00, wake at 7:58', async () => {
     const def = await desirePaths();
-    const start = jul28(19, 3);
-    const grounding = plannedWindowFor(def.expandedRuntimeSegments, 'grounding', start)!;
-    expect(grounding.plannedStartEpochMs).toBe(jul28(19, 3));
-    expect(grounding.plannedEndEpochMs).toBe(jul28(19, 13));
+    const scheduledStart = jul28(19, 0);
+    const actualBegin = jul28(19, 3);
+    const grounding = plannedWindowFor(def.expandedRuntimeSegments, 'grounding', scheduledStart)!;
+    expect(grounding.plannedStartEpochMs).toBe(jul28(19, 0));
+    expect(grounding.plannedEndEpochMs).toBe(jul28(19, 10));
 
-    const hc = constructHardClose(start, CDT_OFFSET_MIN, def.hardCloseLocal);
+    const hc = constructHardClose(actualBegin, CDT_OFFSET_MIN, def.hardCloseLocal, def.scheduledStartLocal);
     expect(hc.epochMs).toBe(jul28(20, 0));
     expect(hc.iso).toBe('2026-07-28T20:00:00-05:00');
     // Wake message eligible two minutes before, i.e. 7:58.
     expect(hc.epochMs - 120_000).toBe(jul28(19, 58));
+  });
+});
+
+describe('schedule correction close calculation', () => {
+  it('keeps the minute mark and advances exactly one hour', () => {
+    expect(hardCloseForScheduledStart('18:30')).toBe('19:30');
+  });
+
+  it('wraps across midnight and rejects incomplete input', () => {
+    expect(hardCloseForScheduledStart('23:30')).toBe('00:30');
+    expect(hardCloseForScheduledStart('6:30')).toBeNull();
+    expect(hardCloseForScheduledStart('')).toBeNull();
   });
 });
 
@@ -102,6 +116,27 @@ describe('Hard-close construction — built once from Begin, never recomputed', 
     const hc = constructHardClose(begin, CDT_OFFSET_MIN, '20:00');
     expect(hc.epochMs).toBe(jul28(20, 0));
     expect(hc.epochMs).toBeLessThan(begin); // hard close is already in the past
+  });
+
+  it('places a 23:30–00:30 hard close on the following local date', () => {
+    const begin = localEpoch(2026, 7, 28, 23, 30, 0, CDT_OFFSET_MIN);
+    const hc = constructHardClose(begin, CDT_OFFSET_MIN, '00:30', '23:30');
+    expect(hc.localDate).toBe('2026-07-29');
+    expect(hc.iso).toBe('2026-07-29T00:30:00-05:00');
+  });
+
+  it('keeps a post-midnight late start inside the hour that began the prior day', () => {
+    const begin = localEpoch(2026, 7, 29, 0, 1, 0, CDT_OFFSET_MIN);
+    const hc = constructHardClose(begin, CDT_OFFSET_MIN, '00:30', '23:30');
+    expect(hc.localDate).toBe('2026-07-29');
+    expect(hc.iso).toBe('2026-07-29T00:30:00-05:00');
+  });
+
+  it('maps an early pre-midnight tap to the upcoming cross-midnight hour', () => {
+    const begin = localEpoch(2026, 7, 28, 23, 0, 0, CDT_OFFSET_MIN);
+    const hc = constructHardClose(begin, CDT_OFFSET_MIN, '00:30', '23:30');
+    expect(hc.localDate).toBe('2026-07-29');
+    expect(hc.iso).toBe('2026-07-29T00:30:00-05:00');
   });
 });
 

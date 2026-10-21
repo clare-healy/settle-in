@@ -21,7 +21,7 @@ import {
   type Side,
   type ValidationError,
   type Warning,
-  CANONICAL_SCHEDULED_START_LOCAL,
+  CLASS_DURATION_SEC,
   SUPPORTED_SCHEMA_VERSION,
   SUPPORTED_SIDES,
 } from '../schema/index.js';
@@ -131,9 +131,8 @@ export function normalizeAndValidate(input: NormalizeInput): NormalizeOutput {
 
   validateSequence(c, contexts, peakPoseId, fmLine('peak_pose_id'));
 
-  // --- Copy, schedule, and wake warnings (independent of expansion) ---------
+  // --- Copy and wake warnings (independent of expansion) --------------------
   applyCopyWarnings(c, contexts);
-  if (date !== null) applyScheduleWarning(c, date, scheduledStart, fmLine('date'));
 
   // --- Expansion and duration checks (only when nothing blocks) -------------
   let classDefinition: ClassDefinition | null = null;
@@ -146,7 +145,7 @@ export function normalizeAndValidate(input: NormalizeInput): NormalizeOutput {
     const authored = contexts.map((ctx) => ctx.seg);
     const expanded = expandSegments(authored);
     const plannedDurationSec = expanded.reduce((sum, s) => sum + s.plannedDurationSec, 0);
-    const intervalSec = timeToSeconds(hardClose) - timeToSeconds(scheduledStart);
+    const intervalSec = scheduledIntervalSec(scheduledStart, hardClose);
 
     if (plannedDurationSec > intervalSec) {
       c.error(
@@ -376,22 +375,38 @@ function validateSequence(c: Collector, contexts: readonly SegCtx[], peakPoseId:
     }
   }
 
-  // Structural alternation: Grounding, (Pose, Transition)+, Savasana, and each
-  // transition leads to the pose or Savasana that follows it in source order.
+  // Structural sequence: Grounding, an optional transition into the first pose,
+  // then every pose followed by a transition, and finally Savasana. Each
+  // transition leads to the pose or Savasana immediately following it.
   if (first?.type === 'grounding' && last?.type === 'savasana') {
+    let expect: 'pose-or-opening-transition' | 'pose' | 'transition' = 'pose-or-opening-transition';
     for (let k = 1; k < contexts.length - 1; k++) {
       const ctx = contexts[k];
       if (!ctx) continue;
-      const expectPose = (k - 1) % 2 === 0;
-      if (expectPose && ctx.seg.type !== 'pose') {
-        c.error(`Expected a pose here but found "${ctx.label}". Poses and transitions must alternate between Grounding and Savasana.`, {
+      if (expect === 'pose-or-opening-transition') {
+        if (ctx.seg.type === 'transition') expect = 'pose';
+        else if (ctx.seg.type === 'pose') expect = 'transition';
+        else c.error(`Expected a pose or opening transition here but found "${ctx.label}".`, {
           segment: ctx.label, field: null, sourceLine: ctx.headingLine,
         });
-      } else if (!expectPose && ctx.seg.type !== 'transition') {
+      } else if (expect === 'pose' && ctx.seg.type !== 'pose') {
+        c.error(`Expected a pose after the opening transition but found "${ctx.label}".`, {
+          segment: ctx.label, field: null, sourceLine: ctx.headingLine,
+        });
+      } else if (expect === 'transition' && ctx.seg.type !== 'transition') {
         c.error(`Expected a transition after "${contexts[k - 1]?.label ?? 'the previous pose'}" but found "${ctx.label}".`, {
           segment: ctx.label, field: null, sourceLine: ctx.headingLine,
         });
       }
+      if (expect === 'pose' && ctx.seg.type === 'pose') expect = 'transition';
+      else if (expect === 'transition' && ctx.seg.type === 'transition') expect = 'pose';
+    }
+
+    const penultimate = contexts[contexts.length - 2];
+    if (penultimate?.seg.type !== 'transition') {
+      c.error('The final pose must be followed by a transition into Savasana.', {
+        segment: penultimate?.label ?? null, field: null, sourceLine: penultimate?.headingLine ?? null,
+      });
     }
 
     for (let k = 0; k < contexts.length; k++) {
@@ -434,17 +449,6 @@ function applyCopyWarnings(c: Collector, contexts: readonly SegCtx[]): void {
     } else if (s.type === 'savasana') {
       warnIfLong(c, s.wakeMessage, 90, ctx.label, 'wake_message', ctx.fieldLines.get('wake_message') ?? ctx.headingLine, 'the wake message');
     }
-  }
-}
-
-function applyScheduleWarning(c: Collector, date: string, scheduledStart: string | null, dateLine: number): void {
-  const isTuesday = dayOfWeekUTC(date) === 2;
-  const usualStart = scheduledStart === CANONICAL_SCHEDULED_START_LOCAL;
-  if (!isTuesday || !usualStart) {
-    c.warn(
-      'This class is not the usual Tuesday 7:00 PM class (a shifted week, a sub, or a rehearsal). It will still import.',
-      { segment: 'Front matter', field: 'date', sourceLine: dateLine },
-    );
   }
 }
 
@@ -602,12 +606,8 @@ function reqHardClose(c: Collector, obj: Record<string, unknown>, scheduledStart
     c.error('Front matter · hard_close_local must be a 24-hour time like "20:00".', { segment: 'Front matter', field: 'hard_close_local', sourceLine: line });
     return null;
   }
-  if (v !== '20:00') {
-    c.error('Front matter · hard_close_local must be 20:00 for v1 (the studio\'s hard close).', { segment: 'Front matter', field: 'hard_close_local', sourceLine: line });
-    return null;
-  }
-  if (scheduledStart && timeToSeconds(v) <= timeToSeconds(scheduledStart)) {
-    c.error('Front matter · hard_close_local must be later than scheduled_start_local.', { segment: 'Front matter', field: 'hard_close_local', sourceLine: line });
+  if (scheduledStart && scheduledIntervalSec(scheduledStart, v) !== CLASS_DURATION_SEC) {
+    c.error('Front matter · hard_close_local must be exactly one hour after scheduled_start_local.', { segment: 'Front matter', field: 'hard_close_local', sourceLine: line });
     return null;
   }
   return v;
@@ -673,6 +673,13 @@ function timeToSeconds(hhmm: string): number {
   return (h ?? 0) * 3600 + (m ?? 0) * 60;
 }
 
+/** Scheduled duration, allowing an hour-long class to cross midnight. */
+function scheduledIntervalSec(start: string, close: string): number {
+  const startSec = timeToSeconds(start);
+  const closeSec = timeToSeconds(close);
+  return (closeSec - startSec + 24 * 3600) % (24 * 3600);
+}
+
 function minutes(seconds: number): number {
   return Math.round(seconds / 60);
 }
@@ -686,10 +693,4 @@ function isRealDate(text: string): boolean {
   if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
   const dt = new Date(Date.UTC(y, mo - 1, d));
   return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
-}
-
-function dayOfWeekUTC(date: string): number {
-  const match = ISO_DATE.exec(date);
-  if (!match) return -1;
-  return new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))).getUTCDay();
 }

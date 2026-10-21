@@ -45,13 +45,21 @@ Claude Fable 5, operating through Claude Code, performed the final build-readine
 - Verifying internal consistency of the canonical package, fixture arithmetic, and archive checksums
 - Renaming the contract convention to the treaty convention across the package (principles-based computing)
 - Defining the as-taught export schema (Export Schema v1) in `docs/class-format.md`, closing the loop behind the end "each taught class strengthens future class construction"
-- Establishing the integrated-system rule between the app and the Claude "Yin Flow State" authoring project, and authoring `docs/yin-flow-state-instructions.md`
+- Establishing the integrated-system rule between the app and the Claude project then named "Yin Flow State," and authoring the canonical instructions now at `docs/settle-in-authoring-instructions.md`
 - Adopting the yes/no/triangulate decision primitive for the decision log and missing-decision handling
 - Defining post-hard-close run behavior, restore merge semantics, and the warn-without-blocking fixture path (`fixtures/warning-short-plan.md`, acceptance test C9)
 - Reframing wireframes as refinements rather than build gates
 - Organizing and descriptively naming the delivered studio reference photographs
 
 Product assumptions introduced: as-taught timing-status thresholds (greater of 30 seconds and 15% of planned) as v1 defaults tunable under the field-learning rule. All decisions were ratified by Clare and recorded in `docs/decision-log.md`.
+
+## Clare + OpenAI Codex — October 20, 2026 field-learning iteration
+
+After two months of live use, Clare supplied the field evidence and governing principle for the first major iteration. Her observations generalized the app from a fixed 7:00–8:00 class to any scheduled 60-minute hour, replaced actual-start re-anchoring with scheduled-hour anchoring, introduced an optional movement transition after Grounding, changed Savasana from a manually advanced checklist to a static cue reminder list, and established the need for a complete human-readable reflection corpus export. Codex translated that evidence into synchronized treaties, tests, and implementation changes. Product assumptions introduced: non-empty saved drafts belong in the corpus alongside final reflections, clearly labeled; historic Savasana-step events remain readable but new runs do not create them.
+
+## Clare + OpenAI Codex — October 20, 2026 schedule correction and authoring handoff
+
+During adversarial review, Clare identified the operational ambiguity between a genuinely late Begin and an incorrectly authored scheduled hour. She specified a one-screen Prep correction: enter the new start, see the one-hour close calculate on that screen, and activate one `Change Schedule` action with no second confirmation. Codex preserved immutable history by implementing the correction as a fully parsed and validated new class revision, added claim-level evidence for a 6:30–7:30 class begun at 6:33 and for live navigation into an opening movement transition, renamed the canonical Claude authoring source to Settle In, and prepared the external project pass. Product assumption introduced: schedule is the only authored field correctable inside the app; every such correction must return upstream to prevent a later authoring regression.
 
 ## Continuing lineage
 

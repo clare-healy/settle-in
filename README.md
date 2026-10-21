@@ -1,8 +1,8 @@
 # Settle In
 
-Build-context package for a quiet, offline-first teaching instrument used by Clare to run her Tuesday 7 PM yin class at Raw Emerald Yoga from a Google Pixel 6.
+Quiet, offline-first teaching instrument used by Clare to run 60-minute yin classes from a Google Pixel 6.
 
-This repository currently contains the canonical product and implementation context. It does not yet contain the application itself.
+This repository contains the canonical product context and the production application.
 
 ## Read this first
 
@@ -17,7 +17,7 @@ The documents have distinct authority:
 
 [`docs/decision-log.md`](docs/decision-log.md) records when and why material decisions were made, operating on the yes/no/triangulate primitive; it does not outrank the canonical documents above.
 
-[`docs/yin-flow-state-instructions.md`](docs/yin-flow-state-instructions.md) is the canonical source of the Claude "Yin Flow State" project instructions. The app and that authoring project are one integrated system: schema changes update both sides in the same change.
+[`docs/settle-in-authoring-instructions.md`](docs/settle-in-authoring-instructions.md) is the canonical source of the Claude "Settle In" project instructions. The app and that authoring project are one integrated system: schema changes update both sides in the same change.
 
 Implementation agents must also follow [`AGENTS.md`](AGENTS.md).
 
@@ -35,12 +35,12 @@ Do not silently choose between conflicting requirements during implementation. R
 
 - The app never emits sound, vibration, or a system notification.
 - Clare advances every teaching segment manually.
-- The only automatic in-class signal is silent text appearing in Savasana two minutes before the hard 8:00 PM close. It appears on no other screen.
+- The only automatic in-class signal is silent text appearing in Savasana two minutes before the class's authored hard close. It appears on no other screen.
 - The app works after installation without a network connection.
 - A class plan remains immutable; each taught run is recorded separately.
 - The wall clock is primary. Timing informs rather than commands.
 - A bilateral pose duration is per side. A bilateral pose marked `4 min` occupies four minutes on Side 1 and four minutes on Side 2.
-- 8:00 PM is a hard class end, even after a late start.
+- Each class has a hard close exactly one hour after its scheduled start, even after a late actual start.
 - Device brightness remains under Clare's control; the app supplies a low-glare dark interface but does not claim to control hardware brightness.
 
 ## Repository map
@@ -89,7 +89,7 @@ The multi-file packaging is an implementation means. It may not broaden the prod
 ## Inputs still to be added
 
 - Wireframes from Claude Design in `mockups/`, prioritized for the four highest-visual-risk states (see `mockups/README.md`); wireframes refine the build, they do not gate it
-- One final, real class file generated through the Yin Flow State authoring workflow (this also validates the workflow itself)
+- One final, real class file generated through the Settle In authoring workflow (this also validates the workflow itself)
 
 Studio reference photographs arrived July 21, 2026, and live in `reference-photos/` with descriptive names. They refine the build; they do not reopen the core product decisions unless they expose a conflict with dim-room usability.
 

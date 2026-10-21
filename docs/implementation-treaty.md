@@ -7,8 +7,8 @@ This document defines the means required to preserve the product ends and princi
 ## Locked decisions
 
 - Target device: Google Pixel 6 in portrait orientation.
-- Scheduled class: Tuesday, 7:00–8:00 PM in the device's local time zone.
-- Hard close: 8:00 PM, regardless of actual start time or accumulated drift.
+- Scheduled class: exactly 60 minutes, at the authored local start time.
+- Hard close: exactly one hour after the authored scheduled start, regardless of actual start time or accumulated drift.
 - Bilateral duration: per side. Four minutes means four minutes on each side.
 - Advancement: always manual.
 - Actual durations: derived from timestamped run events.
@@ -49,39 +49,53 @@ Durations are normalized to integer seconds.
 Import expands the authored class into ordered runtime segments:
 
 - One grounding segment
+- An optional opening transition between Grounding and the first pose
 - One segment for each non-bilateral pose
 - One segment for each side of a bilateral pose
 - Explicit transition segments
-- One savasana segment with six manually advanced internal steps
+- One savasana segment displaying six authored cue reminders together
 
 For a bilateral pose, each generated side receives the authored `duration_per_side_sec`.
 
 `planned_offset_sec` is the sum of all earlier expanded runtime-segment durations.
 
-### Re-anchored plan
+### Scheduled-hour plan
 
 `run_started_at` is captured when Clare activates Begin Class.
 
 `run_local_date` is captured from the device's local date at the same moment. For the first teaching it will normally match the authored class date; rerunning a historical class uses the new run date. If the authored date and run date differ, the run remains linked to the authored class while its hard close follows the run date.
 
-For every expanded segment:
+The scheduled hour, not the Begin Class action, anchors every planned window. `scheduled_start_at` is constructed for the run date using the persisted Begin-time offset. For every expanded segment:
 
 ```text
-planned_start = run_started_at + planned_offset_sec
+planned_start = scheduled_start_at + planned_offset_sec
 planned_end   = planned_start + planned_duration_sec
 ```
 
-Beginning late therefore shifts the teaching plan with the room; it does not create drift by itself.
+Beginning late does not shift the teaching plan. If a 7:00 class begins at 7:03, Grounding retains its authored 7:00–7:10 window and begins at `+3 min`. This is informational, not failure: community-building may consciously delay the first tap, while the scheduled end still honors the student.
 
 The hard close does not shift:
 
 ```text
-hard_close_at = run_local_date + hard_close_local
+hard_close_at = scheduled_start_at + 60 minutes
 ```
 
-`hard_close_at` is constructed exactly once, at Begin Class, using the device's then-current time zone offset, and is persisted with the run. It is never recomputed: a mid-run zone change, DST oddity, or clock adjustment does not move it, and the export shows the same instant Begin Class showed.
+`hard_close_at` is constructed exactly once, at Begin Class, from the authored schedule and the device's then-current time zone offset, and is persisted with the run. A class may cross midnight. The hard close is never recomputed: a mid-run zone change, DST oddity, or clock adjustment does not move it, and the export shows the same instant Begin Class showed.
 
-If a late start makes the re-anchored plan extend beyond the hard close, the UI continues to show the re-anchored planned window while also showing the fixed hard close. The app does not compress or automatically recompute remaining segments.
+If teaching runs behind the scheduled plan, the UI continues to show the scheduled windows and fixed hard close. The app does not compress, automatically recompute, or advance remaining segments.
+
+### Schedule correction before Begin
+
+Prep displays the complete authored scheduled hour beside Begin Class. `Change scheduled time` opens one screen with:
+
+- one editable local start-time field;
+- a read-only hard close recalculated immediately as exactly 60 minutes later, including across midnight;
+- Cancel; and
+- one primary `Change Schedule` action at the bottom of the screen.
+
+There is no second confirmation screen. Activating `Change Schedule` changes only the top-level `scheduled_start_local` and `hard_close_local` fields in the original Markdown, runs the complete ordinary import and validation pipeline, and persists the result as a new immutable class revision before Prep acknowledges the change. The earlier revision and every run linked to it remain untouched. Begin Class always starts the exact revision currently displayed on Prep.
+
+This is a narrow in-room recovery path, not a general class editor. No teaching content, date, identity, duration, or cue can be changed from Prep. The corrected source remains part of the integrated app/authoring-system contract and must be passed back upstream.
 
 ### Elapsed time
 
@@ -119,26 +133,26 @@ A visit that begins via Previous (`segment_back`) displays `revisited` in place 
 
 ### Hard close and savasana signal
 
-The wake message becomes **temporally eligible** at exactly two minutes before `hard_close_at`, normally 7:58 PM. Temporal eligibility alone never shows anything.
+The wake message becomes **temporally eligible** at exactly two minutes before `hard_close_at`. Temporal eligibility alone never shows anything.
 
 **The message displays only while the current segment is Savasana.** Both conditions must hold: the run is active, the clock has reached `hard_close_at - 120s`, and Clare is in Savasana. On Grounding, a pose, or a transition the message never appears, at any time. It is a signal to begin the gentle awakening, and it belongs only where that awakening happens; on any other screen it is a distraction in the room (field evidence, July 25, 2026).
 
 Consequences:
 
-- If Clare is already in Savasana when the clock reaches 7:58, the message appears then.
-- If she enters Savasana after 7:58, it is present immediately on entry.
-- If she is still teaching elsewhere at 7:58, nothing appears; the message waits for Savasana.
+- If Clare is already in Savasana when the clock reaches two minutes before hard close, the message appears then.
+- If she enters Savasana after that time, it is present immediately on entry.
+- If she is still teaching elsewhere then, nothing appears; the message waits for Savasana.
 - A run begun at or after `hard_close_at` — a rehearsal later in the evening — shows no message on Grounding, poses, or transitions; entering Savasana shows it immediately, once. The message is not suppressed for rehearsals: it is simply gated on Savasana like every other run.
 
 The message text is the class's authored `wake_message`, shown verbatim.
 
-The message fades in once over approximately three seconds and remains visible until Clare advances or finishes. It never cycles, fades away on its own, makes sound, vibrates, or posts a notification. The `wake_message_shown` event is persisted immediately before the message's **first render in Savasana** — never merely because the clock passed 7:58 while another segment was current. The fade-once guarantee derives from that durable event, so a reload or process death after the message has shown recovers with it simply present — no replayed fade.
+The message fades in once over approximately three seconds and remains visible until Clare finishes. It never cycles, fades away on its own, makes sound, vibrates, or posts a notification. The `wake_message_shown` event is persisted immediately before the message's **first render in Savasana** — never merely because the clock passed the eligibility time while another segment was current. The fade-once guarantee derives from that durable event, so a reload or process death after the message has shown recovers with it simply present — no replayed fade.
 
-At 8:00 PM the app does not advance or end the class. It changes the quiet close indicator to `8:00 · hard close` and leaves the action with Clare.
+At the authored hard close the app does not advance or end the class. It changes the quiet close indicator to `{time} · hard close` and leaves the action with Clare.
 
-A run begun at or after `hard_close_at` — for example a rehearsal later in the evening — shows the `8:00 · hard close` indicator immediately. This is defined behavior, not an error. There is no separate rehearsal or practice mode; the re-anchored planned windows still shift with the actual start, and nothing blocks running the class. The wake message follows the Savasana gate above and therefore does not appear until Savasana.
+A run begun at or after `hard_close_at` — for example a rehearsal later in the day — shows the `{time} · hard close` indicator immediately. This is defined behavior, not an error. There is no separate rehearsal or practice mode; the scheduled windows remain anchored to the authored hour, and nothing blocks running the class. The wake message follows the Savasana gate above and therefore does not appear until Savasana.
 
-8:00 PM ends teaching, not the record. After the hard close, forward and back navigation and Finish remain fully available so Clare can stage the room's actual ending — even a few minutes past 8:00 while students roll up mats — and finalize the record at her pace. Nothing locks and nothing advances.
+The hard close ends teaching, not the record. After it, back navigation and Finish remain fully available so Clare can stage the room's actual ending and finalize the record at her pace. Nothing locks and nothing advances.
 
 ## Run state model
 
@@ -158,7 +172,7 @@ An active run contains:
 - `class_id`
 - `run_started_at`
 - Current expanded segment ID
-- Current savasana step when applicable
+- Historic savasana-step projection for backward compatibility with earlier runs
 - Minimal or expanded presentation state
 - Ordered run events
 - Wake-message acknowledgment state
@@ -185,7 +199,7 @@ Append events; do not rewrite history:
 - `run_resumed`
 - `clock_discontinuity_noted`
 
-Savasana step movement in either direction is a teaching-state event and persists before rendering, so recovery returns to the exact step. `clock_discontinuity_noted` is a presentation-class event.
+`savasana_step_advanced` and `savasana_step_back` remain readable for historic runs. New runs do not append them because the six authored Savasana cues display together as a reminder list. `clock_discontinuity_noted` is a presentation-class event.
 
 Only teaching-state events affect derived durations. Presentation events are retained only if useful for recovery and may be excluded from exports.
 
@@ -281,7 +295,10 @@ Support:
 
 - Original class Markdown
 - One as-taught Markdown record containing plan and actuals, conforming to the as-taught export schema in `docs/class-format.md`
+- One human-readable Markdown corpus containing every non-empty saved reflection with its class and run identity
 - Whole-library backup containing schema version, classes, revisions, runs, events, and notes
+
+The reflection corpus is an analysis artifact, not a restore format. It includes final reflections and any non-empty saved draft, preserves reflection text verbatim, and orders entries chronologically. The whole-library JSON backup remains the lossless safety net.
 
 A whole-library restore parses and validates the entire backup before any write transaction opens; merge or replacement is then applied atomically, so a failure mid-apply leaves the library unchanged. Replacement is destructive and requires explicit confirmation. Merge is the default.
 

@@ -170,7 +170,7 @@ This is the change with the longest tail, which is why I want your audit rather 
 - Export Schema v1 keeps `substituted_with` and the `skipped` / `substituted` statuses. If nothing
   can set them manually, do they stay as derivable-only fields (my inclination — the schema is a
   treaty and the fields are harmless when null), or does the export schema need a version bump?
-  If the schema changes at all, `docs/yin-flow-state-instructions.md` must change in the same
+  If the schema changes at all, `docs/settle-in-authoring-instructions.md` must change in the same
   commit, and the Yin Flow State project's "Honest history" section currently tells the assistant
   to read those statuses.
 - The derived actuals do not disappear — they still belong in the **as-taught export**, which is

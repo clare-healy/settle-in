@@ -167,7 +167,7 @@ export interface VisitDrift {
 export function deriveVisitDrifts(
   definition: ClassDefinition,
   events: readonly RunEvent[],
-  runStartedAtEpochMs: number,
+  plannedAnchorEpochMs: number,
 ): VisitDrift[] {
   const ordered = sortedBySeq(events);
   const out: VisitDrift[] = [];
@@ -175,7 +175,7 @@ export function deriveVisitDrifts(
     const e = ordered[i];
     if (!e || e.type !== 'segment_entered') continue;
     const revisited = entryIsRevisited(ordered, i);
-    const window = plannedWindowFor(definition.expandedRuntimeSegments, e.segmentId, runStartedAtEpochMs);
+    const window = plannedWindowFor(definition.expandedRuntimeSegments, e.segmentId, plannedAnchorEpochMs);
     out.push({
       segmentId: e.segmentId,
       entryEpochMs: e.wallEpochMs,
@@ -190,9 +190,9 @@ export function deriveVisitDrifts(
 export function currentDriftDisplay(
   definition: ClassDefinition,
   events: readonly RunEvent[],
-  runStartedAtEpochMs: number,
+  plannedAnchorEpochMs: number,
 ): DriftDisplay | null {
-  const drifts = deriveVisitDrifts(definition, events, runStartedAtEpochMs);
+  const drifts = deriveVisitDrifts(definition, events, plannedAnchorEpochMs);
   const last = drifts[drifts.length - 1];
   return last ? last.drift : null;
 }
