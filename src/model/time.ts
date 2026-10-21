@@ -5,7 +5,7 @@
 // shifts and is constructed exactly once (docs/implementation-treaty.md § Scheduled-hour plan, § Elapsed time,
 // § Hard close and savasana signal).
 
-import type { EventSample, ExpandedSegment } from '../schema/index.js';
+import { CLASS_DURATION_SEC, type EventSample, type ExpandedSegment } from '../schema/index.js';
 import { formatIsoWithOffset, localDateAt } from './clock.js';
 
 // --- Hard close --------------------------------------------------------------
@@ -47,17 +47,21 @@ export function constructHardClose(
   // Wall values at a fixed offset → epoch: realEpoch = UTC(walls) - offset.
   let epochMs =
     Date.UTC(y ?? 1970, (mo ?? 1) - 1, d ?? 1, hh ?? 0, mm ?? 0, 0) - offsetMinutes * 60_000;
-  // A scheduled hour may cross midnight (for example 23:30–00:30). A Begin tap
-  // at/after the scheduled start belongs to that night's occurrence; a tap after
-  // midnight and before the next scheduled start belongs to the occurrence that
-  // began on the previous local date. This keeps a 00:01 late start closing at
-  // 00:30, rather than incorrectly moving the close to the following night.
+  // A scheduled hour may cross midnight (for example 23:30–00:30). Two schedule
+  // occurrences then touch the Begin date: the one that began the prior evening
+  // and the one beginning that evening. Choose the occurrence whose scheduled
+  // start is closest to the Begin tap. This makes both a 23:00 early tap and a
+  // 00:01 late tap resolve to the humanly expected hour without a rehearsal mode.
   if (scheduledStartLocal) {
     const startMinute = timeOfDayMinutes(scheduledStartLocal);
     const closeMinute = timeOfDayMinutes(hardCloseLocal);
-    const beginLocalMinute = timeOfDayMinutes(formatLocalTime(beginInstantEpochMs, offsetMinutes));
-    if (closeMinute <= startMinute && beginLocalMinute >= startMinute) {
-      epochMs += 24 * 60 * 60_000;
+    if (closeMinute <= startMinute) {
+      const nextClose = epochMs + 24 * 60 * 60_000;
+      const priorStart = epochMs - CLASS_DURATION_SEC * 1000;
+      const nextStart = nextClose - CLASS_DURATION_SEC * 1000;
+      if (Math.abs(nextStart - beginInstantEpochMs) < Math.abs(beginInstantEpochMs - priorStart)) {
+        epochMs = nextClose;
+      }
     }
   }
   return {
@@ -72,11 +76,6 @@ export function constructHardClose(
 function timeOfDayMinutes(hhmm: string): number {
   const [h, m] = hhmm.split(':').map((x) => Number.parseInt(x, 10));
   return (h ?? 0) * 60 + (m ?? 0);
-}
-
-function formatLocalTime(epochMs: number, offsetMinutes: number): string {
-  const shifted = new Date(epochMs + offsetMinutes * 60_000);
-  return `${String(shifted.getUTCHours()).padStart(2, '0')}:${String(shifted.getUTCMinutes()).padStart(2, '0')}`;
 }
 
 // --- Scheduled plan ----------------------------------------------------------
