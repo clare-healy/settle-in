@@ -131,7 +131,7 @@ test('J3: every primary touch target is at least 48 × 48 CSS pixels', async ({ 
   }
   await page.getByTestId('return-to-class').click();
 
-  // Finish, from the last savasana step.
+  // Finish, revealed from the static Savasana reminder list.
   for (let i = 0; i < 30; i++) {
     if ((await page.locator('.live').getAttribute('data-segment-type')) === 'savasana') break;
     await page.locator('[data-zone="next"]').click({ force: true });

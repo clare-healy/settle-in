@@ -1,6 +1,6 @@
 # Build Instructions for Agents
 
-This repository is currently a build-context package for Settle In.
+This repository contains the production Settle In app and its canonical build context.
 
 ## Required reading order
 
@@ -23,7 +23,7 @@ Use the authority order in `README.md` when resolving apparent conflicts.
 
 - Preserve the Ends / Means / Principles. Technical convenience does not outrank them.
 - Never add audio, vibration, haptics, notifications, analytics, tracking, accounts, cloud dependencies, or automatic teaching advancement.
-- Treat 8:00 PM as a hard close and bilateral duration as per side.
+- Treat the authored scheduled hour as the timing anchor: hard close is exactly 60 minutes after scheduled start, even when Begin Class is tapped late. Bilateral duration remains per side.
 - Keep authored class definitions immutable and store every taught run separately.
 - Derive live timing and actual durations from durable timestamps.
 - Do not claim to control device brightness or guarantee wake lock.

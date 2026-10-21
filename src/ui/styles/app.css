@@ -612,7 +612,7 @@ button {
 
 /* --- Savasana ------------------------------------------------------------- */
 
-.savasana__steps {
+.savasana__prompts {
   list-style: none;
   margin: var(--space-5) 0;
   padding: 0;
@@ -622,7 +622,7 @@ button {
   width: 100%;
   max-width: 28ch;
 }
-.savasana__step {
+.savasana__prompt {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -635,22 +635,6 @@ button {
   height: 8px;
   border-radius: 50%;
   border: 1px solid var(--raw-pine);
-}
-/* Past: quietly visible. Future: subdued but legible at close distance
-   (not opacity alone). Active: warmer, static marker. */
-.savasana__step--past {
-  color: var(--raw-pine);
-}
-.savasana__step--future {
-  color: var(--curtain-linen);
-  opacity: 0.72;
-}
-.savasana__step--active {
-  color: var(--taper-wax);
-}
-.savasana__step--active .savasana__marker {
-  background: var(--candlelight-amber);
-  border-color: var(--candlelight-amber);
 }
 .savasana__close-line {
   color: var(--taper-wax);

@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 //
-// Savasana (screen-states § 9): six steps, step Back, deliberate Finish after the
-// sixth step (never a silent finish), and the post-8:00 hard-close label (D9).
+// Savasana (screen-states § 9): six static cue reminders, direct Back, deliberate
+// Finish reveal (never a silent finish), and the post-hard-close label (D9).
 
 import { describe, it, expect } from 'vitest';
 import {
@@ -32,33 +32,28 @@ async function toSavasana(h: Harness): Promise<void> {
 }
 
 describe('Savasana', () => {
-  it('renders the six fixed steps with the first active', async () => {
+  it('renders all six authored cues together as a non-interactive reminder list', async () => {
     const h = await bootApp();
     await toSavasana(h);
-    const steps = h.root.querySelectorAll('.savasana__step');
+    const steps = h.root.querySelectorAll('.savasana__prompt');
     expect(steps).toHaveLength(6);
-    expect(h.root.querySelector('.savasana__step--active [data-active]') ?? h.root.querySelector('[data-active]')).toBeTruthy();
+    expect(h.root.querySelector('[data-active]')).toBeNull();
     expect(peek(h).controller.snapshot().savasanaStep).toBe(0);
   });
 
-  it('Next advances a step and step Back returns to the previous step', async () => {
+  it('Previous returns directly to the prior runtime segment without cue-step navigation', async () => {
     const h = await bootApp();
     await toSavasana(h);
-    await zone(h.app, h.root, 'next'); // step 0 → 1
-    await zone(h.app, h.root, 'next'); // step 1 → 2
-    expect(peek(h).controller.snapshot().savasanaStep).toBe(2);
-    await zone(h.app, h.root, 'prev'); // step 2 → 1
-    expect(peek(h).controller.snapshot().savasanaStep).toBe(1);
+    await zone(h.app, h.root, 'prev');
+    expect(peek(h).controller.snapshot().currentSegment?.type).toBe('transition');
   });
 
-  it('after the sixth step, Next exposes Finish rather than finishing silently', async () => {
+  it('one Next exposes Finish rather than finishing silently', async () => {
     const h = await bootApp();
     await toSavasana(h);
-    for (let i = 0; i < 5; i++) await zone(h.app, h.root, 'next'); // to step 5 (last)
-    expect(peek(h).controller.snapshot().savasanaStep).toBe(5);
-    expect(maybeId(h.root, 'finish-class')).toBeNull(); // not armed yet
+    expect(maybeId(h.root, 'finish-class')).toBeNull();
 
-    await zone(h.app, h.root, 'next'); // exposes Finish, does NOT finish
+    await zone(h.app, h.root, 'next');
     expect(maybeId(h.root, 'finish-class')).not.toBeNull();
     // No run_finished appended by a mere Next — finishing is deliberate.
     expect(peek(h).controller.eventLog().some((e) => e.type === 'run_finished')).toBe(false);
@@ -94,10 +89,9 @@ describe('Savasana', () => {
     // reject the tap as `busy` — the F9 behavior, not a navigation failure.
     await h.app.idle();
 
-    // Navigation stays open after 8:00.
-    const stepBefore = peek(h).controller.snapshot().savasanaStep;
+    // Finish remains reachable after the hard close.
     await zone(h.app, h.root, 'next');
-    expect(peek(h).controller.snapshot().savasanaStep).toBe(stepBefore + 1);
+    expect(maybeId(h.root, 'finish-class')).not.toBeNull();
   });
 });
 

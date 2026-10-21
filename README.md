@@ -1,8 +1,8 @@
 # Settle In
 
-Build-context package for a quiet, offline-first teaching instrument used by Clare to run her Tuesday 7 PM yin class at Raw Emerald Yoga from a Google Pixel 6.
+Quiet, offline-first teaching instrument used by Clare to run 60-minute yin classes from a Google Pixel 6.
 
-This repository currently contains the canonical product and implementation context. It does not yet contain the application itself.
+This repository contains the canonical product context and the production application.
 
 ## Read this first
 
@@ -35,12 +35,12 @@ Do not silently choose between conflicting requirements during implementation. R
 
 - The app never emits sound, vibration, or a system notification.
 - Clare advances every teaching segment manually.
-- The only automatic in-class signal is silent text appearing in Savasana two minutes before the hard 8:00 PM close. It appears on no other screen.
+- The only automatic in-class signal is silent text appearing in Savasana two minutes before the class's authored hard close. It appears on no other screen.
 - The app works after installation without a network connection.
 - A class plan remains immutable; each taught run is recorded separately.
 - The wall clock is primary. Timing informs rather than commands.
 - A bilateral pose duration is per side. A bilateral pose marked `4 min` occupies four minutes on Side 1 and four minutes on Side 2.
-- 8:00 PM is a hard class end, even after a late start.
+- Each class has a hard close exactly one hour after its scheduled start, even after a late actual start.
 - Device brightness remains under Clare's control; the app supplies a low-glare dark interface but does not claim to control hardware brightness.
 
 ## Repository map

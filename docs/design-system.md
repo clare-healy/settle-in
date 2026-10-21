@@ -34,7 +34,7 @@ Opaque contrast on Pond Charcoal is approximately:
 
 Opacity changes alter contrast. Every actual foreground/background combination must be tested after compositing. Meaningful text should meet WCAG AA contrast; primary glance information should target stronger contrast than the minimum.
 
-Inactive savasana steps may be visually quiet, but must remain legible at close reference distance. Do not use very low opacity as the only way to indicate state.
+Savasana cue reminders must remain legible together at close reference distance.
 
 ## Light and surfaces
 
@@ -109,7 +109,7 @@ Nothing moves faster than a slow breath.
 - Easing: `cubic-bezier(0.25, 0.10, 0.25, 1.0)`
 - Wake message: one fade from opacity 0 to 1 over approximately three seconds; remain visible afterward
 - No bounce, spring, shimmer, spinner, flashing, or looping attention motion
-- A small active savasana marker may be static; continuous flame pulsing is not necessary
+- Savasana reminder markers are static; no cue is presented as a live checklist state
 
 Honor `prefers-reduced-motion: reduce` by eliminating the positional settle and shortening cross-fades. The wake message may appear through a short non-positional fade or immediately.
 
@@ -151,4 +151,3 @@ Every release candidate must be checked:
 - At normal and 125% Android font scaling
 - With the longest fixture content
 - With airplane mode enabled so fallback fonts or missing assets cannot hide
-

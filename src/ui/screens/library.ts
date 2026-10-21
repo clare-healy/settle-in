@@ -157,6 +157,12 @@ function renderBackupRestore(props: LibraryProps): HTMLElement {
         }),
         el('button', {
           class: 'btn btn--quiet',
+          text: 'Export reflections',
+          attrs: { 'data-testid': 'export-reflections' },
+          on: { click: () => actions.exportReflections() },
+        }),
+        el('button', {
+          class: 'btn btn--quiet',
           text: 'Restore from backup',
           attrs: { 'data-testid': 'restore-library' },
           on: { click: () => restoreInput.click() },

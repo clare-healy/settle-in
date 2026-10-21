@@ -54,7 +54,7 @@ describe('two-minute wake message', () => {
 
     // Essential info is not obscured: clock, steps, and zones remain present.
     expect(maybeId(h.root, 'savasana-close')).not.toBeNull();
-    expect(h.root.querySelectorAll('.savasana__step')).toHaveLength(6);
+    expect(h.root.querySelectorAll('.savasana__prompt')).toHaveLength(6);
     expect(h.root.querySelector('[data-zone="next"]')).toBeTruthy();
   });
 
@@ -65,7 +65,7 @@ describe('two-minute wake message', () => {
     h.app.tick();
     expect(byId(h.root, 'wake-callout').className).toContain('wake-callout--fade');
 
-    // A subsequent structural render (step advance) keeps the message but no fade.
+    // A subsequent structural render (Finish reveal) keeps the message but no fade.
     await zone(h.app, h.root, 'next');
     const callout = byId(h.root, 'wake-callout');
     expect(callout.textContent).toBeTruthy();

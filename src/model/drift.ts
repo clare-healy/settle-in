@@ -1,4 +1,4 @@
-// Drift — how far a segment's actual entry ran from its re-anchored planned start.
+// Drift — how far a segment's actual entry ran from its scheduled planned start.
 //
 // Drift is computed once when the segment is entered and stays stable during the
 // visit. Display rounds to whole minutes; under 30 seconds absolute it reads

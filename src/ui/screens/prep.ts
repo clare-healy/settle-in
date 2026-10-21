@@ -8,13 +8,13 @@
 
 import { el, text as textNode } from '../dom.js';
 import { classDateLabel, plannedWindowLabel, sideLabel } from '../format.js';
-import { format12hLabel, reanchorPlan } from '../../model/index.js';
+import { format12hLabel, scheduledPlan } from '../../model/index.js';
 import type { PrepProps } from '../view-types.js';
 
 const PREFLIGHT = 'Do Not Disturb on · brightness set · battery comfortable';
 
 export function renderPrep(props: PrepProps): HTMLElement {
-  const { def, runStartedPreviewEpochMs, offsetMinutes, prefs, actions } = props;
+  const { def, plannedAnchorPreviewEpochMs, offsetMinutes, prefs, actions } = props;
 
   const scroll = el('div', { class: 'prep__scroll' });
 
@@ -73,8 +73,8 @@ export function renderPrep(props: PrepProps): HTMLElement {
     ],
   });
 
-  // runStartedPreviewEpochMs is used inside renderSequence; keep the binding read.
-  void runStartedPreviewEpochMs;
+  // plannedAnchorPreviewEpochMs is used inside renderSequence; keep the binding read.
+  void plannedAnchorPreviewEpochMs;
   void offsetMinutes;
 
   return el('section', {
@@ -85,8 +85,8 @@ export function renderPrep(props: PrepProps): HTMLElement {
 }
 
 function renderSequence(props: PrepProps): HTMLElement {
-  const { def, runStartedPreviewEpochMs, offsetMinutes } = props;
-  const windows = reanchorPlan(def.expandedRuntimeSegments, runStartedPreviewEpochMs);
+  const { def, plannedAnchorPreviewEpochMs, offsetMinutes } = props;
+  const windows = scheduledPlan(def.expandedRuntimeSegments, plannedAnchorPreviewEpochMs);
   const container = el('div');
 
   def.expandedRuntimeSegments.forEach((seg, i) => {

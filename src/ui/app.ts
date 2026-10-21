@@ -28,6 +28,7 @@ import type {
   EventSample,
   RunStartedEvent,
 } from '../schema/index.js';
+import { CLASS_DURATION_SEC } from '../schema/index.js';
 import {
   RunController,
   buildRecoverySnapshot,
@@ -45,6 +46,7 @@ import {
   backupFilenameFor,
   parseBackupText,
   validateBackup,
+  exportReflectionCorpus,
 } from '../export/index.js';
 import { clear, el } from './dom.js';
 import { renderHome } from './screens/home.js';
@@ -373,7 +375,7 @@ export class AppController {
         return def
           ? renderPrep({
               def,
-              runStartedPreviewEpochMs: this.prepPreviewStart(def),
+              plannedAnchorPreviewEpochMs: this.prepPreviewStart(def),
               offsetMinutes: this.offsetMinutes,
               prefs: this.prefs,
               actions: this.actions,
@@ -437,7 +439,7 @@ export class AppController {
       def: controller.definition,
       snapshot,
       events,
-      runStartedAtEpochMs: ctx.runStartedAtEpochMs,
+      plannedAnchorEpochMs: ctx.hardCloseAtEpochMs - CLASS_DURATION_SEC * 1000,
       hardCloseAtEpochMs: ctx.hardCloseAtEpochMs,
       hardCloseLocal: this.hardCloseLocal(),
       offsetMinutes: this.offsetMinutes,
@@ -580,6 +582,7 @@ export class AppController {
 
       // --- Backup / restore (screen-states § 13) ---------------------------
       exportBackup: () => this.exportBackup(),
+      exportReflections: () => this.exportReflections(),
       restoreFileLoaded: (text) => this.restoreFileLoaded(text),
       restoreMerge: () => this.applyRestore('merge'),
       requestRestoreReplace: () => { this.dialog = { kind: 'restore-replace-confirm' }; this.render(); },
@@ -713,6 +716,20 @@ export class AppController {
     });
   }
 
+  private exportReflections(): void {
+    this.dispatch(async () => {
+      const snapshot = await this.store.exportLibrary();
+      const markdown = exportReflectionCorpus({
+        revisions: snapshot.revisions,
+        runs: snapshot.runs,
+        notes: snapshot.notes,
+        exportedAt: this.nowIso(),
+      });
+      const date = this.todayLocalDate();
+      downloadMarkdown(`settle-in-reflections-${date}.md`, markdown);
+    });
+  }
+
   private restoreFileLoaded(text: string): void {
     this.dispatch(async () => {
       const parsed = parseBackupText(text);
@@ -809,11 +826,9 @@ export class AppController {
     const seg = snap?.currentSegment;
     if (!snap || !seg) return;
     if (seg.type === 'savasana') {
-      if (snap.savasanaStep < snap.savasanaStepCount - 1) {
-        this.finishArmed = false;
-        this.dispatch(async () => { await this.controller?.savasanaStepForward(); });
-      } else if (!this.finishArmed) {
-        // After the final step, Next exposes Finish rather than finishing silently.
+      if (!this.finishArmed) {
+        // Savasana cues are a static reminder list. One deliberate Next exposes
+        // Finish rather than advancing a checklist or finishing silently.
         this.finishArmed = true;
         this.render();
       }
@@ -828,11 +843,7 @@ export class AppController {
     const seg = snap?.currentSegment;
     if (!snap || !seg) return;
     this.finishArmed = false;
-    if (seg.type === 'savasana' && snap.savasanaStep > 0) {
-      this.dispatch(async () => { await this.controller?.savasanaStepBack(); });
-    } else {
-      this.dispatch(async () => { await this.controller?.previousSegment(); });
-    }
+    this.dispatch(async () => { await this.controller?.previousSegment(); });
   }
 
   private toggleReference(): void {
@@ -1049,12 +1060,11 @@ export class AppController {
     return sampleFrom(this.clock, this.offsetMinutes, this.executionId);
   }
 
-  private runContext(): { runStartedAtEpochMs: number; hardCloseAtEpochMs: number } {
+  private runContext(): { hardCloseAtEpochMs: number } {
     const started = this.controller
       ?.eventLog()
       .find((e): e is RunStartedEvent => e.type === 'run_started');
     return {
-      runStartedAtEpochMs: started ? started.runStartedAtEpochMs : 0,
       hardCloseAtEpochMs: started ? started.hardCloseAtEpochMs : 0,
     };
   }
@@ -1064,8 +1074,7 @@ export class AppController {
   }
 
   private prepPreviewStart(def: ClassDefinition): number {
-    // Preview planned windows anchored to the scheduled start on the class date,
-    // at the current offset. Begin Class re-anchors to the actual start.
+    // Preview planned windows anchored to the authored schedule on the class date.
     const [y, mo, d] = def.date.split('-').map((x) => Number.parseInt(x, 10));
     const [hh, mm] = def.scheduledStartLocal.split(':').map((x) => Number.parseInt(x, 10));
     return (

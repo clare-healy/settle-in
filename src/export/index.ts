@@ -16,4 +16,5 @@ export {
   type BackupPayload,
   type PreferenceEntry,
 } from './backup.js';
+export { exportReflectionCorpus, type ReflectionCorpusInputs } from './reflections.js';
 export { parseBackupText, validateBackup, type RestoreValidation } from './restore.js';

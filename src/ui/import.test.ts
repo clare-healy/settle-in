@@ -70,15 +70,17 @@ describe('Import — warning without blocking (C9)', () => {
   });
 });
 
-describe('Import — schedule warning (C10)', () => {
-  it('a non-Tuesday date warns without blocking', async () => {
+describe('Import — generalized one-hour schedule (C10)', () => {
+  it('a non-Tuesday 5:30–6:30 class imports without a schedule warning', async () => {
     const h = await bootApp({ seed: false, wallEpochMs: jul28(19, 0) });
     await openImport(h);
-    // 2026-07-29 is a Wednesday → schedule warning, still valid.
-    await validate(h, replaceOnce(VALID, 'date: 2026-07-28', 'date: 2026-07-29'));
+    let source = replaceOnce(VALID, 'date: 2026-07-28', 'date: 2026-07-29');
+    source = replaceOnce(source, 'scheduled_start_local: "19:00"', 'scheduled_start_local: "17:30"');
+    source = replaceOnce(source, 'hard_close_local: "20:00"', 'hard_close_local: "18:30"');
+    await validate(h, source);
 
     expect(h.root.querySelector('[data-import-phase="confirm"]')).not.toBeNull();
-    expect(byId(h.root, 'import-warnings').textContent?.length).toBeGreaterThan(0);
+    expect(maybeId(h.root, 'import-warnings')).toBeNull();
   });
 });
 

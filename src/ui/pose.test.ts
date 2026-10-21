@@ -13,6 +13,13 @@ async function toButterflyAt(h: Harness, wallEpochMs: number): Promise<void> {
 }
 
 describe('Pose minimal — §6 hierarchy', () => {
+  it('anchors the first planned window to the scheduled hour after a late Begin', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(19, 3) });
+    await beginRun(h);
+    expect(h.root.querySelector('.planned-window')?.textContent).toBe('7:00–7:10');
+    expect(byId(h.root, 'drift').textContent).toBe('+3 min');
+  });
+
   it('shows pose name+side, wall clock, planned window+elapsed, drift, midpoint, next preview, three zones', async () => {
     const h = await bootApp({ wallEpochMs: jul28(19, 0) });
     await toButterflyAt(h, jul28(19, 13)); // enter at 7:13

@@ -82,7 +82,7 @@ export class RunController {
   // --- Construction ---------------------------------------------------------
 
   /**
-   * Begin a fresh run. Captures the re-anchor origin and constructs the fixed
+   * Begin a fresh run. Captures the actual start and constructs the fixed
    * hard close exactly once, both persisted with `run_started`. Enters the first
    * expanded segment (grounding) so the run opens in a teaching segment. The
    * single-active-run guard runs inside the store's begin transaction (F7).
@@ -99,7 +99,12 @@ export class RunController {
 
     const startSample = sampleFrom(env.clock, env.offsetMinutes, env.executionId);
     const runLocalDate = localDateAt(startSample.wallEpochMs, env.offsetMinutes);
-    const hardClose = constructHardClose(startSample.wallEpochMs, env.offsetMinutes, def.hardCloseLocal);
+    const hardClose = constructHardClose(
+      startSample.wallEpochMs,
+      env.offsetMinutes,
+      def.hardCloseLocal,
+      def.scheduledStartLocal,
+    );
 
     const runStarted: RunEvent = {
       seq: 0,
@@ -338,7 +343,7 @@ export class RunController {
     });
   }
 
-  /** Advance one savasana step. Invalid outside savasana or at the last step. */
+  /** Historic compatibility path: advance one stored Savasana step. */
   savasanaStepForward(): Promise<ActionResult> {
     return this.withGuard(async () => {
       if (!this.inSavasana()) return { ok: false, rejected: 'invalid', reason: 'not in savasana' };
@@ -353,7 +358,7 @@ export class RunController {
     });
   }
 
-  /** Step back one savasana step. Invalid outside savasana or at the first step. */
+  /** Historic compatibility path: step back one stored Savasana step. */
   savasanaStepBack(): Promise<ActionResult> {
     return this.withGuard(async () => {
       if (!this.inSavasana()) return { ok: false, rejected: 'invalid', reason: 'not in savasana' };
@@ -397,7 +402,7 @@ export class RunController {
   /**
    * Persist `wake_message_shown` before the caller renders the message (E6). A
    * no-op (invalid) if already shown or the run is not active. The strict write
-   * completes before the result returns, so a reload after 7:58 recovers with the
+   * completes before the result returns, so a reload after the eligibility point recovers with the
    * message present and no replayed fade.
    */
   markWakeShown(): Promise<ActionResult> {

@@ -25,7 +25,7 @@ src/
 │              validate (blocking vs warning, segment/field/line) →
 │              ClassDefinition + source_hash (newline-normalized).
 ├── model/     Pure functions of (definition, events, now):
-│              plan expansion, planned offsets, re-anchoring,
+│              plan expansion, scheduled-hour anchoring,
 │              elapsed, drift, hard-close math, status derivation.
 │              No I/O, no Date.now() — everything takes a Clock.
 ├── store/     idb schema + migrations (forward-only, versioned),
@@ -81,7 +81,7 @@ A checked-in `docs/device-checklist.md` will script the physical passes so they 
 Each milestone ends green, committed, and reviewable. This is the README vertical slice with review seams.
 
 1. **M1 — Parse and validate.** Parser, normalizer, validator; all fixtures pass (C1–C9). *Review seam: parser security.*
-2. **M2 — Time model.** Expansion, re-anchoring, drift, hard-close, status derivation, all against the controllable clock (D1–D9). *Review seam: timing math — highest correctness risk.*
+2. **M2 — Time model.** Expansion, scheduled-hour anchoring, drift, hard-close, status derivation, all against the controllable clock (D1–D9). *Review seam: timing math — highest correctness risk.*
 3. **M3 — Store and run machine.** Persistence, event log, single-run guard, recovery derivation (H1, H4–H6).
 4. **M4 — Live surfaces.** Prep → Grounding → Pose/Transition → Savasana → Post-Class → finish; tap zones; back handling; wake message (E, F).
 5. **M5 — Import/export/library.** Import flow, library, as-taught export, backup round trip (C8, I1–I6).

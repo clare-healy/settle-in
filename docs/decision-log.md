@@ -8,6 +8,20 @@ The log operates on the yes/no/triangulate primitive. Each entry records a quest
 
 - **Android font scaling does not reach the app** (opened July 25, 2026; evidence in, ruling pending). Clare ran the three-step Pixel observation on July 25: raising Android's system font size to its largest standard step changes Settle In's text size **not at all** — `text changed: no`. The node stays open because the ruling is Codex's; nothing in the type scale or in J1/J2/J10's wording changes until it returns. Original framing follows. `html { -webkit-text-size-adjust: 100% }` plus an all-pixel type scale means Chrome on Android may not enlarge Settle In's text when Clare raises her system font size. If so, acceptance J1/J2/J10's "125% font scale" checks are measuring something the device never actually does, and a real accessibility need goes unserved. Triangulate against Principle 2 (glance, do not read) and Principle 4 (legibility outranks decoration) before changing the type scale, since a relative-unit scale would alter every screen Clare has already learned to read. Needs a Pixel observation first: does raising the system font size move the app's text at all? Route to Codex with that evidence.
 
+## October 20, 2026 — First major field-learning iteration
+
+Field evidence: after two months of use, Clare reported that Settle In materially reduced scrolling, improved timing awareness and cue structure, and created useful teaching feedback loops. Four demonstrated frictions now revise v1 assumptions.
+
+- Question: are classes always tied to Tuesday 7:00–8:00 PM? **No.** They are always exactly one scheduled hour, at any authored local start. `hard_close_local` must be one hour after `scheduled_start_local`, including across midnight.
+- Question: should Begin Class re-anchor the planned hour to the tap time? **No.** The scheduled hour is the anchor. A 7:00 class begun at 7:03 retains a 7:00–7:10 Grounding window, begins at `+3 min`, and still closes at 8:00. Rationale from Clare: “start on time to honor the teacher and end on time to honor the student.” A consciously late start for catching up and community-building is relational infrastructure, but it does not move the student-facing end.
+- Question: may a designed movement transition sit between Grounding and the first held pose? **Yes.** One optional opening Transition uses the existing transition schema and timing/history behavior. It supports waking the body and previewing the muscle groups and movement directions used later in the sequence.
+- Question: should Savasana cues remain a manually advanced checklist? **No.** The six authored cues display together as a static reminder list. One Next reveals Finish Class; no new Savasana-step events are written. Historic step events remain readable for backward compatibility.
+- Question: should Clare be able to export all reflections as one analysis artifact? **Yes.** Library adds a chronological human-readable Markdown reflection corpus containing every non-empty final reflection and saved draft, with class/run identity. The lossless JSON backup remains separate and unchanged.
+
+These rulings update the product, implementation, class-format, screen-state, acceptance, and Yin Flow State instructions together. Existing 7:00–8:00 class files and taught-run history remain valid.
+
+Application version advances from `0.1.0` to `0.2.0`. Class input, as-taught export, backup, and database schema versions do not change because their stored shapes remain backward compatible.
+
 ## July 21, 2026 — Context-package scope
 
 Decision: reorganize and strengthen the build context before writing application code.

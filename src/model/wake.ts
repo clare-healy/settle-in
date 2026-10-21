@@ -1,7 +1,7 @@
 // Wake-message eligibility and the hard-close indicator.
 //
 // The wake message is gated on TWO conditions, not one. It becomes TEMPORALLY
-// ELIGIBLE at exactly two minutes before hard_close_at (normally 7:58 PM) while a
+// ELIGIBLE at exactly two minutes before hard_close_at while a
 // run is active — but it is DISPLAYED only while the current segment is Savasana.
 // Temporal eligibility alone never shows anything and never persists anything: on
 // Grounding, a pose, or a transition the message never appears, at any time,

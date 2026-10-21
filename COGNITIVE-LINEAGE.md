@@ -53,6 +53,10 @@ Claude Fable 5, operating through Claude Code, performed the final build-readine
 
 Product assumptions introduced: as-taught timing-status thresholds (greater of 30 seconds and 15% of planned) as v1 defaults tunable under the field-learning rule. All decisions were ratified by Clare and recorded in `docs/decision-log.md`.
 
+## Clare + OpenAI Codex — October 20, 2026 field-learning iteration
+
+After two months of live use, Clare supplied the field evidence and governing principle for the first major iteration. Her observations generalized the app from a fixed 7:00–8:00 class to any scheduled 60-minute hour, replaced actual-start re-anchoring with scheduled-hour anchoring, introduced an optional movement transition after Grounding, changed Savasana from a manually advanced checklist to a static cue reminder list, and established the need for a complete human-readable reflection corpus export. Codex translated that evidence into synchronized treaties, tests, and implementation changes. Product assumptions introduced: non-empty saved drafts belong in the corpus alongside final reflections, clearly labeled; historic Savasana-step events remain readable but new runs do not create them.
+
 ## Continuing lineage
 
 Future material contributions should be appended with:
