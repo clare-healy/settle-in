@@ -23,7 +23,7 @@ const STATUS_LABEL: Record<RunStateKind, string> = {
 
 export function renderClassDetail(props: ClassDetailProps): HTMLElement {
   const { group, isUpcoming, runs, actions } = props;
-  const def = group.latest.definition;
+  const def = group.current.definition;
 
   const head = el('div', {
     class: 'import__head',
@@ -84,7 +84,7 @@ export function renderClassDetail(props: ClassDetailProps): HTMLElement {
 }
 
 function renderPlan(props: ClassDetailProps): HTMLElement {
-  const def = props.group.latest.definition;
+  const def = props.group.current.definition;
   const rows = def.expandedRuntimeSegments.map((seg) => {
     const isPeak = seg.parentId === def.peakPoseId;
     const name = seg.side ? `${seg.name} · ${sideLabel(seg.side)}` : seg.name;

@@ -77,7 +77,20 @@ describe('groupClasses', () => {
     expect(groups[0]!.runCount).toBe(2);
     expect(groups[0]!.revisions).toHaveLength(2);
     // latest = most-recently imported revision.
-    expect(groups[0]!.latest.importedAt).toBe('2026-07-03');
+    // With no recorded choice, current = most-recently imported revision.
+    expect(groups[0]!.current.importedAt).toBe('2026-07-03');
+  });
+
+  it('prefers the revision Clare last chose when it still exists', () => {
+    const revisions = [rev('a', '2026-07-28', '2026-07-02'), rev('a', '2026-07-28', '2026-07-03')];
+    const chosen = new Map([['a', 'a-2026-07-02']]);
+    expect(groupClasses(revisions, [], chosen)[0]!.current.importedAt).toBe('2026-07-02');
+  });
+
+  it('falls back to the most-recently imported revision when the choice is missing', () => {
+    const revisions = [rev('a', '2026-07-28', '2026-07-02'), rev('a', '2026-07-28', '2026-07-03')];
+    const chosen = new Map([['a', 'no-such-revision']]);
+    expect(groupClasses(revisions, [], chosen)[0]!.current.importedAt).toBe('2026-07-03');
   });
 });
 

@@ -5,7 +5,7 @@ import { localEpoch } from '../model/test-support.js';
 import { Store } from '../store/index.js';
 import { loadValidClass, newDbName, revisionOf } from '../store/test-support.js';
 import { latestRevision } from './library-model.js';
-import { bootApp, byId, CDT_OFFSET_MIN, tap } from './test-support.js';
+import { bootApp, byId, CDT_OFFSET_MIN, tap, type Harness } from './test-support.js';
 
 describe('Prep schedule correction', () => {
   it('uses one screen to calculate the close, persists a new revision, and begins from it', async () => {
@@ -55,4 +55,35 @@ describe('Prep schedule correction', () => {
     expect(runs[0]?.revisionSourceHash).toBe(corrected?.sourceHash);
     expect(runs[0]?.hardCloseAt).toBe('2026-07-28T19:30:00-05:00');
   });
+
+  it('keeps the time Clare chose after a correction is undone and Prep is reopened', async () => {
+    const at = localEpoch(2026, 7, 28, 18, 33, 0, CDT_OFFSET_MIN);
+    const store = await Store.open({ name: newDbName() });
+    await store.putClassRevision(revisionOf(await loadValidClass(), '2026-07-28T18:00:00-05:00'));
+    const h = await bootApp({ store, wallEpochMs: at });
+    await tap(h.app, h.root, 'open-prep');
+
+    // A mistaken correction to 6:30, then back to the authored 7:00. The second
+    // change resolves to the original, already stored revision.
+    await changeStart(h, '18:30');
+    await changeStart(h, '19:00');
+    expect(byId(h.root, 'prep-schedule').textContent).toBe('Scheduled class · 7:00–8:00');
+    expect(await h.store.getAllClassRevisions()).toHaveLength(2);
+
+    // Relaunch on the same store: Prep must still show 7:00, and Begin must use it.
+    const relaunched = await bootApp({ store, wallEpochMs: at + 60_000 });
+    await tap(relaunched.app, relaunched.root, 'open-prep');
+    expect(byId(relaunched.root, 'prep-schedule').textContent).toBe('Scheduled class · 7:00–8:00');
+    await tap(relaunched.app, relaunched.root, 'begin-class');
+    const runs = await store.getAllRuns();
+    expect(runs[0]?.hardCloseAt).toBe('2026-07-28T20:00:00-05:00');
+  });
 });
+
+async function changeStart(h: Harness, scheduledStartLocal: string): Promise<void> {
+  await tap(h.app, h.root, 'change-schedule');
+  const input = byId<HTMLInputElement>(h.root, 'schedule-start');
+  input.value = scheduledStartLocal;
+  input.dispatchEvent(new Event('input'));
+  await tap(h.app, h.root, 'confirm-schedule-change');
+}

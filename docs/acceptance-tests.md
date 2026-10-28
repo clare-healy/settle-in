@@ -102,6 +102,8 @@ Prep shows the complete scheduled hour. `Change scheduled time` opens one screen
 
 For a corrected 6:30–7:30 revision begun at 6:33, the live Grounding window is 6:30–6:40, drift is `+3 min`, and hard close remains 7:30.
 
+Changing a 7:00 class to 6:30 and then back to 7:00 leaves Prep showing 7:00–8:00 after a relaunch, and a run begun then closes at 8:00.
+
 ### C13 — Bilateral midpoint cues
 
 A bilateral pose may author `midpoint` as one shared sentence or as a mapping with exactly one nonempty `right` cue and one nonempty `left` cue. Existing shared-cue classes remain valid and show the shared cue on both cards. A per-side map shows only the right cue on the right card and only the left cue on the left card, even when `side_order` begins with left. Missing, empty, or unsupported side keys block import. The 150-character glance warning applies independently to each side.
