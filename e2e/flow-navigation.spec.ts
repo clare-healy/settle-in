@@ -26,11 +26,17 @@ test('F1/F2/F3/F8: forward through the bilateral sequence, Previous revisits Sid
   await next(page);
   await expect(page.locator('.pose-name')).toHaveText('Sleeping Swan');
   await expect(page.locator('.pose-side')).toHaveText('Right');
+  await expect(page.getByTestId('midpoint')).toHaveText(
+    'Notice what the first side teaches you about meeting sensation without force.',
+  );
 
   // Next → Side 2 (Left) — it does NOT jump to the following transition (F3).
   await next(page);
   await expect(page.locator('.pose-name')).toHaveText('Sleeping Swan');
   await expect(page.locator('.pose-side')).toHaveText('Left');
+  await expect(page.getByTestId('midpoint')).toHaveText(
+    'Meet this side as new information; let breath choose the depth again.',
+  );
 
   // Previous → back to Side 1 (Right), preserving the earlier visit (F2), and the
   // revisit shows `revisited` in place of a drift value (F8).

@@ -7,6 +7,62 @@ The log operates on the yes/no/triangulate primitive. Each entry records a quest
 ## Open triangulate nodes
 
 - **Android font scaling does not reach the app** (opened July 25, 2026; evidence in, ruling pending). Clare ran the three-step Pixel observation on July 25: raising Android's system font size to its largest standard step changes Settle In's text size **not at all** — `text changed: no`. The node stays open because the ruling is Codex's; nothing in the type scale or in J1/J2/J10's wording changes until it returns. Original framing follows. `html { -webkit-text-size-adjust: 100% }` plus an all-pixel type scale means Chrome on Android may not enlarge Settle In's text when Clare raises her system font size. If so, acceptance J1/J2/J10's "125% font scale" checks are measuring something the device never actually does, and a real accessibility need goes unserved. Triangulate against Principle 2 (glance, do not read) and Principle 4 (legibility outranks decoration) before changing the type scale, since a relative-unit scale would alter every screen Clare has already learned to read. Needs a Pixel observation first: does raising the system font size move the app's text at all? Route to Codex with that evidence.
+- **Explicit scheduled start in as-taught exports** (opened October 28, 2026; no defect, ruling pending). The export already carries `run_started_at` and the persisted `hard_close_at`, so the scheduled start is exactly one hour before the hard close and the authoring instructions explain that derivation. Adding a dedicated scheduled-start field would make late-start Grounding easier to interpret but would change the export treaty. Question for Clare: should future as-taught exports state the scheduled start explicitly? **Triangulate** against honest history, authoring clarity, and the cost of an otherwise unnecessary export-schema change; the current iteration leaves Export Schema v1 unchanged.
+
+## October 28, 2026 — Prep reopens on the revision Clare last chose
+
+Context: the independent Claude Code review of PR #1 found that changing a scheduled time and then changing it back could revive the wrong hour. The second change resolves to the original revision, which is already stored and is never re-saved, so the mistaken revision stayed the most recently imported. After a relaunch or a Home → Prep round trip, Prep showed the mistaken hour, and Begin Class persisted its hard close.
+
+- Question: should Prep reopen on the revision Clare last chose, even when that choice resolves to an earlier stored revision? **Yes.** This restores the treaty's promise that a correction returns to Prep with the revised schedule visible and that Begin Class starts the revision shown there. The choice is recorded per class as a local preference (`pref.currentRevision.<class_id>`), written by a schedule change and by importing a new revision. If the recorded revision is missing, for example after a restore, the most recently imported revision is used as before. Clare accepted Codex's review recommendation that this teaching-critical choice and its immutable revision use one strict, atomic transaction rather than two separately durable writes.
+- Question: does this change a stored schema? **No.** Class, export, backup, and database schema versions are unchanged. Preferences already travel in the whole-library backup, and merge leaves existing local preferences untouched.
+
+## October 28, 2026 — Independent-review hardening before merge
+
+Context: Claude's independent review and Codex's follow-up review found three low-frequency technical paths that could weaken an otherwise correct release. These were resolved before merging to `main` rather than carried as undocumented limits.
+
+- Question: should nearest-occurrence timing apply only to schedules that cross midnight? **No.** It applies to every authored hour. This prevents an early 11:58 PM tap for a 12:15–1:15 AM class from constructing a hard close almost a day in the past.
+- Question: may pull-request verification share the production Pages deployment queue? **No.** Only the `deploy` job uses the Pages concurrency group, and that job additionally requires a push to `main`; pull-request and manual verification runs cannot deploy or displace a waiting production deployment.
+- Question: must the PWA update test require a waiting worker to remain inactive after the browser process dies? **No.** The treaty explicitly permits activation after process death. The test now protects recovery to the exact segment, absence of an in-run update action, and absence of a forced reload, while accepting either permitted activation state.
+- Protected-history repair: the July cognitive-lineage sentence is restored verbatim, and the later project rename/path change is recorded as an appended clarification.
+
+## October 28, 2026 — Final review rulings before merge
+
+- Question: does re-importing an identical class source deliberately re-select that existing revision? **Yes.** Opening the duplicate records its exact `source_hash` as the current revision without creating or rewriting a class record.
+- Question: does a skipped but non-empty dictated reflection remain in the corpus? **Yes.** It is retained verbatim and labeled `saved draft`; Skip means the reflection was not finalized, not that Clare's words were deleted. The run's as-taught export may still state `None recorded` because no final reflection was submitted.
+- Question: may a run begun under 0.1.0 adopt scheduled-hour timing if it is recovered under 0.2.0 after process death? **Yes.** The case is accepted as rare; the release handoff mitigates it by applying the phone update only when no run is active.
+- Question: should GitHub require passing checks before future merges to `main`? **Yes.** Configure branch protection after this release merge so future pull requests cannot merge until the hosted verification job passes.
+
+## October 28, 2026 — Authoring-project sync review
+
+Context: a Claude session with this repository mounted followed `docs/pass-to-settle-in-authoring-project.md`, compared the canonical v3 instructions and the current `docs/class-format.md` with the live Claude "Settle In" project, and surfaced conflicts instead of resolving them. Clare ruled on each. Full detail and the open requests are in `docs/pass-to-codex-authoring-sync.md`.
+
+- Question: should the canonical instructions keep the TCM Sources and Meridian Visuals standards, the early mind-wandering midpoint cue, and the bilateral midpoint rule that Clare had added to the live project after July? **Yes.** They govern authoring and design research, not the app, and now live in `docs/settle-in-authoring-instructions.md`.
+- Question: should each side of a bilateral pose carry its own distinct midpoint cue on its own card? **Yes.** Clare: the two sides are "two different experiences of the pose," and the cue on the right card and the left card should differ. A single field reading "Side 1: … Side 2: …" on both cards is not what she wants. Implemented as an additive Schema v1 form: `midpoint` may be the existing shared sentence or an explicit `right`/`left` mapping. The side labels, not list position, bind cues to cards.
+- Question: does the per-side midpoint form require a class-schema version bump? **No.** Every existing Schema v1 class retains exactly the same meaning, the new form is additive, and stored classes require no migration. Parser, expansion, live-card, warning, fixture, and acceptance coverage change together.
+- Question: does the as-taught export schema change for per-side midpoint cues? **No.** Export Schema v1 records segment identity, side, timing, status, and reflection; it does not carry authored cue copy. The existing right/left expanded segment identities already preserve the teaching history required by that export.
+- Question: should the authoring project keep producing Bethany's Monday flow summary and social media blurb? **No.** Clare stopped these on October 12; she asks Bethany for feedback directly, and promotion has its own process. Removed from the canonical instructions.
+- Question: is Child's pose limited to a grounding hold or a counterpose? **No.** It is also welcome as its own long hold mid-sequence where it fits the theme and the flow.
+- Question: does Grounding still absorb a relationally late start now that Begin Class no longer re-anchors? **Yes.** Clare uses the close of Grounding's planned window as her cue to advance manually, and later segments keep their scheduled windows; a 7:00–7:11 Grounding begun at 7:03 runs 8 minutes. No automatic app change is intended: the Grounding screen already shows its planned window and elapsed time, while the app continues to never advance teaching for her. The as-taught export will usually record Grounding as `short` after a late start, and the authoring instructions now say how to read that.
+
+Deployment status: the Claude project is already named Settle In. Its instructions and its `class-format.md` copy are still the July versions, so the integrated system remains **awaiting external sync**.
+
+Dry-run evidence: Claude produced `tending-dry-run-2026-10-28.md` under the still-stale project instructions. The original file imported successfully with zero warnings and an exact 60-minute plan (6:30–7:30), including a four-minute opening movement transition. As expected, its bilateral midpoint fields still used the temporary combined `Side 1` / `Side 2` form. The governed repository copy at `fixtures/tending-dry-run-2026-10-28.md` preserves the authored teaching content and mechanically separates those two combined fields into explicit `right` and `left` cues. Automated fixture coverage pins the schedule, segment counts, opening transition, Savasana window, and side-specific runtime cues. This validates the repository half of the dry run; it does not mark the external Claude instructions as synchronized or the Pixel rehearsal as complete.
+
+## October 20, 2026 — First major field-learning iteration
+
+Field evidence: after two months of use, Clare reported that Settle In materially reduced scrolling, improved timing awareness and cue structure, and created useful teaching feedback loops. Four demonstrated frictions now revise v1 assumptions.
+
+- Question: are classes always tied to Tuesday 7:00–8:00 PM? **No.** They are always exactly one scheduled hour, at any authored local start. `hard_close_local` must be one hour after `scheduled_start_local`, including across midnight.
+- Question: should Begin Class re-anchor the planned hour to the tap time? **No.** The scheduled hour is the anchor. A 7:00 class begun at 7:03 retains a 7:00–7:10 Grounding window, begins at `+3 min`, and still closes at 8:00. Rationale from Clare: “start on time to honor the teacher and end on time to honor the student.” A consciously late start for catching up and community-building is relational infrastructure, but it does not move the student-facing end.
+- Question: if Prep reveals that the authored scheduled hour is wrong, must Clare leave the app and repair the class upstream before she can teach? **No.** Prep shows the full scheduled window and offers `Change scheduled time`. One screen accepts a new start, calculates the one-hour close immediately, and saves with one `Change Schedule` action. The correction creates a new immutable class revision; the prior revision and every taught run remain unchanged. There is no second confirmation screen. The corrected source must be carried back to the integrated authoring project so it does not regress later.
+- Question: does the integrated Claude authoring project retain the name “Yin Flow State”? **No.** Clare renamed it “Settle In,” matching the app. The canonical deployment source is now `docs/settle-in-authoring-instructions.md`; a written pass/handoff accompanies this iteration because the external Claude project must still be updated manually.
+- Question: may a designed movement transition sit between Grounding and the first held pose? **Yes.** One optional opening Transition uses the existing transition schema and timing/history behavior. It supports waking the body and previewing the muscle groups and movement directions used later in the sequence.
+- Question: should Savasana cues remain a manually advanced checklist? **No.** The six authored cues display together as a static reminder list. One Next reveals Finish Class; no new Savasana-step events are written. Historic step events remain readable for backward compatibility.
+- Question: should Clare be able to export all reflections as one analysis artifact? **Yes.** Library adds a chronological human-readable Markdown reflection corpus containing every non-empty final reflection and saved draft, with class/run identity. The lossless JSON backup remains separate and unchanged.
+
+These rulings update the product, implementation, class-format, screen-state, acceptance, and Settle In authoring instructions together. Existing 7:00–8:00 class files and taught-run history remain valid.
+
+Application version advances from `0.1.0` to `0.2.0`. Class input, as-taught export, backup, and database schema versions do not change because their stored shapes remain backward compatible.
 
 ## July 21, 2026 — Context-package scope
 
@@ -16,7 +72,7 @@ Reason: the initial concept was strong in purpose and visual direction but left 
 
 ## July 21, 2026 — Hard class close
 
-Decision: 8:00 PM is a hard end, even if class begins late or runs behind the re-anchored plan.
+Decision: 8:00 PM is a hard end, even if class begins late or runs behind the re-anchored plan. **Superseded October 20, 2026:** the same end-on-time principle now applies to any authored 60-minute scheduled hour, and planned windows no longer re-anchor to Begin Class.
 
 Consequence: the savasana wake message is tied to 7:58 PM on the run date, not to planned savasana progress. At 8:00 the app informs but does not automatically finish.
 
@@ -90,13 +146,13 @@ Decision: the as-taught export is a versioned schema (Export Schema v1 in `docs/
 
 Question: is the Claude Chat project "Yin Flow State" part of this product? **Yes.**
 
-Decision: the app and the authoring project form one integrated system. The project's instructions live canonically in `docs/yin-flow-state-instructions.md`; any schema change updates both sides in the same change, even when the chat side is applied manually by Clare. The project carries `class-format.md` and the valid fixture as project knowledge.
+Decision: the app and the authoring project form one integrated system. The project's instructions now live canonically in `docs/settle-in-authoring-instructions.md`; any schema change updates both sides in the same change, even when the chat side is applied manually by Clare. The project carries `class-format.md` and the valid fixture as project knowledge.
 
 ## July 21, 2026 — Run begun after hard close
 
 Question: does a run begun at or after 8:00 PM (a rehearsal) need special handling? **No.**
 
-Decision: the wake message and the `8:00 · hard close` indicator are simply present from the start; re-anchored planned windows still follow the actual start time. Defined behavior, no rehearsal mode. Ratified by Clare.
+Decision: the wake message and the `8:00 · hard close` indicator are simply present from the start; re-anchored planned windows still follow the actual start time. Defined behavior, no rehearsal mode. Ratified by Clare. **Superseded October 20, 2026:** planned windows now remain anchored to the authored scheduled hour. **Further superseded July 25, 2026 for wake rendering:** the wake message appears only in Savasana.
 
 ## July 21, 2026 — Wireframes refine, they do not gate
 
@@ -156,7 +212,7 @@ Decision: `docs/build-plan.md` proposes the v1 architecture — vanilla strict T
 
 Question: do the Yin Flow State project instructions carry Clare's full teaching framework, not just the schema rules? **Yes, now.**
 
-Decision: `docs/yin-flow-state-instructions.md` v2 merges Clare's existing project instructions (four-phase cueing architecture, accessibility principles, sequence-building workflow, Bethany's Monday review, cueing style, key learnings) with the app system. Material triangulations: the four-phase cueing architecture maps onto the schema's cue fields (entry/target, settling, midpoint, exit); Clare's nine-beat savasana arc maps into the schema's six steps without a schema change; the instructor guide remains the full script for design, rehearsal, and Bethany review while Settle In replaces it as the in-class reference; Clare's 5–6 pose ceiling is carried as a stricter authoring rule than the schema warning; the relational late start is honored by re-anchoring. Nothing from Clare's teaching instructions was dropped.
+Decision: `docs/settle-in-authoring-instructions.md` v2 merges Clare's existing project instructions (four-phase cueing architecture, accessibility principles, sequence-building workflow, Bethany's Monday review, cueing style, key learnings) with the app system. Material triangulations: the four-phase cueing architecture maps onto the schema's cue fields (entry/target, settling, midpoint, exit); Clare's nine-beat savasana arc maps into the schema's six steps without a schema change; the instructor guide remains the full script for design, rehearsal, and Bethany review while Settle In replaces it as the in-class reference; Clare's 5–6 pose ceiling is carried as a stricter authoring rule than the schema warning; the relational late start was then honored by re-anchoring. That timing decision is superseded by the October 20, 2026 field-learning decision: the authored scheduled hour now remains fixed. Nothing from Clare's teaching instructions was dropped.
 
 ## July 22, 2026 — Adversarial review prompt canonized
 

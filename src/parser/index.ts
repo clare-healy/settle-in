@@ -107,3 +107,4 @@ function fail(errors: readonly ValidationError[], hash: string | null, originalM
 }
 
 export { importClass as default };
+export { reviseScheduleSource } from './revise-schedule.js';

@@ -34,8 +34,8 @@ On Transition:
 
 On Savasana:
 
-- Previous returns to the previous savasana step, or the previous runtime segment from the first step.
-- Next advances the six internal steps; after the sixth, it exposes Finish Class rather than silently finishing.
+- Previous returns to the previous runtime segment.
+- All six authored cues display together as a static reminder list. Next exposes Finish Class rather than silently finishing.
 - The center has no hidden expansion action.
 
 Navigation zones have subtle persistent affordances. The interface must not depend on an invisible gesture that Clare has to remember.
@@ -145,12 +145,15 @@ Shows in this order:
 - Arrival
 - Breathwork
 - Full sequence with expanded side-aware planned times and peak marker
-- Hard close
+- Complete scheduled hour
+- `Change scheduled time`
 - `Begin Class`
 
 The sequence may scroll. `Begin Class` remains reachable without content being clipped and is not obscured by browser or system UI.
 
 A quiet Display Options disclosure may toggle the next-pose preview. Its default is on. Display Options are not available accidentally during the run.
+
+`Change scheduled time` opens one sheet. It contains a local start-time field, a hard close that recalculates immediately to one hour later, Cancel, and one `Change Schedule` button as the bottom action. There is no follow-up confirmation. A successful change persists a new immutable revision and returns to Prep with the revised sequence windows and scheduled hour visible. Prior revisions and taught runs are unchanged.
 
 Activating Begin Class:
 
@@ -158,7 +161,7 @@ Activating Begin Class:
 2. Records `run_started_at`.
 3. Persists the new run.
 4. Requests wake lock.
-5. Enters Grounding.
+5. Enters Grounding. Planned windows remain anchored to the authored scheduled start, so a late Begin appears as honest informational drift and never shifts the hard close.
 
 ## 5. Grounding
 
@@ -194,7 +197,7 @@ Hierarchy:
 2. Large current wall clock
 3. Planned window and elapsed-in-current-visit
 4. Informational drift
-5. Midpoint reorientation cue
+5. Midpoint reorientation cue — on a bilateral side card, the cue authored for that side when present, otherwise the shared cue
 6. Next authored pose name and planned start
 7. Subtle Previous / Reference / Next affordances
 
@@ -221,6 +224,8 @@ There is no `overflow: hidden` clipping of authored cue content.
 
 ## 7. Transition
 
+The same screen carries both between-pose transitions and the optional opening movement transition between Grounding and the first pose.
+
 Shows:
 
 - `Transition`
@@ -235,14 +240,14 @@ Transition navigation is manual. Expiration of its planned minute changes no sta
 
 ## 8. Two-minute hard-close message
 
-The message appears **only on the Savasana screen**, and only once the clock has reached two minutes before the hard close. It never appears on Grounding, a pose, or a transition — at any time, including a rehearsal begun after 8:00.
+The message appears **only on the Savasana screen**, and only once the clock has reached two minutes before the authored hard close. It never appears on Grounding, a pose, or a transition — at any time, including a rehearsal begun after the hard close.
 
 On Savasana, once eligible:
 
 - Fade in the class's authored `wake_message` once, verbatim, in the dedicated lower message area.
-- Persist `wake_message_shown` immediately before that first render — not when the clock passes 7:58 on some other screen.
+- Persist `wake_message_shown` immediately before that first render — not when the clock passes the two-minute eligibility point on some other screen.
 - Keep it visible until the next teaching-state action or Finish Class.
-- Do not obscure the wall clock, current step, or navigation affordances.
+- Do not obscure the wall clock, cue reminders, or navigation affordances.
 - Do not animate it again.
 
 There is no lower callout on non-Savasana screens. Entering Savasana after the eligibility time shows the message immediately, without animation replay if it has already been shown.
@@ -253,17 +258,16 @@ Shows only:
 
 - `Savasana`
 - Hard close and current wall clock
-- Six fixed steps
-- Current step
-- Time to hard close, until 8:00
+- Six authored cue reminders, all visible together
+- Time to the authored hard close
 - Two-minute message when eligible
 - Previous and Next affordances
 
-Past steps remain quietly visible; future steps are subdued but legible at close viewing distance. The active step is not animated continuously.
+The cue reminders are informational rather than interactive: no active, past, or future state, and no tapping through them.
 
-At or after 8:00, replace countdown language with `8:00 · hard close`. Do not use negative time. Navigation and Finish remain fully available after 8:00; nothing locks.
+At or after the authored close, replace countdown language with `{time} · hard close`. Do not use negative time. Back navigation and Finish remain fully available; nothing locks.
 
-After the final step, Next reveals a deliberate `Finish Class` action with confirmation.
+Next reveals a deliberate `Finish Class` action with confirmation.
 
 ## 10. Leave Class guard
 
@@ -341,6 +345,7 @@ Rerunning always creates a new run.
 Library provides:
 
 - Export whole-library backup
+- Export the complete reflection corpus as human-readable Markdown
 - Restore and merge backup
 - Replace local library only behind explicit destructive confirmation
 
@@ -389,4 +394,3 @@ Frames for the remaining states are welcome refinements whenever they arrive:
 - Run Recovery
 - Leave Class guard
 - Wake-lock unavailable
-

@@ -18,6 +18,7 @@ import './styles/app.css';
 import {
   EXECUTION_ID,
   deriveWakeState,
+  hardCloseForScheduledStart,
   isoOffsetMinutes,
   sampleFrom,
   SystemClock,
@@ -28,6 +29,7 @@ import type {
   EventSample,
   RunStartedEvent,
 } from '../schema/index.js';
+import { CLASS_DURATION_SEC } from '../schema/index.js';
 import {
   RunController,
   buildRecoverySnapshot,
@@ -45,6 +47,7 @@ import {
   backupFilenameFor,
   parseBackupText,
   validateBackup,
+  exportReflectionCorpus,
 } from '../export/index.js';
 import { clear, el } from './dom.js';
 import { renderHome } from './screens/home.js';
@@ -69,6 +72,8 @@ import {
   type ClassGroup,
 } from './library-model.js';
 import {
+  currentRevisionPreference,
+  loadCurrentRevisions,
   loadPreferences,
   setNextPosePreview,
   setUpcomingClassId,
@@ -273,7 +278,7 @@ export class AppController {
   private async loadLibrary(): Promise<void> {
     this.revisions = await this.store.getAllClassRevisions();
     this.runs = await this.store.getAllRuns();
-    this.groups = groupClasses(this.revisions, this.runs);
+    this.groups = groupClasses(this.revisions, this.runs, await loadCurrentRevisions(this.store));
     this.upcomingClassId = pickUpcomingClassId(this.groups, this.prefs.upcomingClassId, this.todayLocalDate());
     this.upcomingDef = upcomingDefinition(this.groups, this.upcomingClassId);
   }
@@ -373,7 +378,7 @@ export class AppController {
         return def
           ? renderPrep({
               def,
-              runStartedPreviewEpochMs: this.prepPreviewStart(def),
+              plannedAnchorPreviewEpochMs: this.prepPreviewStart(def),
               offsetMinutes: this.offsetMinutes,
               prefs: this.prefs,
               actions: this.actions,
@@ -437,7 +442,7 @@ export class AppController {
       def: controller.definition,
       snapshot,
       events,
-      runStartedAtEpochMs: ctx.runStartedAtEpochMs,
+      plannedAnchorEpochMs: ctx.hardCloseAtEpochMs - CLASS_DURATION_SEC * 1000,
       hardCloseAtEpochMs: ctx.hardCloseAtEpochMs,
       hardCloseLocal: this.hardCloseLocal(),
       offsetMinutes: this.offsetMinutes,
@@ -493,6 +498,13 @@ export class AppController {
         this.route = { kind: 'prep' };
         this.render();
       },
+      openScheduleChange: () => {
+        const def = this.prepDef ?? this.upcomingDef;
+        if (!def || this.route.kind !== 'prep') return;
+        this.dialog = { kind: 'schedule-change', scheduledStartLocal: def.scheduledStartLocal };
+        this.render();
+      },
+      changeSchedule: (scheduledStartLocal) => this.changeSchedule(scheduledStartLocal),
       applyUpdate: () => {
         // A5: only ever apply an update outside a run. The pill is shown only on
         // idle screens, but guard here too so nothing can swap versions mid-class.
@@ -555,7 +567,14 @@ export class AppController {
       importReturnToSource: () => this.importBackToInput(),
       importCopyErrors: () => this.importCopyErrors(),
       importConfirm: () => this.importConfirm(),
-      importOpenExisting: (classId) => this.dispatch(async () => {
+      importOpenExisting: (classId, sourceHash) => this.dispatch(async () => {
+        const existing = await this.store.getClassRevision(sourceHash);
+        if (existing) {
+          await this.store.putClassRevisionAndPreference(
+            existing,
+            currentRevisionPreference(classId, sourceHash),
+          );
+        }
         await this.loadLibrary();
         this.importState = { phase: 'input', source: '' };
         this.route = { kind: 'class-detail', classId };
@@ -580,6 +599,7 @@ export class AppController {
 
       // --- Backup / restore (screen-states § 13) ---------------------------
       exportBackup: () => this.exportBackup(),
+      exportReflections: () => this.exportReflections(),
       restoreFileLoaded: (text) => this.restoreFileLoaded(text),
       restoreMerge: () => this.applyRestore('merge'),
       requestRestoreReplace: () => { this.dialog = { kind: 'restore-replace-confirm' }; this.render(); },
@@ -612,7 +632,12 @@ export class AppController {
       const existing = await this.store.getClassRevision(def.sourceHash);
       if (existing) {
         // Exact source_hash already present → open the existing class (C5).
-        this.importState = { phase: 'duplicate', source, existingClassId: existing.classId };
+        this.importState = {
+          phase: 'duplicate',
+          source,
+          existingClassId: existing.classId,
+          existingSourceHash: existing.sourceHash,
+        };
         return;
       }
       const sameId = await this.store.getClassRevisionsByClassId(def.classId);
@@ -663,10 +688,72 @@ export class AppController {
         importedAt: this.nowIso(),
         definition: def,
       };
-      await this.store.putClassRevision(record);
+      await this.store.putClassRevisionAndPreference(
+        record,
+        currentRevisionPreference(def.classId, def.sourceHash),
+      );
       await this.requestPersist(); // request persistence after the first successful import
       this.importState = { phase: 'input', source: '' };
       await this.gotoHomeOrEmpty(); // the imported class now surfaces as upcoming
+    });
+  }
+
+  /**
+   * Save a schedule-only correction as a new immutable class revision. The
+   * original Markdown is revised in exactly two front-matter fields, then sent
+   * through the normal parser and validator before it can become Prep's active
+   * definition. No taught run or earlier revision is changed.
+   */
+  private changeSchedule(scheduledStartLocal: string): void {
+    const current = this.prepDef ?? this.upcomingDef;
+    if (!current || this.route.kind !== 'prep') return;
+    const hardCloseLocal = hardCloseForScheduledStart(scheduledStartLocal);
+    if (!hardCloseLocal) {
+      this.dialog = {
+        kind: 'schedule-change',
+        scheduledStartLocal,
+        error: 'Enter a complete scheduled start time.',
+      };
+      this.render();
+      return;
+    }
+
+    this.dispatch(async () => {
+      const { importClass, reviseScheduleSource } = await import('../parser/index.js');
+      const revisedSource = reviseScheduleSource(
+        current.originalMarkdown,
+        scheduledStartLocal,
+        hardCloseLocal,
+      );
+      const result = await importClass(revisedSource);
+      if (!result.ok) {
+        this.dialog = {
+          kind: 'schedule-change',
+          scheduledStartLocal,
+          error: result.errors[0]?.message ?? 'The schedule could not be changed.',
+        };
+        return;
+      }
+
+      const def = result.classDefinition;
+      const record: StoredClassRevision = {
+        sourceHash: def.sourceHash,
+        classId: def.classId,
+        schemaVersion: def.schemaVersion,
+        warnings: result.warnings,
+        importedAt: this.nowIso(),
+        definition: def,
+      };
+      // The corrected source may already be stored (a time changed back), so the
+      // revision choice and immutable revision are committed together. Prep may
+      // acknowledge the change only after this strict transaction completes.
+      await this.store.putClassRevisionAndPreference(
+        record,
+        currentRevisionPreference(def.classId, def.sourceHash),
+      );
+      this.prepDef = def;
+      this.dialog = null;
+      await this.loadLibrary();
     });
   }
 
@@ -710,6 +797,20 @@ export class AppController {
       const file = buildBackup(snapshot, this.nowIso(), APP_VERSION);
       const filename = backupFilenameFor(this.clock.now().getTime(), this.offsetMinutes);
       downloadJson(filename, serializeBackup(file));
+    });
+  }
+
+  private exportReflections(): void {
+    this.dispatch(async () => {
+      const snapshot = await this.store.exportLibrary();
+      const markdown = exportReflectionCorpus({
+        revisions: snapshot.revisions,
+        runs: snapshot.runs,
+        notes: snapshot.notes,
+        exportedAt: this.nowIso(),
+      });
+      const date = this.todayLocalDate();
+      downloadMarkdown(`settle-in-reflections-${date}.md`, markdown);
     });
   }
 
@@ -761,7 +862,9 @@ export class AppController {
   }
 
   private beginClass(): void {
-    const def = this.upcomingDef;
+    // Begin the exact revision currently shown on Prep. This matters for reruns
+    // and for a schedule correction saved immediately before the class.
+    const def = this.prepDef ?? this.upcomingDef;
     if (!def) return;
     // Fire the wake-lock request synchronously inside the Begin gesture task, in
     // parallel with persistence (wake-lock treaty; risk carried from M4a). Some
@@ -809,11 +912,9 @@ export class AppController {
     const seg = snap?.currentSegment;
     if (!snap || !seg) return;
     if (seg.type === 'savasana') {
-      if (snap.savasanaStep < snap.savasanaStepCount - 1) {
-        this.finishArmed = false;
-        this.dispatch(async () => { await this.controller?.savasanaStepForward(); });
-      } else if (!this.finishArmed) {
-        // After the final step, Next exposes Finish rather than finishing silently.
+      if (!this.finishArmed) {
+        // Savasana cues are a static reminder list. One deliberate Next exposes
+        // Finish rather than advancing a checklist or finishing silently.
         this.finishArmed = true;
         this.render();
       }
@@ -828,11 +929,7 @@ export class AppController {
     const seg = snap?.currentSegment;
     if (!snap || !seg) return;
     this.finishArmed = false;
-    if (seg.type === 'savasana' && snap.savasanaStep > 0) {
-      this.dispatch(async () => { await this.controller?.savasanaStepBack(); });
-    } else {
-      this.dispatch(async () => { await this.controller?.previousSegment(); });
-    }
+    this.dispatch(async () => { await this.controller?.previousSegment(); });
   }
 
   private toggleReference(): void {
@@ -1034,7 +1131,10 @@ export class AppController {
 
   private applyFocus(): void {
     if (this.dialog) {
-      const target = this.root.querySelector<HTMLElement>('.sheet .btn');
+      const selector = this.dialog.kind === 'schedule-change'
+        ? '[data-testid="schedule-start"]'
+        : '.sheet .btn';
+      const target = this.root.querySelector<HTMLElement>(selector);
       if (target) target.focus();
     }
   }
@@ -1049,12 +1149,11 @@ export class AppController {
     return sampleFrom(this.clock, this.offsetMinutes, this.executionId);
   }
 
-  private runContext(): { runStartedAtEpochMs: number; hardCloseAtEpochMs: number } {
+  private runContext(): { hardCloseAtEpochMs: number } {
     const started = this.controller
       ?.eventLog()
       .find((e): e is RunStartedEvent => e.type === 'run_started');
     return {
-      runStartedAtEpochMs: started ? started.runStartedAtEpochMs : 0,
       hardCloseAtEpochMs: started ? started.hardCloseAtEpochMs : 0,
     };
   }
@@ -1064,8 +1163,7 @@ export class AppController {
   }
 
   private prepPreviewStart(def: ClassDefinition): number {
-    // Preview planned windows anchored to the scheduled start on the class date,
-    // at the current offset. Begin Class re-anchors to the actual start.
+    // Preview planned windows anchored to the authored schedule on the class date.
     const [y, mo, d] = def.date.split('-').map((x) => Number.parseInt(x, 10));
     const [hh, mm] = def.scheduledStartLocal.split(':').map((x) => Number.parseInt(x, 10));
     return (

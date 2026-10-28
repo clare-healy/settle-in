@@ -100,6 +100,23 @@ describe('class revisions — identity and immutability (H5, C5, C6)', () => {
     expect(await store.getClassRevisionsByClassId(original.classId)).toHaveLength(1);
     store.close();
   });
+
+  it('atomically selects an existing revision without rewriting it', async () => {
+    const store = await freshStore();
+    const def = await loadValidClass();
+    const original = revisionOf(def);
+    await store.putClassRevision(original);
+
+    const result = await store.putClassRevisionAndPreference(
+      revisionOf(def, '2030-01-01T00:00:00-05:00'),
+      { key: `pref.currentRevision.${def.classId}`, value: def.sourceHash },
+    );
+
+    expect(result.stored).toBe('existing');
+    expect(result.record.importedAt).toBe(original.importedAt);
+    expect(await store.getPreference(`pref.currentRevision.${def.classId}`)).toBe(def.sourceHash);
+    store.close();
+  });
 });
 
 describe('single active run guard (F7)', () => {

@@ -322,9 +322,30 @@ button {
   /* Always reachable, never clipped or obscured by system UI. */
   flex: 0 0 auto;
   padding-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 .prep__begin .btn {
   width: 100%;
+}
+.prep__schedule {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+.prep__schedule-window {
+  margin: 0;
+  color: var(--taper-wax);
+  font-size: var(--size-secondary);
+}
+.prep__schedule-change {
+  width: auto !important;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-3);
+  color: var(--candlelight-amber);
+  font-size: var(--size-secondary);
 }
 .disclosure summary {
   cursor: pointer;
@@ -612,7 +633,7 @@ button {
 
 /* --- Savasana ------------------------------------------------------------- */
 
-.savasana__steps {
+.savasana__prompts {
   list-style: none;
   margin: var(--space-5) 0;
   padding: 0;
@@ -622,7 +643,7 @@ button {
   width: 100%;
   max-width: 28ch;
 }
-.savasana__step {
+.savasana__prompt {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -635,22 +656,6 @@ button {
   height: 8px;
   border-radius: 50%;
   border: 1px solid var(--raw-pine);
-}
-/* Past: quietly visible. Future: subdued but legible at close distance
-   (not opacity alone). Active: warmer, static marker. */
-.savasana__step--past {
-  color: var(--raw-pine);
-}
-.savasana__step--future {
-  color: var(--curtain-linen);
-  opacity: 0.72;
-}
-.savasana__step--active {
-  color: var(--taper-wax);
-}
-.savasana__step--active .savasana__marker {
-  background: var(--candlelight-amber);
-  border-color: var(--candlelight-amber);
 }
 .savasana__close-line {
   color: var(--taper-wax);
@@ -755,6 +760,33 @@ button {
 }
 .sheet .btn {
   width: 100%;
+}
+.sheet__time-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--curtain-linen);
+  font-size: var(--size-secondary);
+}
+.sheet__time-input {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3);
+  border: 1px solid rgba(169, 140, 100, 0.5);
+  border-radius: var(--radius-action);
+  background: var(--pond-charcoal);
+  color: var(--taper-wax);
+  font: inherit;
+  color-scheme: dark;
+}
+.sheet__calculated-close {
+  margin: 0;
+  color: var(--taper-wax);
+}
+.sheet__error {
+  margin: 0;
+  color: var(--candlelight-amber);
+  font-size: var(--size-secondary);
 }
 
 /* --- Recovery ------------------------------------------------------------- */

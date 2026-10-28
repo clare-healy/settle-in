@@ -13,13 +13,17 @@ import type { ClassDefinition } from '../schema/index.js';
 /** One authored class: its revisions (a class is immutable per revision) and runs. */
 export interface ClassGroup {
   readonly classId: string;
-  /** The most-recently-imported revision — the plan shown and rerun by default. */
-  readonly latest: StoredClassRevision;
+  /**
+   * The plan shown and rerun by default: the revision Clare last chose (a schedule
+   * correction or a newly imported revision) when it still exists, otherwise the
+   * most-recently-imported revision.
+   */
+  readonly current: StoredClassRevision;
   /** All revisions of this class, oldest import first. */
   readonly revisions: readonly StoredClassRevision[];
   /** Number of taught runs recorded for this class (every run that began). */
   readonly runCount: number;
-  /** Convenience: the class date of the latest revision (YYYY-MM-DD). */
+  /** Convenience: the class date of the current revision (YYYY-MM-DD). */
   readonly date: string;
 }
 
@@ -32,11 +36,12 @@ export function latestRevision(revisions: readonly StoredClassRevision[]): Store
 /**
  * Group revisions into authored classes and attach taught-run counts, sorted by
  * class date ascending (then classId for stability). A run belongs to a class by
- * `classId`.
+ * `classId`. `chosenRevisions` maps classId → the sourceHash Clare last chose.
  */
 export function groupClasses(
   revisions: readonly StoredClassRevision[],
   runs: readonly StoredRun[],
+  chosenRevisions: ReadonlyMap<string, string> = new Map(),
 ): ClassGroup[] {
   const byClass = new Map<string, StoredClassRevision[]>();
   for (const r of revisions) {
@@ -52,13 +57,14 @@ export function groupClasses(
   const groups: ClassGroup[] = [];
   for (const [classId, list] of byClass) {
     const ordered = [...list].sort((a, b) => a.importedAt.localeCompare(b.importedAt));
-    const latest = latestRevision(list)!;
+    const chosenHash = chosenRevisions.get(classId);
+    const current = list.find((r) => r.sourceHash === chosenHash) ?? latestRevision(list)!;
     groups.push({
       classId,
-      latest,
+      current,
       revisions: ordered,
       runCount: runCounts.get(classId) ?? 0,
-      date: latest.definition.date,
+      date: current.definition.date,
     });
   }
   groups.sort((a, b) => a.date.localeCompare(b.date) || a.classId.localeCompare(b.classId));
@@ -91,14 +97,14 @@ export function upcomingChoiceIsAmbiguous(
   return groups.filter((g) => g.date >= todayLocalDate).length > 1;
 }
 
-/** The definition to run/preview for a class id (its latest revision), or null. */
+/** The definition to run/preview for a class id (its current revision), or null. */
 export function upcomingDefinition(
   groups: readonly ClassGroup[],
   classId: string | null,
 ): ClassDefinition | null {
   if (!classId) return null;
   const group = groups.find((g) => g.classId === classId);
-  return group ? group.latest.definition : null;
+  return group ? group.current.definition : null;
 }
 
 /** The display name of a class's peak pose (falls back to the raw id if unresolved). */

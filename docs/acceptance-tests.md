@@ -70,7 +70,7 @@ Imported Markdown containing HTML, a script tag, a link, or a YAML executable/cu
 
 ### C5 — Idempotent duplicate
 
-Importing the exact same normalized source twice does not create a second class.
+Importing the exact same normalized source twice does not create a second class. Opening the existing class records that exact revision as Clare's current choice.
 
 ### C6 — Changed revision
 
@@ -88,9 +88,25 @@ Before saving the valid fixture, the confirmation shows title, date, 60 planned 
 
 Importing `fixtures/warning-short-plan.md` produces no blocking errors and exactly the short-plan warning from `fixtures/expected-validation-errors.md`. Confirmation remains available and the class can be saved.
 
-### C10 — Schedule warning
+### C10 — Generalized one-hour schedule
 
-A valid file with a non-Tuesday `date` or a `scheduled_start_local` other than `19:00` imports with a warning and no blocking error.
+A valid file may use any local scheduled start without a schedule warning when `hard_close_local` is exactly one hour later. A different interval is blocked. An hour that crosses midnight is valid.
+
+### C11 — Opening movement transition
+
+A class with one Transition directly after Grounding imports and expands in source order when that transition points to the first pose. A class without an opening transition remains valid.
+
+### C12 — One-screen schedule correction
+
+Prep shows the complete scheduled hour. `Change scheduled time` opens one screen with the current start, a hard close calculated live as exactly one hour later, and a primary `Change Schedule` button as the bottom action. Entering 6:30 shows a 7:30 hard close on that same screen. One activation of `Change Schedule` persists a new immutable revision and returns to Prep; there is no second confirmation. The original revision remains byte-identical and existing runs retain it.
+
+For a corrected 6:30–7:30 revision begun at 6:33, the live Grounding window is 6:30–6:40, drift is `+3 min`, and hard close remains 7:30.
+
+Changing a 7:00 class to 6:30 and then back to 7:00 leaves Prep showing 7:00–8:00 after a relaunch, and a run begun then closes at 8:00.
+
+### C13 — Bilateral midpoint cues
+
+A bilateral pose may author `midpoint` as one shared sentence or as a mapping with exactly one nonempty `right` cue and one nonempty `left` cue. Existing shared-cue classes remain valid and show the shared cue on both cards. A per-side map shows only the right cue on the right card and only the left cue on the left card, even when `side_order` begins with left. Missing, empty, or unsupported side keys block import. The 150-character glance warning applies independently to each side.
 
 ## D. Timing
 
@@ -100,6 +116,8 @@ Automated timing tests use a controllable clock.
 
 Sleeping Swan with `duration_per_side_min: 4` expands into Right for four minutes followed by Left for four minutes. It contributes eight planned minutes.
 
+When Sleeping Swan carries per-side midpoint cues, the expanded Right and Left segments each carry only their matching cue.
+
 ### D2 — Canonical planned windows
 
 For the valid fixture begun at 7:00 PM:
@@ -108,13 +126,15 @@ For the valid fixture begun at 7:00 PM:
 - Supported Caterpillar is planned for 7:24–7:30.
 - Savasana is planned for 7:45–8:00.
 
-### D3 — Late begin re-anchor
+### D3 — Late begin preserves the scheduled-hour anchor
 
-When Begin Class occurs at 7:03 PM, Grounding is planned for 7:03–7:13 and initial drift is `on plan`. The hard close remains 8:00 PM and the wake message remains eligible from 7:58 PM (displayed only once Savasana is current).
+For an authored 7:00–8:00 class, when Begin Class occurs at 7:03 PM, Grounding remains planned for 7:00–7:10 and initial drift is `+3 min`. The hard close remains 8:00 PM and the wake message remains eligible from 7:58 PM (displayed only once Savasana is current).
+
+The scheduled occurrence nearest Begin is used for every authored hour. For a 12:15–1:15 AM class tapped at 11:58 PM, the upcoming 12:15 AM occurrence is selected and the hard close is 1:15 AM the following date; it is never constructed almost a day in the past.
 
 ### D4 — Drift on segment entry
 
-If a segment's re-anchored planned start is 7:15 and it is entered at 7:18, drift is `+3 min` and remains stable during that visit.
+If a segment's scheduled planned start is 7:15 and it is entered at 7:18, drift is `+3 min` and remains stable during that visit.
 
 ### D5 — Early entry
 
@@ -134,7 +154,7 @@ Passing a segment's planned end changes no teaching state.
 
 ### D9 — Hard close
 
-At 8:00 PM the app displays `8:00 · hard close`, never a negative countdown, and does not automatically advance or finish.
+At the authored hard close the app displays `{time} · hard close`, never a negative countdown, and does not automatically advance or finish.
 
 ## E. Wake message
 
@@ -176,7 +196,7 @@ A run begun at or after `hard_close_at` shows no wake message on Grounding, pose
 
 ### F1 — Manual forward
 
-Activating Next once enters exactly one runtime segment or savasana step and immediately persists the event.
+Outside Savasana, activating Next once enters exactly one runtime segment and immediately persists the event. In Savasana, one Next reveals Finish Class without appending a cue-step event or silently finishing.
 
 ### F2 — Manual back
 
@@ -236,7 +256,7 @@ Every teaching-state navigation, finish/abandon action, substitution, and draft-
 
 ### H2 — Reload recovery
 
-Reloading mid-pose opens Run Recovery. Resume returns to the same class revision, segment, side, and savasana step with correct elapsed time.
+Reloading mid-pose opens Run Recovery. Resume returns to the same class revision, segment, and side with correct elapsed time. Historic runs containing Savasana-step events remain readable, although new runs do not create them.
 
 ### H3 — Process-death recovery
 
@@ -286,6 +306,10 @@ Exporting a library, clearing a test profile, and restoring with merge reproduce
 
 Restore never replaces an existing library without explicit destructive confirmation.
 
+### I7 — Reflection corpus export
+
+Library can export one human-readable Markdown file containing every non-empty saved reflection in chronological order, with its class title, run date, run ID, and final/draft state. The reflection text is verbatim. This export does not replace the lossless whole-library backup.
+
 ## J. Layout, access, and dim-room use
 
 **Verification status (July 25, 2026).** Every J-series result recorded before this date is void. The production CSP blocked Vite's dev-server style injection, so the Playwright suites — the only tests with a real layout engine — were asserting against an unstyled document. The Vitest DOM tests use happy-dom, which has no layout engine at all.
@@ -317,7 +341,7 @@ Live navigation remains reliable on the Pixel 6 with Android gesture navigation 
 
 ### J5 — Meaning without color
 
-Peak, drift, validation error, warning, current savasana step, and disabled state remain understandable without relying on hue alone. The layout portion of this check (that the distinguishing structure actually renders) is part of the strict-production coverage; the perceptual judgment is device-only.
+Peak, drift, validation error, warning, Savasana cue reminders, and disabled state remain understandable without relying on hue alone. The layout portion of this check (that the distinguishing structure actually renders) is part of the strict-production coverage; the perceptual judgment is device-only.
 
 ### J6 — Reduced motion
 
@@ -342,4 +366,3 @@ No tap anywhere in the app produces the Android default blue highlight. The live
 ## Release gate
 
 The first live-class pilot requires all A–I tests and J1–J6 to pass. J7 and J8 are completed during a studio rehearsal before students arrive. Observations from the first taught class are recorded as field evidence before scope expands.
-

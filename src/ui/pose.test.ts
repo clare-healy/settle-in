@@ -13,6 +13,13 @@ async function toButterflyAt(h: Harness, wallEpochMs: number): Promise<void> {
 }
 
 describe('Pose minimal — §6 hierarchy', () => {
+  it('anchors the first planned window to the scheduled hour after a late Begin', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(19, 3) });
+    await beginRun(h);
+    expect(h.root.querySelector('.planned-window')?.textContent).toBe('7:00–7:10');
+    expect(byId(h.root, 'drift').textContent).toBe('+3 min');
+  });
+
   it('shows pose name+side, wall clock, planned window+elapsed, drift, midpoint, next preview, three zones', async () => {
     const h = await bootApp({ wallEpochMs: jul28(19, 0) });
     await toButterflyAt(h, jul28(19, 13)); // enter at 7:13
@@ -44,6 +51,24 @@ describe('Pose minimal — §6 hierarchy', () => {
     const h = await bootApp({ wallEpochMs: jul28(19, 0) });
     await toButterflyAt(h, jul28(19, 10)); // exactly planned start
     expect(byId(h.root, 'drift').textContent).toBe('on plan');
+  });
+
+  it('shows each bilateral side only its own authored midpoint cue', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(19, 0) });
+    await beginRun(h);
+    await zone(h.app, h.root, 'next'); // butterfly
+    await zone(h.app, h.root, 'next'); // transition
+    await zone(h.app, h.root, 'next'); // Sleeping Swan right
+    expect(h.root.querySelector('.pose-side')?.textContent).toBe('Right');
+    expect(byId(h.root, 'midpoint').textContent).toBe(
+      'Notice what the first side teaches you about meeting sensation without force.',
+    );
+
+    await zone(h.app, h.root, 'next'); // Sleeping Swan left
+    expect(h.root.querySelector('.pose-side')?.textContent).toBe('Left');
+    expect(byId(h.root, 'midpoint').textContent).toBe(
+      'Meet this side as new information; let breath choose the depth again.',
+    );
   });
 
   it('a Previous-entered visit shows `revisited` in place of the drift value (F8)', async () => {

@@ -5,7 +5,8 @@
 // ordinary forward/back navigation does not. Return-to-class is always the primary,
 // lowest-friction choice.
 
-import { el } from '../dom.js';
+import { format12hLabel, hardCloseForScheduledStart } from '../../model/index.js';
+import { el, text as textNode } from '../dom.js';
 import type { AppActions, Dialog } from '../view-types.js';
 
 export function renderDialog(dialog: Dialog, actions: AppActions): HTMLElement {
@@ -114,5 +115,72 @@ function sheetChildren(dialog: Dialog, actions: AppActions): HTMLElement[] {
           on: { click: () => actions.closeDialog() },
         }),
       ];
+    case 'schedule-change':
+      return scheduleChangeChildren(dialog, actions);
   }
+}
+
+function scheduleChangeChildren(
+  dialog: Extract<Dialog, { kind: 'schedule-change' }>,
+  actions: AppActions,
+): HTMLElement[] {
+  const input = el('input', {
+    class: 'sheet__time-input tabular',
+    attrs: {
+      type: 'time',
+      id: 'schedule-start',
+      'data-testid': 'schedule-start',
+      required: 'true',
+      step: '60',
+    },
+  }) as HTMLInputElement;
+  input.value = dialog.scheduledStartLocal;
+
+  const closeValue = el('span', {
+    class: 'tabular',
+    attrs: { 'data-testid': 'schedule-close' },
+  });
+  const change = el('button', {
+    class: 'btn btn--primary',
+    text: 'Change Schedule',
+    attrs: { 'data-testid': 'confirm-schedule-change' },
+    on: { click: () => actions.changeSchedule(input.value) },
+  }) as HTMLButtonElement;
+
+  const updateClose = (): void => {
+    const hardClose = hardCloseForScheduledStart(input.value);
+    closeValue.textContent = hardClose ? format12hLabel(hardClose) : '—';
+    change.disabled = hardClose === null;
+  };
+  input.addEventListener('input', updateClose);
+  updateClose();
+
+  const children: HTMLElement[] = [
+    el('h2', { class: 'sheet__title', text: 'Change scheduled time' }),
+    el('p', {
+      class: 'sheet__body',
+      text: 'This saves a new version of this class. Earlier versions and taught runs stay unchanged.',
+    }),
+    el('label', {
+      class: 'sheet__time-label',
+      attrs: { for: 'schedule-start' },
+      children: [textNode('Scheduled start'), input],
+    }),
+    el('p', {
+      class: 'sheet__calculated-close',
+      children: [textNode('Hard close '), closeValue],
+    }),
+  ];
+  if (dialog.error) {
+    children.push(el('p', { class: 'sheet__error', attrs: { role: 'alert' }, text: dialog.error }));
+  }
+  children.push(
+    el('button', {
+      class: 'btn btn--quiet',
+      text: 'Cancel',
+      on: { click: () => actions.closeDialog() },
+    }),
+    change,
+  );
+  return children;
 }

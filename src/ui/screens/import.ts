@@ -93,7 +93,7 @@ export function renderImport(props: ImportProps): HTMLElement {
       children.push(renderConfirm(view.kind, view.summary, view.warnings, actions));
       break;
     case 'duplicate':
-      children.push(renderDuplicate(view.existingClassId, actions));
+      children.push(renderDuplicate(view.existingClassId, view.existingSourceHash, actions));
       break;
   }
 
@@ -333,7 +333,11 @@ function renderSummary(s: ImportSummary): HTMLElement {
 
 // --- Duplicate state --------------------------------------------------------
 
-function renderDuplicate(existingClassId: string, actions: ImportProps['actions']): HTMLElement {
+function renderDuplicate(
+  existingClassId: string,
+  existingSourceHash: string,
+  actions: ImportProps['actions'],
+): HTMLElement {
   return el('div', {
     class: 'import__body',
     children: [
@@ -355,7 +359,7 @@ function renderDuplicate(existingClassId: string, actions: ImportProps['actions'
             class: 'btn btn--primary',
             text: 'Open existing class',
             attrs: { 'data-testid': 'import-open-existing' },
-            on: { click: () => actions.importOpenExisting(existingClassId) },
+            on: { click: () => actions.importOpenExisting(existingClassId, existingSourceHash) },
           }),
         ],
       }),

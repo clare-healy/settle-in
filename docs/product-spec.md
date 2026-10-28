@@ -3,11 +3,11 @@
 Status: canonical product specification  
 Primary user: Clare  
 Primary device: Google Pixel 6  
-Primary setting: Tuesday 7:00–8:00 PM yin class at Raw Emerald Yoga
+Primary setting: 60-minute yin classes at Raw Emerald Yoga
 
 ## Product statement
 
-Settle In (working title through v4: Yin Class Companion) is an instrument for running Clare's Tuesday yin classes. It carries the complete authored class into the room and answers a glance without becoming a presence in the room.
+Settle In (working title through v4: Yin Class Companion) is an instrument for running Clare's 60-minute yin classes. It carries the complete authored class into the room and answers a glance without becoming a presence in the room.
 
 It is not a timer that conducts the class. It is a quiet reference that shows where the plan expected the class to be, records what actually happened, and leaves every teaching decision with Clare.
 
@@ -19,7 +19,7 @@ The app exists to make these outcomes true:
 - A glance answers the question of the moment in under two seconds.
 - The phone remains perceptually quiet to students: no sound, vibration, notification, urgent color, or attention-seeking motion.
 - Timing serves the room. Clare can run early or late without the app pressuring her or advancing on its own.
-- The class ends at the hard 8:00 PM studio close.
+- The class ends at its authored hard close, exactly one hour after its scheduled start.
 - The app preserves both what was planned and what was taught.
 - Each taught class strengthens future class construction through honest history, pose recency, and exportable reflection.
 
@@ -31,9 +31,9 @@ The app exists to make these outcomes true:
 - Class library and taught-run history stored on the device, with explicit backup export and restore import.
 - Weekly classes authored with an AI assistant in the canonical Markdown format.
 - The app parses, normalizes, validates, and summarizes the file before import.
-- Classes are not edited inside the v1 app. Authoring corrections return to the AI-assisted workflow.
+- Teaching content is not edited inside the v1 app. Prep may correct only the scheduled start; the app calculates the one-hour close and saves the corrected Markdown as a new immutable revision. The correction returns to the AI-assisted workflow through the integrated-system handoff.
 - As-taught exports follow the versioned export schema in `docs/class-format.md`. Pose recency and honest history reach future class construction through those exports in the weekly authoring workflow, not through an in-app analytics view.
-- The app and the authoring assistant's project (currently the Claude project "Yin Flow State") form one integrated system. The project's instructions are maintained canonically in `docs/yin-flow-state-instructions.md`; any change to a class or export schema updates both sides of the system in the same change, even when the chat side must be applied manually.
+- The app and the authoring assistant's Claude project, also named "Settle In," form one integrated system. The project's instructions are maintained canonically in `docs/settle-in-authoring-instructions.md`; any change to a class or export schema updates both sides of the system in the same change, even when the chat side must be applied manually.
 
 ## Principles
 
@@ -59,7 +59,7 @@ The same actions have the same meaning throughout a run. Clare never searches fo
 
 ### 6. Self-nourishing, anti-fragile utility
 
-The authored class definition never changes after import. Each live teaching creates a separate run record derived from actual timestamped actions and supplemented by optional human notes.
+An imported class revision never changes. A schedule correction creates a new revision, leaving the prior source and taught runs intact. Each live teaching creates a separate run record derived from actual timestamped actions and supplemented by optional human notes.
 
 ### 7. Failure must be quiet and recoverable
 
@@ -81,7 +81,8 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 1. Clare opens the upcoming class.
 2. Prep shows props, staging assumptions, theme line, arrival, breath, and sequence.
 3. Preflight reminds Clare to enable Do Not Disturb and set device brightness.
-4. Begin Class records the actual start timestamp and requests a screen wake lock.
+4. Prep shows the complete scheduled hour. If it is wrong, one schedule-change screen accepts a new start, immediately calculates the close, and saves a new immutable revision with `Change Schedule`.
+5. Begin Class records the actual start timestamp and requests a screen wake lock.
 
 ### During class
 
@@ -90,8 +91,8 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 3. The live pose screen prioritizes wall clock, pose and side, planned window, elapsed time, drift, midpoint cue, and a quiet next-pose preview.
 4. A deliberate central action opens the expanded reference state without changing the teaching segment.
 5. Going back records a navigation correction without deleting history.
-6. Savasana remains manually staged. The two-minute text appears automatically once the clock reaches 7:58 PM **and Clare is in Savasana**, and remains until she advances. It never appears on any other screen.
-7. Teaching ends at the 8:00 PM hard close; the run is finished through Clare's manual action, which may fall a few minutes after 8:00 as the room resolves. The app never advances or ends the class for her, and navigation never locks.
+6. Savasana presents the authored settling and return cues together as a static reminder list. The two-minute text appears automatically once the clock reaches two minutes before the authored hard close **and Clare is in Savasana**, and remains until she finishes. It never appears on any other screen.
+7. Teaching ends at the authored hard close; the run is finished through Clare's manual action, which may fall a few minutes later as the room resolves. The app never advances or ends the class for her, and navigation never locks.
 
 ### After class
 
@@ -108,20 +109,21 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 - Prep, Grounding, Pose, Transition, Savasana, Post-Class, and Library screens
 - Manual forward and back navigation
 - Minimal and expanded pose states
-- Re-anchored planned windows and informational drift
-- Hard-close savasana message, shown in Savasana only, from 7:58 PM
+- Scheduled-hour planned windows and informational drift
+- Hard-close savasana message, shown in Savasana only, from two minutes before the authored hard close
 - Screen wake-lock request, monitoring, and calm fallback
 - Automatic persistence and interrupted-run recovery
 - Immutable class definitions and multiple taught runs
+- One-screen scheduled-start correction on Prep, saved as a new immutable revision
 - Human-readable Markdown export for a class or taught run
 - Versioned whole-library backup export and restore
 
 ## Out of scope for v1
 
 - Sound, vibration, haptics, or system notifications
-- Automatic pose, side, transition, savasana-step, or class advancement
+- Automatic pose, side, transition, or class advancement
 - Accounts, cloud sync, collaboration, or sharing services
-- In-app class authoring or full editing
+- In-app class authoring or editing beyond the narrow scheduled-start correction
 - Student-facing screens
 - Pose media, illustrations, video, or audio
 - Analytics or telemetry
@@ -136,7 +138,7 @@ V1 is successful when:
 - Every default live-state glance can answer its intended question in approximately two seconds.
 - A reload or accidental closure does not lose the active segment, timing history, or notes.
 - The app never makes a sound, vibrates, or posts a notification.
-- The 7:58 PM wake message appears silently in Savasana, and nowhere else, and remains visible.
+- The two-minute wake message appears silently in Savasana, and nowhere else, and remains visible.
 - The exported record distinguishes the authored plan from each taught run.
 - One real Tuesday class can be taught without returning to chat notes or paper.
 

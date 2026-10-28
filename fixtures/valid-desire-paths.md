@@ -72,7 +72,9 @@ side_order:
 entry: From all fours, bring the named-side shin forward and extend the other leg behind you.
 target: Outer hip and glute of the forward-leg side.
 settling: Fold only as far as breath and jaw remain easy; stay between 2 and 5 out of 10.
-midpoint: Let the top hip roll gently open without forcing the front knee.
+midpoint:
+  right: Notice what the first side teaches you about meeting sensation without force.
+  left: Meet this side as new information; let breath choose the depth again.
 props: Bolster lengthwise beneath the chest; blanket under the forward-side hip if needed.
 alternative: Reclined figure four, using the same named side.
 exit: Press back to all fours and pause in neutral before changing sides or moving on.
@@ -187,4 +189,3 @@ steps:
   - Gentle awakening
 wake_message: Two minutes. Time to begin the gentle awakening.
 ```
-

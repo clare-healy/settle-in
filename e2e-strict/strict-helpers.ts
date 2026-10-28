@@ -104,8 +104,8 @@ export async function next(page: Page): Promise<void> {
         const type = live?.getAttribute('data-segment-type') ?? '';
         const name = document.querySelector('.pose-name')?.textContent?.trim() ?? '';
         const side = document.querySelector('.pose-side')?.textContent?.trim() ?? '';
-        const step = document.querySelector('.savasana__step--active')?.textContent?.trim() ?? '';
-        return `${type}|${name}|${side}|${step}` !== b;
+        const finish = document.querySelector('[data-testid="finish-class"]') ? 'finish' : '';
+        return `${type}|${name}|${side}|${finish}` !== b;
       },
       before,
       { timeout: 10_000 },
@@ -119,8 +119,8 @@ export async function segmentSignature(page: Page): Promise<string> {
     const type = live?.getAttribute('data-segment-type') ?? '';
     const name = document.querySelector('.pose-name')?.textContent?.trim() ?? '';
     const side = document.querySelector('.pose-side')?.textContent?.trim() ?? '';
-    const step = document.querySelector('.savasana__step--active')?.textContent?.trim() ?? '';
-    return `${type}|${name}|${side}|${step}`;
+    const finish = document.querySelector('[data-testid="finish-class"]') ? 'finish' : '';
+    return `${type}|${name}|${side}|${finish}`;
   });
 }
 

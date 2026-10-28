@@ -1,9 +1,9 @@
 # Settle In — CI gate + GitHub Pages deploy (M6).
 #
-# On every push to main: install, run the full automated gate (Vitest, typecheck of
-# both the app and the service worker, production build with the precache + CSP audit,
-# the dev-server flow harness, and the production-build PWA suite), and only on green
-# deploy dist/ to GitHub Pages. Any failing gate fails the deploy.
+# On every pull request into main and every push to main: install and run the full
+# automated gate (Vitest, typecheck of both the app and the service worker,
+# production build with the precache + CSP audit, the dev-server flow harness, and
+# the production-build PWA suite). Only a green push to main deploys to GitHub Pages.
 #
 # The production origin is https://clare-healy.github.io/settle-in/ (permanent per the
 # implementation treaty); Vite's base is already /settle-in/.
@@ -13,18 +13,14 @@ name: Deploy
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
-
-# One deploy at a time; let an in-progress run finish so a half-published shell is
-# never live during a class.
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -84,8 +80,14 @@ jobs:
           path: dist
 
   deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
+    # Serialize deployments only. Pull-request verification must never occupy or
+    # replace the queue for a production main-branch deploy.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -23,6 +23,13 @@ async function openLibrary(h: Harness): Promise<void> {
 }
 
 describe('Library list (screen-states § 13)', () => {
+  it('offers a separate reflection-corpus export alongside the lossless backup', async () => {
+    const h = await bootApp({ seed: true, wallEpochMs: jul28(19, 0) });
+    await openLibrary(h);
+    expect(maybeId(h.root, 'export-reflections')).not.toBeNull();
+    expect(maybeId(h.root, 'export-backup')).not.toBeNull();
+  });
+
   it('lists classes with theme, peak, planned duration, and run count', async () => {
     const h = await bootApp({ seed: true, wallEpochMs: jul28(19, 0) }); // desire-paths seeded
     await openLibrary(h);

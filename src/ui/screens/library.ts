@@ -67,7 +67,7 @@ function renderClassRow(
   ambiguousUpcoming: boolean,
   actions: LibraryProps['actions'],
 ): HTMLElement {
-  const def = g.latest.definition;
+  const def = g.current.definition;
   const meta = el('div', {
     class: 'library__row-meta',
     children: [
@@ -154,6 +154,12 @@ function renderBackupRestore(props: LibraryProps): HTMLElement {
           text: 'Export library backup',
           attrs: { 'data-testid': 'export-backup' },
           on: { click: () => actions.exportBackup() },
+        }),
+        el('button', {
+          class: 'btn btn--quiet',
+          text: 'Export reflections',
+          attrs: { 'data-testid': 'export-reflections' },
+          on: { click: () => actions.exportReflections() },
         }),
         el('button', {
           class: 'btn btn--quiet',

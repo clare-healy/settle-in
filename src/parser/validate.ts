@@ -18,10 +18,11 @@ import {
   type ClassDefinition,
   type ExpandedSegment,
   type ImportSummary,
+  type MidpointCue,
   type Side,
   type ValidationError,
   type Warning,
-  CANONICAL_SCHEDULED_START_LOCAL,
+  CLASS_DURATION_SEC,
   SUPPORTED_SCHEMA_VERSION,
   SUPPORTED_SIDES,
 } from '../schema/index.js';
@@ -61,7 +62,7 @@ const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
-const POSE_CUE_FIELDS = ['entry', 'target', 'settling', 'midpoint', 'props', 'alternative', 'exit', 'notes'] as const;
+const POSE_TEXT_CUE_FIELDS = ['entry', 'target', 'settling', 'props', 'alternative', 'exit', 'notes'] as const;
 
 interface SegCtx {
   seg: AuthoredSegment;
@@ -131,9 +132,8 @@ export function normalizeAndValidate(input: NormalizeInput): NormalizeOutput {
 
   validateSequence(c, contexts, peakPoseId, fmLine('peak_pose_id'));
 
-  // --- Copy, schedule, and wake warnings (independent of expansion) ---------
+  // --- Copy and wake warnings (independent of expansion) --------------------
   applyCopyWarnings(c, contexts);
-  if (date !== null) applyScheduleWarning(c, date, scheduledStart, fmLine('date'));
 
   // --- Expansion and duration checks (only when nothing blocks) -------------
   let classDefinition: ClassDefinition | null = null;
@@ -146,7 +146,7 @@ export function normalizeAndValidate(input: NormalizeInput): NormalizeOutput {
     const authored = contexts.map((ctx) => ctx.seg);
     const expanded = expandSegments(authored);
     const plannedDurationSec = expanded.reduce((sum, s) => sum + s.plannedDurationSec, 0);
-    const intervalSec = timeToSeconds(hardClose) - timeToSeconds(scheduledStart);
+    const intervalSec = scheduledIntervalSec(scheduledStart, hardClose);
 
     if (plannedDurationSec > intervalSec) {
       c.error(
@@ -292,7 +292,7 @@ function validatePose(
   const entry = cue('entry');
   const target = cue('target');
   const settling = cue('settling');
-  const midpoint = cue('midpoint');
+  const midpoint = reqMidpoint(c, raw, bilateral, label, line('midpoint'));
   const propsField = cue('props');
   const alternative = cue('alternative');
   const exit = cue('exit');
@@ -376,22 +376,38 @@ function validateSequence(c: Collector, contexts: readonly SegCtx[], peakPoseId:
     }
   }
 
-  // Structural alternation: Grounding, (Pose, Transition)+, Savasana, and each
-  // transition leads to the pose or Savasana that follows it in source order.
+  // Structural sequence: Grounding, an optional transition into the first pose,
+  // then every pose followed by a transition, and finally Savasana. Each
+  // transition leads to the pose or Savasana immediately following it.
   if (first?.type === 'grounding' && last?.type === 'savasana') {
+    let expect: 'pose-or-opening-transition' | 'pose' | 'transition' = 'pose-or-opening-transition';
     for (let k = 1; k < contexts.length - 1; k++) {
       const ctx = contexts[k];
       if (!ctx) continue;
-      const expectPose = (k - 1) % 2 === 0;
-      if (expectPose && ctx.seg.type !== 'pose') {
-        c.error(`Expected a pose here but found "${ctx.label}". Poses and transitions must alternate between Grounding and Savasana.`, {
+      if (expect === 'pose-or-opening-transition') {
+        if (ctx.seg.type === 'transition') expect = 'pose';
+        else if (ctx.seg.type === 'pose') expect = 'transition';
+        else c.error(`Expected a pose or opening transition here but found "${ctx.label}".`, {
           segment: ctx.label, field: null, sourceLine: ctx.headingLine,
         });
-      } else if (!expectPose && ctx.seg.type !== 'transition') {
+      } else if (expect === 'pose' && ctx.seg.type !== 'pose') {
+        c.error(`Expected a pose after the opening transition but found "${ctx.label}".`, {
+          segment: ctx.label, field: null, sourceLine: ctx.headingLine,
+        });
+      } else if (expect === 'transition' && ctx.seg.type !== 'transition') {
         c.error(`Expected a transition after "${contexts[k - 1]?.label ?? 'the previous pose'}" but found "${ctx.label}".`, {
           segment: ctx.label, field: null, sourceLine: ctx.headingLine,
         });
       }
+      if (expect === 'pose' && ctx.seg.type === 'pose') expect = 'transition';
+      else if (expect === 'transition' && ctx.seg.type === 'transition') expect = 'pose';
+    }
+
+    const penultimate = contexts[contexts.length - 2];
+    if (penultimate?.seg.type !== 'transition') {
+      c.error('The final pose must be followed by a transition into Savasana.', {
+        segment: penultimate?.label ?? null, field: null, sourceLine: penultimate?.headingLine ?? null,
+      });
     }
 
     for (let k = 0; k < contexts.length; k++) {
@@ -424,8 +440,14 @@ function applyCopyWarnings(c: Collector, contexts: readonly SegCtx[]): void {
     const s = ctx.seg;
     if (s.type === 'pose') {
       warnIfLong(c, s.name, 36, ctx.label, 'name', ctx.headingLine, 'the pose name');
-      warnIfLong(c, s.midpoint, 150, ctx.label, 'midpoint', ctx.fieldLines.get('midpoint') ?? ctx.headingLine, 'the midpoint cue');
-      for (const field of POSE_CUE_FIELDS) {
+      const midpointLine = ctx.fieldLines.get('midpoint') ?? ctx.headingLine;
+      for (const [side, midpoint] of midpointEntries(s.midpoint)) {
+        const sideLabel = side ? `${side} ` : '';
+        const field = side ? `midpoint.${side}` : 'midpoint';
+        warnIfLong(c, midpoint, 150, ctx.label, field, midpointLine, `the ${sideLabel}midpoint cue`);
+        warnIfLong(c, midpoint, 280, ctx.label, field, midpointLine, `the ${sideLabel}midpoint cue`);
+      }
+      for (const field of POSE_TEXT_CUE_FIELDS) {
         warnIfLong(c, s[field], 280, ctx.label, field, ctx.fieldLines.get(field) ?? ctx.headingLine, `the ${field} cue`);
       }
     } else if (s.type === 'grounding') {
@@ -434,17 +456,6 @@ function applyCopyWarnings(c: Collector, contexts: readonly SegCtx[]): void {
     } else if (s.type === 'savasana') {
       warnIfLong(c, s.wakeMessage, 90, ctx.label, 'wake_message', ctx.fieldLines.get('wake_message') ?? ctx.headingLine, 'the wake message');
     }
-  }
-}
-
-function applyScheduleWarning(c: Collector, date: string, scheduledStart: string | null, dateLine: number): void {
-  const isTuesday = dayOfWeekUTC(date) === 2;
-  const usualStart = scheduledStart === CANONICAL_SCHEDULED_START_LOCAL;
-  if (!isTuesday || !usualStart) {
-    c.warn(
-      'This class is not the usual Tuesday 7:00 PM class (a shifted week, a sub, or a rehearsal). It will still import.',
-      { segment: 'Front matter', field: 'date', sourceLine: dateLine },
-    );
   }
 }
 
@@ -486,18 +497,17 @@ function expandSegments(authored: readonly AuthoredSegment[]): ExpandedSegment[]
         cues: { steps: s.steps, wakeMessage: s.wakeMessage },
       });
     } else {
-      const cues = poseCues(s);
       if (s.bilateral && s.sideOrder && s.durationPerSideMin !== null) {
         for (const side of s.sideOrder) {
           push({
             id: `${s.id}--${side}`, parentId: s.id, type: 'pose', name: s.name, side,
-            plannedDurationSec: s.durationPerSideMin * 60, cues,
+            plannedDurationSec: s.durationPerSideMin * 60, cues: poseCues(s, side),
           });
         }
       } else {
         push({
           id: s.id, parentId: s.id, type: 'pose', name: s.name, side: null,
-          plannedDurationSec: (s.durationMin ?? 0) * 60, cues,
+          plannedDurationSec: (s.durationMin ?? 0) * 60, cues: poseCues(s, null),
         });
       }
     }
@@ -506,9 +516,14 @@ function expandSegments(authored: readonly AuthoredSegment[]): ExpandedSegment[]
   return expanded;
 }
 
-function poseCues(s: AuthoredPose): Readonly<Record<string, string | readonly string[]>> {
+function poseCues(s: AuthoredPose, side: Side | null): Readonly<Record<string, string | readonly string[]>> {
+  const midpoint = typeof s.midpoint === 'string'
+    ? s.midpoint
+    : side === null
+      ? ''
+      : s.midpoint[side];
   return {
-    entry: s.entry, target: s.target, settling: s.settling, midpoint: s.midpoint,
+    entry: s.entry, target: s.target, settling: s.settling, midpoint,
     props: s.props, alternative: s.alternative, exit: s.exit, notes: s.notes,
   };
 }
@@ -602,12 +617,8 @@ function reqHardClose(c: Collector, obj: Record<string, unknown>, scheduledStart
     c.error('Front matter · hard_close_local must be a 24-hour time like "20:00".', { segment: 'Front matter', field: 'hard_close_local', sourceLine: line });
     return null;
   }
-  if (v !== '20:00') {
-    c.error('Front matter · hard_close_local must be 20:00 for v1 (the studio\'s hard close).', { segment: 'Front matter', field: 'hard_close_local', sourceLine: line });
-    return null;
-  }
-  if (scheduledStart && timeToSeconds(v) <= timeToSeconds(scheduledStart)) {
-    c.error('Front matter · hard_close_local must be later than scheduled_start_local.', { segment: 'Front matter', field: 'hard_close_local', sourceLine: line });
+  if (scheduledStart && scheduledIntervalSec(scheduledStart, v) !== CLASS_DURATION_SEC) {
+    c.error('Front matter · hard_close_local must be exactly one hour after scheduled_start_local.', { segment: 'Front matter', field: 'hard_close_local', sourceLine: line });
     return null;
   }
   return v;
@@ -642,6 +653,64 @@ function reqStringList(
   return v as string[];
 }
 
+function reqMidpoint(
+  c: Collector,
+  obj: Record<string, unknown>,
+  bilateral: boolean,
+  segment: string,
+  line: number,
+): MidpointCue {
+  const value = obj['midpoint'];
+  if (typeof value === 'string') {
+    if (value.trim().length > 0) return value;
+    c.error(`${segment} · midpoint is required and must not be empty.`, {
+      segment, field: 'midpoint', sourceLine: line,
+    });
+    return '';
+  }
+
+  if (!bilateral) {
+    c.error(`${segment} · midpoint must be one non-empty text cue for a non-bilateral pose.`, {
+      segment, field: 'midpoint', sourceLine: line,
+    });
+    return '';
+  }
+
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    c.error(`${segment} · midpoint must be one text cue or a right/left cue map.`, {
+      segment, field: 'midpoint', sourceLine: line,
+    });
+    return '';
+  }
+
+  const map = value as Record<string, unknown>;
+  const keys = Object.keys(map);
+  const hasOnlySupportedSides = keys.length === SUPPORTED_SIDES.length
+    && keys.every((key) => SUPPORTED_SIDES.includes(key as Side));
+  const right = map['right'];
+  const left = map['left'];
+  if (
+    !hasOnlySupportedSides
+    || typeof right !== 'string'
+    || right.trim().length === 0
+    || typeof left !== 'string'
+    || left.trim().length === 0
+  ) {
+    c.error(`${segment} · a per-side midpoint must contain exactly one non-empty right cue and one non-empty left cue.`, {
+      segment, field: 'midpoint', sourceLine: line,
+    });
+    return '';
+  }
+
+  return { right, left };
+}
+
+function midpointEntries(midpoint: MidpointCue): readonly [Side | null, string][] {
+  return typeof midpoint === 'string'
+    ? [[null, midpoint]]
+    : SUPPORTED_SIDES.map((side) => [side, midpoint[side]] as const);
+}
+
 function reqSideOrder(c: Collector, obj: Record<string, unknown>, segment: string, line: number): Side[] | null {
   const v = obj['side_order'];
   if (!Array.isArray(v) || v.length !== 2) {
@@ -673,6 +742,13 @@ function timeToSeconds(hhmm: string): number {
   return (h ?? 0) * 3600 + (m ?? 0) * 60;
 }
 
+/** Scheduled duration, allowing an hour-long class to cross midnight. */
+function scheduledIntervalSec(start: string, close: string): number {
+  const startSec = timeToSeconds(start);
+  const closeSec = timeToSeconds(close);
+  return (closeSec - startSec + 24 * 3600) % (24 * 3600);
+}
+
 function minutes(seconds: number): number {
   return Math.round(seconds / 60);
 }
@@ -686,10 +762,4 @@ function isRealDate(text: string): boolean {
   if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
   const dt = new Date(Date.UTC(y, mo - 1, d));
   return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
-}
-
-function dayOfWeekUTC(date: string): number {
-  const match = ISO_DATE.exec(date);
-  if (!match) return -1;
-  return new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))).getUTCDay();
 }

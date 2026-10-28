@@ -9,4 +9,4 @@
 // This is the single source of truth for that string. Bump it on a release; the
 // golden as-taught fixtures pin it, so a bump is a deliberate, reviewed change.
 
-export const APP_VERSION = '0.1.0';
+export const APP_VERSION = '0.2.0';

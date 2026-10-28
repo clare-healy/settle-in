@@ -16,7 +16,7 @@ Record each run of this checklist at the bottom with date, app version, and Andr
 
 - [x] **A1**: Install from Chrome. App name "Settle In", taper icon, dark theme color, portrait, standalone (no browser chrome).
 - [x] **A2**: Enable airplane mode. Force-stop the app (system settings). Cold-launch from the launcher icon. Full app renders with Hanken Grotesk/Spectral (no fallback fonts — compare a known glyph), correct icons, no browser offline page.
-- [ ] **A3**: Still in airplane mode: import a class (paste), open Prep, begin, navigate the entire run including expanded references and savasana steps, finish, write a note, export the as-taught record and a backup. Every step works.
+- [ ] **A3**: Still in airplane mode: import a class (paste), open Prep, begin, navigate the entire run including expanded references and the Savasana reminder list, finish, write a note, export the as-taught record, reflection corpus, and backup. Every step works.
 - [ ] **A4**: With DevTools remote debugging (USB), reload and run the core workflow. Network panel shows zero requests to any non-app origin.
 - [ ] **A5**: Deploy a trivial new version while a run is active on the device. No update prompt appears mid-run and the version does not change until after the run ends. Then: kill the app process mid-run with the update still waiting, relaunch — Run Recovery appears (possibly on the new version) and resumes to the exact segment.
 
@@ -45,7 +45,7 @@ Record each run of this checklist at the bottom with date, app version, and Andr
 
 These exist because Clare found all three in her first practice run. Run them before anything else — they are what stands between her and teaching from the app.
 
-- [ ] **J9 — no blue tap flash.** In the installed app, tap the Previous zone, the Reference zone, the Next zone, and a Savasana step, in a dim room. **No blue highlight of any kind appears.** The zones instead show a quiet warm edge while pressed, which disappears on release. Nothing animates.
+- [ ] **J9 — no blue tap flash.** In the installed app, tap the Previous zone, the Reference zone, and the Next zone in a dim room. **No blue highlight of any kind appears.** The zones instead show a quiet warm edge while pressed, which disappears on release. Nothing animates.
 - [ ] Long-press and double-tap on cue text: if a blue selection highlight appears and reads as intrusive in the room, record it — `::selection` recoloring is conditional on this observation.
 - [ ] **E3/E8 — wake message is Savasana-only.** Begin a rehearsal run *after* 8:00 PM. Walk Grounding → pose → transition: **no two-minute message appears on any of them.** Advance into Savasana: the message appears immediately, once, and does not re-animate. The `8:00 · hard close` indicator behaves as before throughout.
 - [ ] Repeat during real class hours if possible: at 7:58 while still in a pose, confirm nothing appears; on entering Savasana, it appears once.
@@ -72,7 +72,7 @@ If anything clips, record exactly which screen and scale. The fix is to reflow t
 - [ ] Repeat at 125% (or nearest larger) font size.
 - [ ] **J3**: Every core control (Previous/Reference/Next, Begin, Finish, Resume, dialogs) is comfortably tappable without precision.
 - [ ] **J4**: With gesture navigation, live-screen zone taps near the edges never trigger system back/home; system back from a live screen opens the Leave Class guard, never exits silently.
-- [ ] **J5**: Squint test / grayscale (accessibility setting): peak marker, drift, warnings, current savasana step, disabled states all still distinguishable.
+- [ ] **J5**: Squint test / grayscale (accessibility setting): peak marker, drift, warnings, Savasana reminders, disabled states all still distinguishable.
 - [ ] **J6**: Enable "Remove animations" — transitions simplify, nothing becomes unclear, wake message still appears.
 
 ## Studio rehearsal (gates the pilot; J7/J8)

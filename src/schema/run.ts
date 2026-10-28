@@ -80,9 +80,9 @@ export interface RunEventBase {
 }
 
 /**
- * Begin Class. Captures the re-anchor origin and the once-and-only-once hard
+ * Begin Class. Captures the actual start and the once-and-only-once hard
  * close, both persisted with the run and never recomputed
- * (docs/implementation-treaty.md § Re-anchored plan).
+ * (docs/implementation-treaty.md § Scheduled-hour plan).
  */
 export interface RunStartedEvent extends RunEventBase {
   readonly type: 'run_started';
@@ -92,7 +92,7 @@ export interface RunStartedEvent extends RunEventBase {
   readonly revisionSourceHash: string;
   /** ISO 8601; equals `wall`. */
   readonly runStartedAt: string;
-  /** Epoch ms; equals `wallEpochMs`. The re-anchor origin. */
+  /** Epoch ms; equals `wallEpochMs`. The actual Begin instant. */
   readonly runStartedAtEpochMs: number;
   /** Local date at Begin, YYYY-MM-DD. */
   readonly runLocalDate: string;

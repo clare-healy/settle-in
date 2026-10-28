@@ -56,11 +56,11 @@ test('import a class, run it, export as-taught, and round-trip a backup', async 
   await idle(page);
   await advanceSegments(page, 14); // to Savasana
   await expect(page.locator('.live')).toHaveAttribute('data-segment-type', 'savasana');
-  for (let i = 0; i < 5; i++) await next(page); // to the last savasana step
-  await next(page); // reveal Finish
+  await next(page); // static cue list → reveal Finish
   await page.getByTestId('finish-class').click();
   await page.getByTestId('confirm-finish').click();
   await expect(page.locator('[data-screen="post-class"]')).toBeVisible();
+  await page.getByTestId('room-note').fill('The static Savasana prompts kept my attention in the room.');
   await page.getByTestId('save-notes').click();
 
   // 4. Open the class in the Library and export the as-taught run.
@@ -79,6 +79,15 @@ test('import a class, run it, export as-taught, and round-trip a backup', async 
   // 5. Export a whole-library backup, then restore it (merge) back through the UI.
   await page.getByTestId('detail-back').click();
   await expect(page.locator('[data-screen="library"]')).toBeVisible();
+
+  const [reflectionDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByTestId('export-reflections').click(),
+  ]);
+  const reflectionText = readFileSync(await reflectionDownload.path(), 'utf8');
+  expect(reflectionText).toContain('# Settle In — Reflection Corpus');
+  expect(reflectionText).toContain('The static Savasana prompts kept my attention in the room.');
+
   const [backupDownload] = await Promise.all([
     page.waitForEvent('download'),
     page.getByTestId('export-backup').click(),

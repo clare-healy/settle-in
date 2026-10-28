@@ -70,15 +70,17 @@ describe('Import — warning without blocking (C9)', () => {
   });
 });
 
-describe('Import — schedule warning (C10)', () => {
-  it('a non-Tuesday date warns without blocking', async () => {
+describe('Import — generalized one-hour schedule (C10)', () => {
+  it('a non-Tuesday 5:30–6:30 class imports without a schedule warning', async () => {
     const h = await bootApp({ seed: false, wallEpochMs: jul28(19, 0) });
     await openImport(h);
-    // 2026-07-29 is a Wednesday → schedule warning, still valid.
-    await validate(h, replaceOnce(VALID, 'date: 2026-07-28', 'date: 2026-07-29'));
+    let source = replaceOnce(VALID, 'date: 2026-07-28', 'date: 2026-07-29');
+    source = replaceOnce(source, 'scheduled_start_local: "19:00"', 'scheduled_start_local: "17:30"');
+    source = replaceOnce(source, 'hard_close_local: "20:00"', 'hard_close_local: "18:30"');
+    await validate(h, source);
 
     expect(h.root.querySelector('[data-import-phase="confirm"]')).not.toBeNull();
-    expect(byId(h.root, 'import-warnings').textContent?.length).toBeGreaterThan(0);
+    expect(maybeId(h.root, 'import-warnings')).toBeNull();
   });
 });
 
@@ -121,12 +123,17 @@ describe('Import — duplicate and revision', () => {
     await validate(h, VALID);
 
     expect(byId(h.root, 'import-duplicate').textContent).toContain('already in the library');
-    const countBefore = (await h.store.getAllClassRevisions()).length;
+    const revisions = await h.store.getAllClassRevisions();
+    const countBefore = revisions.length;
+    const existing = revisions[0]!;
+    await h.store.setPreference(`pref.currentRevision.${existing.classId}`, 'a-different-revision');
     byId(h.root, 'import-open-existing').click();
     await h.app.idle();
     expect(h.app.routeKind).toBe('class-detail');
     // No duplicate written.
     expect((await h.store.getAllClassRevisions()).length).toBe(countBefore);
+    // Re-importing is a deliberate choice: the exact existing revision becomes current.
+    expect(await h.store.getPreference(`pref.currentRevision.${existing.classId}`)).toBe(existing.sourceHash);
   });
 
   it('changed content with the same class_id is offered as a revision (C6)', async () => {
@@ -146,6 +153,10 @@ describe('Import — duplicate and revision', () => {
     // Two revisions of the one class now exist.
     const revs = await h.store.getClassRevisionsByClassId('desire-paths-2026-07-28');
     expect(revs.length).toBe(2);
+    // The newly imported revision becomes the one Prep shows, even if an earlier
+    // revision had been chosen before.
+    const imported = revs.find((r) => r.definition.originalMarkdown === changed);
+    expect(await h.store.getPreference('pref.currentRevision.desire-paths-2026-07-28')).toBe(imported?.sourceHash);
   });
 });
 

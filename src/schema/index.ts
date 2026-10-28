@@ -15,13 +15,19 @@ export const SUPPORTED_SCHEMA_VERSION = 1;
 /** As-taught export schema version (versioned independently of the class input). */
 export const EXPORT_SCHEMA_VERSION = 1;
 
-/** For v1 the canonical class is Tuesday 19:00–20:00. */
+/** Historic v1 default retained for compatibility and examples. */
 export const CANONICAL_SCHEDULED_START_LOCAL = '19:00';
 export const CANONICAL_HARD_CLOSE_LOCAL = '20:00';
+
+/** Every Settle In class occupies one scheduled hour. */
+export const CLASS_DURATION_SEC = 60 * 60;
 
 /** Sides supported by schema v1. */
 export type Side = 'right' | 'left';
 export const SUPPORTED_SIDES: readonly Side[] = ['right', 'left'];
+
+/** A legacy/shared midpoint cue or one explicitly authored for each supported side. */
+export type MidpointCue = string | Readonly<Record<Side, string>>;
 
 export type SegmentType = 'grounding' | 'pose' | 'transition' | 'savasana';
 
@@ -51,7 +57,7 @@ export interface AuthoredPose {
   readonly entry: string;
   readonly target: string;
   readonly settling: string;
-  readonly midpoint: string;
+  readonly midpoint: MidpointCue;
   readonly props: string;
   readonly alternative: string;
   readonly exit: string;
