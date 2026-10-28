@@ -21,6 +21,11 @@ Do not mark the integrated-system handoff complete until Clare performs the manu
 5. The six Savasana cues display together as a reminder list. They are not a checklist and are not advanced one at a time.
 6. Settle In can export the complete reflection corpus as human-readable Markdown. That corpus is evidence for app-development learning; it does not authorize the authoring project to turn teaching history into a scorecard.
 7. Class input, as-taught export, backup, and database schema version numbers remain unchanged. Existing class files and taught runs remain valid.
+8. (October 28) A bilateral pose's `midpoint` may be a mapping with exactly one `right` cue and one `left` cue, and new bilateral poses use it so each side card shows only its own cue. A single shared sentence remains valid for older files.
+
+## Prerequisite: the app must be deployed first
+
+On October 28 the app installed on Clare's phone was still the July build (`0.1.0`, from `main` at `4d490fb`). That build rejects every class file written to the new instructions: a hard close other than `20:00`, a transition directly after Grounding, and a `right`/`left` midpoint mapping are all blocking errors there, and even the updated `valid-desire-paths.md` fails to import. The new instructions may be pasted into the Claude project at any time, but no class authored from them can be imported until PR #1 is merged to `main`, the deploy succeeds, and the phone has taken the `0.2.0` update. The dry run in step 6 needs the same.
 
 ## Manual deployment steps for Clare
 
@@ -30,13 +35,14 @@ Do not mark the integrated-system handoff complete until Clare performs the manu
 4. Replace the project's governed knowledge copies with the current repository versions of:
    - [`docs/class-format.md`](class-format.md)
    - [`fixtures/valid-desire-paths.md`](../fixtures/valid-desire-paths.md)
+   - and add [`fixtures/tending-dry-run-2026-10-28.md`](../fixtures/tending-dry-run-2026-10-28.md), the field-authored example
 5. Keep Clare's existing teacher-training, accessibility, principles, and research knowledge in place; this pass does not replace it.
-6. Ask Claude to produce a dry-run class file scheduled 6:30–7:30 with an opening movement transition after Grounding. Validate it in Settle In, but do not use that dry run as a live class unless Clare chooses to.
+6. After the phone has the `0.2.0` update, import the dry-run class (`fixtures/tending-dry-run-2026-10-28.md`, scheduled 6:30–7:30 with an opening movement transition and per-side midpoint cues) and validate it in Settle In. Do not use that dry run as a live class unless Clare chooses to.
 7. Record the date and result of the sync in `docs/decision-log.md`.
 
 ## Handoff message to paste into the Claude project
 
-> This project is now named Settle In, matching the phone app it authors for. I have replaced your project instructions and governed schema knowledge from the Settle In repository. Read the updated instructions and class format as authoritative. Pay particular attention to arbitrary one-hour scheduled windows, fixed scheduled-hour anchoring after a late Begin, the optional opening movement transition after Grounding, static Savasana cue reminders, and the rule that an in-app schedule correction creates a new immutable revision that must flow back into this project. Before writing a live class, tell me which old assumptions changed and identify any conflict you find in the attached materials. Do not silently resolve a conflict.
+> This project is now named Settle In, matching the phone app it authors for. I have replaced your project instructions and governed schema knowledge from the Settle In repository. Read the updated instructions and class format as authoritative. Pay particular attention to arbitrary one-hour scheduled windows, fixed scheduled-hour anchoring after a late Begin, the optional opening movement transition after Grounding, static Savasana cue reminders, distinct `right`/`left` midpoint cues for bilateral poses, delivery of class files as downloadable `.md` files, and the rule that an in-app schedule correction creates a new immutable revision that must flow back into this project. Before writing a live class, tell me which old assumptions changed and identify any conflict you find in the attached materials. Do not silently resolve a conflict.
 
 ## Completion evidence
 
