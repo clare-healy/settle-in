@@ -23,6 +23,8 @@ Context: a Claude session with this repository mounted followed `docs/pass-to-se
 
 Deployment status: the Claude project is already named Settle In. Its instructions and its `class-format.md` copy are still the July versions, so the integrated system remains **awaiting external sync**.
 
+Dry-run evidence: Claude produced `tending-dry-run-2026-10-28.md` under the still-stale project instructions. The original file imported successfully with zero warnings and an exact 60-minute plan (6:30–7:30), including a four-minute opening movement transition. As expected, its bilateral midpoint fields still used the temporary combined `Side 1` / `Side 2` form. The governed repository copy at `fixtures/tending-dry-run-2026-10-28.md` preserves the authored teaching content and mechanically separates those two combined fields into explicit `right` and `left` cues. Automated fixture coverage pins the schedule, segment counts, opening transition, Savasana window, and side-specific runtime cues. This validates the repository half of the dry run; it does not mark the external Claude instructions as synchronized or the Pixel rehearsal as complete.
+
 ## October 20, 2026 — First major field-learning iteration
 
 Field evidence: after two months of use, Clare reported that Settle In materially reduced scrolling, improved timing awareness and cue structure, and created useful teaching feedback loops. Four demonstrated frictions now revise v1 assumptions.

@@ -8,7 +8,7 @@ The Settle In app and the Claude project "Settle In" are one integrated system. 
 
 1. When this file or `docs/class-format.md` changes, Clare updates the Claude project:
    - Replace the project instructions with the block below.
-   - Keep `docs/class-format.md` and `fixtures/valid-desire-paths.md` attached to the project as project knowledge, replacing them when they change.
+   - Keep `docs/class-format.md`, `fixtures/valid-desire-paths.md`, and `fixtures/tending-dry-run-2026-10-28.md` attached to the project as project knowledge, replacing them when they change.
 2. Record the sync in `docs/decision-log.md` when the change is material.
 3. A schema change is not complete until both sides are updated. This is a build-scope rule, not a suggestion.
 
@@ -215,6 +215,7 @@ The Claude project should hold, as project knowledge:
 |---|---|
 | `class-format.md` | The full Schema v1 treaty, including the as-taught export schema |
 | `valid-desire-paths.md` | Known-good 60-minute example class |
+| `tending-dry-run-2026-10-28.md` | Field-authored 6:30–7:30 example with an opening movement transition and distinct per-side midpoint cues |
 
 Plus Clare's existing project knowledge (teacher training manual, accessibility principles check, principles-based framework, research synthesis), which this file does not govern.
 

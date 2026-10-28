@@ -77,6 +77,50 @@ describe('valid-boundary-content.md (C1, J2)', () => {
   });
 });
 
+describe('tending-dry-run-2026-10-28.md (C10, C11, C13)', () => {
+  it('pins the real 6:30–7:30 dry run, opening transition, and per-side midpoint cues', async () => {
+    const result = expectOk(await importClass(readFixture('tending-dry-run-2026-10-28.md')));
+    expect(result.warnings).toHaveLength(0);
+    expect(result.summary).toMatchObject({
+      scheduledStartLocal: '18:30',
+      hardCloseLocal: '19:30',
+      plannedDurationSec: 3600,
+      authoredPoseCount: 4,
+      teachingSideCount: 6,
+      transitionCount: 5,
+      savasanaDurationSec: 900,
+      peakPoseName: 'Sleeping Swan',
+    });
+
+    const expanded = result.classDefinition.expandedRuntimeSegments;
+    expect(expanded.slice(0, 3).map((segment) => segment.id)).toEqual([
+      'grounding',
+      'transition-to-supported-caterpillar',
+      'supported-caterpillar',
+    ]);
+    expect(expanded.find((segment) => segment.id === 'grounding')).toMatchObject({
+      plannedOffsetSec: 0,
+      plannedDurationSec: 13 * 60,
+    });
+    expect(expanded.find((segment) => segment.id === 'transition-to-supported-caterpillar')).toMatchObject({
+      plannedOffsetSec: 13 * 60,
+      plannedDurationSec: 4 * 60,
+    });
+    expect(expanded.find((segment) => segment.id === 'sleeping-swan--right')?.cues['midpoint'])
+      .toBe('Let the bolster hold your chest.');
+    expect(expanded.find((segment) => segment.id === 'sleeping-swan--left')?.cues['midpoint'])
+      .toBe('Let this shape gather energy rather than spend it.');
+    expect(expanded.find((segment) => segment.id === 'banana--right')?.cues['midpoint'])
+      .toBe('Breathe into the ribs on the long side.');
+    expect(expanded.find((segment) => segment.id === 'banana--left')?.cues['midpoint'])
+      .toBe('Let the floor hold you.');
+    expect(expanded.find((segment) => segment.id === 'savasana')).toMatchObject({
+      plannedOffsetSec: 45 * 60,
+      plannedDurationSec: 15 * 60,
+    });
+  });
+});
+
 describe('warning-short-plan.md (C9)', () => {
   it('imports with exactly the short-plan warning and no blocking error', async () => {
     const result = expectOk(await importClass(readFixture('warning-short-plan.md')));

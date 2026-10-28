@@ -68,6 +68,7 @@ Do not silently choose between conflicting requirements during implementation. R
 │   └── device-checklist.md
 ├── fixtures/
 │   ├── valid-desire-paths.md
+│   ├── tending-dry-run-2026-10-28.md
 │   ├── valid-boundary-content.md
 │   ├── warning-short-plan.md
 │   ├── invalid-missing-duration.md
