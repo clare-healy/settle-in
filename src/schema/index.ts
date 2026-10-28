@@ -26,6 +26,9 @@ export const CLASS_DURATION_SEC = 60 * 60;
 export type Side = 'right' | 'left';
 export const SUPPORTED_SIDES: readonly Side[] = ['right', 'left'];
 
+/** A legacy/shared midpoint cue or one explicitly authored for each supported side. */
+export type MidpointCue = string | Readonly<Record<Side, string>>;
+
 export type SegmentType = 'grounding' | 'pose' | 'transition' | 'savasana';
 
 // --- Authored segments (the plan as written) -------------------------------
@@ -54,7 +57,7 @@ export interface AuthoredPose {
   readonly entry: string;
   readonly target: string;
   readonly settling: string;
-  readonly midpoint: string;
+  readonly midpoint: MidpointCue;
   readonly props: string;
   readonly alternative: string;
   readonly exit: string;

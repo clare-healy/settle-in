@@ -55,7 +55,7 @@ Import expands the authored class into ordered runtime segments:
 - Explicit transition segments
 - One savasana segment displaying six authored cue reminders together
 
-For a bilateral pose, each generated side receives the authored `duration_per_side_sec`.
+For a bilateral pose, each generated side receives the authored `duration_per_side_sec`. A shared midpoint sentence is copied to both sides for backward compatibility; when the author supplies a `right`/`left` midpoint map, each generated side receives only its matching cue.
 
 `planned_offset_sec` is the sum of all earlier expanded runtime-segment durations.
 

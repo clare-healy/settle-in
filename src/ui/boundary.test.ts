@@ -47,6 +47,7 @@ async function bootBoundary(): Promise<{ h: Harness; entry: string; midpoint: st
 
   const pose = def.authoredSegments.find((s) => s.id === 'deeply-supported-reclining-butterfly');
   if (!pose || pose.type !== 'pose') throw new Error('boundary pose missing');
+  if (typeof pose.midpoint !== 'string') throw new Error('boundary midpoint should be shared text');
   return { h: { app, clock, store, root }, entry: pose.entry, midpoint: pose.midpoint, name: pose.name };
 }
 

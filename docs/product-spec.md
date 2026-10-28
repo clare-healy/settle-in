@@ -109,7 +109,7 @@ A lost wake lock, accidental app closure, browser restart, or rejected import mu
 - Prep, Grounding, Pose, Transition, Savasana, Post-Class, and Library screens
 - Manual forward and back navigation
 - Minimal and expanded pose states
-- Re-anchored planned windows and informational drift
+- Scheduled-hour planned windows and informational drift
 - Hard-close savasana message, shown in Savasana only, from two minutes before the authored hard close
 - Screen wake-lock request, monitoring, and calm fallback
 - Automatic persistence and interrupted-run recovery

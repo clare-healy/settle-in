@@ -61,6 +61,10 @@ After two months of live use, Clare supplied the field evidence and governing pr
 
 During adversarial review, Clare identified the operational ambiguity between a genuinely late Begin and an incorrectly authored scheduled hour. She specified a one-screen Prep correction: enter the new start, see the one-hour close calculate on that screen, and activate one `Change Schedule` action with no second confirmation. Codex preserved immutable history by implementing the correction as a fully parsed and validated new class revision, added claim-level evidence for a 6:30–7:30 class begun at 6:33 and for live navigation into an opening movement transition, renamed the canonical Claude authoring source to Settle In, and prepared the external project pass. Product assumption introduced: schedule is the only authored field correctable inside the app; every such correction must return upstream to prevent a later authoring regression.
 
+## Clare + Claude + OpenAI Codex — October 28, 2026 authoring sync and bilateral midpoint cues
+
+Claude reviewed the live Settle In authoring project against the repository, surfaced rather than silently resolved the differences, recorded Clare's rulings, and passed the uncommitted canonical-instruction changes back to Codex. Clare established that each side of a bilateral pose is a distinct experience requiring its own midpoint cue, retired Bethany's automatic Monday deliverables, broadened the valid uses of Child's pose, retained her source standards, and clarified that Grounding absorbs a relationally late start through her manual advancement at its planned close. Codex preserved Claude's documentation work and implemented per-side midpoint cues as a backward-compatible Schema v1 extension: existing shared sentences retain their meaning, while an explicit `right`/`left` map binds each cue to the correct side card regardless of authored order. No database or as-taught export migration was introduced.
+
 ## Continuing lineage
 
 Future material contributions should be appended with:

@@ -53,6 +53,24 @@ describe('Pose minimal — §6 hierarchy', () => {
     expect(byId(h.root, 'drift').textContent).toBe('on plan');
   });
 
+  it('shows each bilateral side only its own authored midpoint cue', async () => {
+    const h = await bootApp({ wallEpochMs: jul28(19, 0) });
+    await beginRun(h);
+    await zone(h.app, h.root, 'next'); // butterfly
+    await zone(h.app, h.root, 'next'); // transition
+    await zone(h.app, h.root, 'next'); // Sleeping Swan right
+    expect(h.root.querySelector('.pose-side')?.textContent).toBe('Right');
+    expect(byId(h.root, 'midpoint').textContent).toBe(
+      'Notice what the first side teaches you about meeting sensation without force.',
+    );
+
+    await zone(h.app, h.root, 'next'); // Sleeping Swan left
+    expect(h.root.querySelector('.pose-side')?.textContent).toBe('Left');
+    expect(byId(h.root, 'midpoint').textContent).toBe(
+      'Meet this side as new information; let breath choose the depth again.',
+    );
+  });
+
   it('a Previous-entered visit shows `revisited` in place of the drift value (F8)', async () => {
     const h = await bootApp({ wallEpochMs: jul28(19, 0) });
     await beginRun(h);

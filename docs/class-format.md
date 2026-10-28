@@ -125,7 +125,9 @@ side_order:
 entry: From all fours, bring the named-side shin forward and extend the other leg behind you.
 target: Outer hip and glute of the forward-leg side.
 settling: Fold only as far as breath and jaw remain easy; stay between 2 and 5 out of 10.
-midpoint: Let the top hip roll gently open without forcing the front knee.
+midpoint:
+  right: Notice what the first side teaches you about meeting sensation without force.
+  left: Meet this side as new information; let breath choose the depth again.
 props: Bolster lengthwise beneath the chest; blanket under the forward-side hip if needed.
 alternative: Reclined figure four, using the same named side.
 exit: Press back to all fours and pause in neutral before changing sides or moving on.
@@ -140,8 +142,10 @@ Rules for all poses:
 - `side_order` must contain exactly two distinct supported side labels. Schema v1 supports `right` and `left`.
 - A bilateral pose must not contain `duration_min`.
 - A non-bilateral pose must not contain `duration_per_side_min` or `side_order`.
-- All cue fields are required. Use a short intentional sentence rather than `N/A`.
-- Pose cue copy is shared across sides and uses “named side” where necessary.
+- All cue fields are required. Use short intentional sentences rather than `N/A`.
+- `midpoint` on a non-bilateral pose is one nonempty sentence.
+- `midpoint` on a bilateral pose may remain one nonempty sentence shared across both sides, preserving every existing Schema v1 class. To give each side its own cue, use a mapping containing exactly one nonempty `right` cue and one nonempty `left` cue, as above. The app matches cues by side label, so reversing `side_order` cannot put a cue on the wrong card.
+- Other pose cue copy is shared across sides and uses “named side” where necessary.
 
 ## Transition
 
@@ -253,7 +257,7 @@ Recommended bilateral expanded IDs are `sleeping-swan--right` and `sleeping-swan
 Validation warnings, not blocking errors, should appear when:
 
 - Pose name exceeds 36 characters
-- Any minimal-state midpoint cue exceeds 150 characters
+- Any shared or per-side minimal-state midpoint cue exceeds 150 characters
 - Any expanded cue exceeds 280 characters
 - Arrival, breathwork, theme anchor, or guided/silent note exceeds 320 characters
 - `wake_message` exceeds 90 characters
@@ -328,7 +332,7 @@ Rules:
 - `status` is one of `on-plan`, `long`, `short`, `revisited`, `skipped`, `substituted`, with precedence `skipped` > `substituted` > `revisited` > timing status.
 - Timing status: a segment is `long` or `short` when the difference between actual and planned exceeds the greater of 30 seconds and 15% of planned duration; otherwise `on-plan`. These thresholds are the v1 default; field evidence may tune them under the field-learning rule, recorded in the decision log.
 - A skipped segment has `actual_sec: 0`. On a completed run, a segment with zero recorded visits derives `skipped` automatically — the app knows it was never taught and never asks Clare to say so. `substituted_with` is retained in the schema for honest history and for runs recorded before manual correction was retired; nothing in the current app sets it.
-- `substituted_with` carries the short replacement name Clare entered, otherwise `null`.
+- In historic runs, `substituted_with` carries the short replacement name Clare entered; otherwise it is `null`.
 
 A `## Room note` section containing Clare's note verbatim, or the single line `None recorded.`
 
@@ -342,4 +346,4 @@ The as-taught export carries `export_schema_version`, versioned independently of
 
 The app must reject an unsupported future `schema_version` without partially importing it. The error should preserve the source and explain that the app must be updated before the class can be used.
 
-Schema changes require a new fixture set and a documented migration. Never reinterpret an already imported schema-v1 class silently.
+Schema changes require fixture coverage and documented compatibility behavior. An additive authoring form may remain Schema v1 only when every existing Schema v1 class keeps exactly the same meaning and stored classes require no migration. Never reinterpret an already imported Schema v1 class silently.

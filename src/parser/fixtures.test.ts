@@ -35,6 +35,8 @@ describe('valid-desire-paths.md (C1, C8, D1, D2)', () => {
     expect(left?.side).toBe('left');
     expect(right?.plannedDurationSec).toBe(240);
     expect(left?.plannedDurationSec).toBe(240);
+    expect(right?.cues['midpoint']).toBe('Notice what the first side teaches you about meeting sensation without force.');
+    expect(left?.cues['midpoint']).toBe('Meet this side as new information; let breath choose the depth again.');
     // Right precedes left in expanded order.
     expect(expanded.indexOf(right!)).toBeLessThan(expanded.indexOf(left!));
 
@@ -67,6 +69,8 @@ describe('valid-boundary-content.md (C1, J2)', () => {
     expect(pose?.type).toBe('pose');
     if (pose?.type !== 'pose') throw new Error('boundary pose missing');
     expect(pose.name.length).toBe(36);
+    expect(typeof pose.midpoint).toBe('string');
+    if (typeof pose.midpoint !== 'string') throw new Error('boundary midpoint should be shared text');
     expect(pose.midpoint.length).toBe(150);
     expect(pose.entry.length).toBe(280);
     expect(result.warnings).toHaveLength(0);

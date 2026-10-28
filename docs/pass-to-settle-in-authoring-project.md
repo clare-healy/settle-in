@@ -12,7 +12,7 @@ The phone app and the Claude authoring project are one product. This field-learn
 
 Do not mark the integrated-system handoff complete until Clare performs the manual deployment steps below and records the result.
 
-## Contract changes the authoring project must understand
+## Treaty changes the authoring project must understand
 
 1. A class is exactly one scheduled hour but may start at any local minute, including `:30`; `hard_close_local` is always exactly 60 minutes later.
 2. Begin Class never re-anchors the plan. A class scheduled 6:30–7:30 and begun at 6:33 retains its 6:30 windows, shows `+3 min`, and closes at 7:30.

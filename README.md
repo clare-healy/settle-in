@@ -59,7 +59,9 @@ Do not silently choose between conflicting requirements during implementation. R
 │   ├── design-system.md
 │   ├── acceptance-tests.md
 │   ├── decision-log.md
-│   ├── yin-flow-state-instructions.md
+│   ├── settle-in-authoring-instructions.md
+│   ├── pass-to-settle-in-authoring-project.md
+│   ├── pass-to-codex-authoring-sync.md
 │   ├── build-plan.md
 │   ├── adversarial-review-prompt.md
 │   ├── phase-1-adversarial-review.md

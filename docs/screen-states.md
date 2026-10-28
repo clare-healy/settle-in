@@ -197,7 +197,7 @@ Hierarchy:
 2. Large current wall clock
 3. Planned window and elapsed-in-current-visit
 4. Informational drift
-5. Midpoint reorientation cue
+5. Midpoint reorientation cue — on a bilateral side card, the cue authored for that side when present, otherwise the shared cue
 6. Next authored pose name and planned start
 7. Subtle Previous / Reference / Next affordances
 
