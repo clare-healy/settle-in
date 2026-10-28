@@ -93,7 +93,7 @@ Prep displays the complete authored scheduled hour beside Begin Class. `Change s
 - Cancel; and
 - one primary `Change Schedule` action at the bottom of the screen.
 
-There is no second confirmation screen. Activating `Change Schedule` changes only the top-level `scheduled_start_local` and `hard_close_local` fields in the original Markdown, runs the complete ordinary import and validation pipeline, and persists the result as a new immutable class revision before Prep acknowledges the change. The earlier revision and every run linked to it remain untouched. Begin Class always starts the exact revision currently displayed on Prep.
+There is no second confirmation screen. Activating `Change Schedule` changes only the top-level `scheduled_start_local` and `hard_close_local` fields in the original Markdown, runs the complete ordinary import and validation pipeline, and persists the result as a new immutable class revision before Prep acknowledges the change. The earlier revision and every run linked to it remain untouched. Begin Class always starts the exact revision currently displayed on Prep. The revision Clare last chose (by a schedule change or by importing a new revision) is recorded as a local preference, so Prep reopens on it after a relaunch; this holds even when a change resolves to a revision already stored, such as a time changed back to the authored one.
 
 This is a narrow in-room recovery path, not a general class editor. No teaching content, date, identity, duration, or cue can be changed from Prep. The corrected source remains part of the integrated app/authoring-system contract and must be passed back upstream.
 

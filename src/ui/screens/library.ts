@@ -67,7 +67,7 @@ function renderClassRow(
   ambiguousUpcoming: boolean,
   actions: LibraryProps['actions'],
 ): HTMLElement {
-  const def = g.latest.definition;
+  const def = g.current.definition;
   const meta = el('div', {
     class: 'library__row-meta',
     children: [

@@ -72,7 +72,9 @@ import {
   type ClassGroup,
 } from './library-model.js';
 import {
+  loadCurrentRevisions,
   loadPreferences,
+  setCurrentRevision,
   setNextPosePreview,
   setUpcomingClassId,
   type Preferences,
@@ -276,7 +278,7 @@ export class AppController {
   private async loadLibrary(): Promise<void> {
     this.revisions = await this.store.getAllClassRevisions();
     this.runs = await this.store.getAllRuns();
-    this.groups = groupClasses(this.revisions, this.runs);
+    this.groups = groupClasses(this.revisions, this.runs, await loadCurrentRevisions(this.store));
     this.upcomingClassId = pickUpcomingClassId(this.groups, this.prefs.upcomingClassId, this.todayLocalDate());
     this.upcomingDef = upcomingDefinition(this.groups, this.upcomingClassId);
   }
@@ -675,6 +677,7 @@ export class AppController {
         definition: def,
       };
       await this.store.putClassRevision(record);
+      await setCurrentRevision(this.store, def.classId, def.sourceHash);
       await this.requestPersist(); // request persistence after the first successful import
       this.importState = { phase: 'input', source: '' };
       await this.gotoHomeOrEmpty(); // the imported class now surfaces as upcoming
@@ -728,6 +731,9 @@ export class AppController {
         definition: def,
       };
       await this.store.putClassRevision(record);
+      // The corrected source may already be stored (a time changed back), so
+      // record the choice explicitly; Prep must reopen on this revision.
+      await setCurrentRevision(this.store, def.classId, def.sourceHash);
       this.prepDef = def;
       this.dialog = null;
       await this.loadLibrary();

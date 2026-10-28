@@ -148,6 +148,10 @@ describe('Import — duplicate and revision', () => {
     // Two revisions of the one class now exist.
     const revs = await h.store.getClassRevisionsByClassId('desire-paths-2026-07-28');
     expect(revs.length).toBe(2);
+    // The newly imported revision becomes the one Prep shows, even if an earlier
+    // revision had been chosen before.
+    const imported = revs.find((r) => r.definition.originalMarkdown === changed);
+    expect(await h.store.getPreference('pref.currentRevision.desire-paths-2026-07-28')).toBe(imported?.sourceHash);
   });
 });
 
