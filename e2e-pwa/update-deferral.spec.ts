@@ -86,17 +86,22 @@ test('A5: a waiting worker is deferred through the run and applies safely once i
     const second = await launchProfile(dir);
     await second.page.goto(PWA_URL);
 
-    // Reopened with the run still active → Run Recovery, and the update stays
-    // deferred: the new worker is installed and waiting, but the old version is
-    // still in control (its cache intact) and no pill shows during recovery. Per
-    // the treaty a waiting worker MAY activate on process death but is not required
-    // to, so the app never forces it while a run is live.
+    // Reopened with the run still active → Run Recovery. Per the treaty, the
+    // waiting worker MAY activate after process death. Either version may control
+    // this new process; recovery, no forced reload, and no in-run pill are the
+    // protected behavior.
     await expect(second.page.getByTestId('resume')).toBeVisible();
     await waitForController(second.page);
     await expect(second.page.getByText(TARGET).first()).toBeVisible(); // recovered the exact segment across the version boundary
     await expect(second.page.getByTestId('update-ready')).toHaveCount(0);
     const reopenCaches = await second.page.evaluate(() => caches.keys());
-    expect(reopenCaches).toContain(`settle-in-${origVersion}`); // still not activated
+    const activatedAfterProcessDeath = !reopenCaches.includes(`settle-in-${origVersion}`);
+    expect(reopenCaches).toContain(
+      activatedAfterProcessDeath ? `settle-in-${BUMPED}` : `settle-in-${origVersion}`,
+    );
+    await second.page.evaluate(() => {
+      (window as unknown as { __noReload: boolean }).__noReload = true;
+    });
 
     // Resume proves recovery lands on the EXACT segment, version-crossing.
     await second.page.getByTestId('resume').click();
@@ -110,18 +115,25 @@ test('A5: a waiting worker is deferred through the run and applies safely once i
     await second.page.getByTestId('end-this-run').click();
     await second.page.getByTestId('confirm-end-run').click();
 
-    await expect(second.page.getByTestId('update-ready')).toBeVisible();
-    await second.page.getByTestId('update-ready').click();
+    if (activatedAfterProcessDeath) {
+      // The browser already activated safely between processes. Ending the run
+      // must not cause another reload or present a stale update action.
+      await expect(second.page.getByTestId('update-ready')).toHaveCount(0);
+      expect(await second.page.evaluate(() => (window as unknown as { __noReload: boolean }).__noReload)).toBe(true);
+    } else {
+      await expect(second.page.getByTestId('update-ready')).toBeVisible();
+      await second.page.getByTestId('update-ready').click();
 
-    // controllerchange → reload onto the bumped version; the old cache is gone.
-    await second.page.waitForFunction(
-      async ({ bumped, old }) => {
-        const keys = await caches.keys();
-        return keys.includes(`settle-in-${bumped}`) && !keys.includes(`settle-in-${old}`);
-      },
-      { bumped: BUMPED, old: origVersion },
-      { timeout: 20000 },
-    );
+      // controllerchange → reload onto the bumped version; the old cache is gone.
+      await second.page.waitForFunction(
+        async ({ bumped, old }) => {
+          const keys = await caches.keys();
+          return keys.includes(`settle-in-${bumped}`) && !keys.includes(`settle-in-${old}`);
+        },
+        { bumped: BUMPED, old: origVersion },
+        { timeout: 20000 },
+      );
+    }
 
     await second.ctx.close();
   } finally {

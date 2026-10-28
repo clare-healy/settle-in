@@ -72,9 +72,9 @@ import {
   type ClassGroup,
 } from './library-model.js';
 import {
+  currentRevisionPreference,
   loadCurrentRevisions,
   loadPreferences,
-  setCurrentRevision,
   setNextPosePreview,
   setUpcomingClassId,
   type Preferences,
@@ -676,8 +676,10 @@ export class AppController {
         importedAt: this.nowIso(),
         definition: def,
       };
-      await this.store.putClassRevision(record);
-      await setCurrentRevision(this.store, def.classId, def.sourceHash);
+      await this.store.putClassRevisionAndPreference(
+        record,
+        currentRevisionPreference(def.classId, def.sourceHash),
+      );
       await this.requestPersist(); // request persistence after the first successful import
       this.importState = { phase: 'input', source: '' };
       await this.gotoHomeOrEmpty(); // the imported class now surfaces as upcoming
@@ -730,10 +732,13 @@ export class AppController {
         importedAt: this.nowIso(),
         definition: def,
       };
-      await this.store.putClassRevision(record);
-      // The corrected source may already be stored (a time changed back), so
-      // record the choice explicitly; Prep must reopen on this revision.
-      await setCurrentRevision(this.store, def.classId, def.sourceHash);
+      // The corrected source may already be stored (a time changed back), so the
+      // revision choice and immutable revision are committed together. Prep may
+      // acknowledge the change only after this strict transaction completes.
+      await this.store.putClassRevisionAndPreference(
+        record,
+        currentRevisionPreference(def.classId, def.sourceHash),
+      );
       this.prepDef = def;
       this.dialog = null;
       await this.loadLibrary();

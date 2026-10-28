@@ -47,22 +47,25 @@ export function constructHardClose(
   // Wall values at a fixed offset → epoch: realEpoch = UTC(walls) - offset.
   let epochMs =
     Date.UTC(y ?? 1970, (mo ?? 1) - 1, d ?? 1, hh ?? 0, mm ?? 0, 0) - offsetMinutes * 60_000;
-  // A scheduled hour may cross midnight (for example 23:30–00:30). Two schedule
-  // occurrences then touch the Begin date: the one that began the prior evening
-  // and the one beginning that evening. Choose the occurrence whose scheduled
-  // start is closest to the Begin tap. This makes both a 23:00 early tap and a
-  // 00:01 late tap resolve to the humanly expected hour without a rehearsal mode.
+  // Every local schedule has occurrences on the prior, current, and next date.
+  // Choose the one whose scheduled start is closest to Begin. This handles both
+  // cross-midnight hours and an early pre-midnight tap for a just-after-midnight
+  // class without a special rehearsal mode.
   if (scheduledStartLocal) {
-    const startMinute = timeOfDayMinutes(scheduledStartLocal);
-    const closeMinute = timeOfDayMinutes(hardCloseLocal);
-    if (closeMinute <= startMinute) {
-      const nextClose = epochMs + 24 * 60 * 60_000;
-      const priorStart = epochMs - CLASS_DURATION_SEC * 1000;
-      const nextStart = nextClose - CLASS_DURATION_SEC * 1000;
-      if (Math.abs(nextStart - beginInstantEpochMs) < Math.abs(beginInstantEpochMs - priorStart)) {
-        epochMs = nextClose;
-      }
-    }
+    const [startHour, startMinute] = scheduledStartLocal
+      .split(':')
+      .map((x) => Number.parseInt(x, 10));
+    const sameDateStart =
+      Date.UTC(y ?? 1970, (mo ?? 1) - 1, d ?? 1, startHour ?? 0, startMinute ?? 0, 0)
+      - offsetMinutes * 60_000;
+    const dayMs = 24 * 60 * 60_000;
+    const starts = [sameDateStart - dayMs, sameDateStart, sameDateStart + dayMs];
+    const nearestStart = starts.reduce((nearest, candidate) =>
+      Math.abs(candidate - beginInstantEpochMs) < Math.abs(nearest - beginInstantEpochMs)
+        ? candidate
+        : nearest,
+    );
+    epochMs = nearestStart + CLASS_DURATION_SEC * 1000;
   }
   return {
     epochMs,
@@ -71,11 +74,6 @@ export function constructHardClose(
     hardCloseLocal,
     offsetMinutes,
   };
-}
-
-function timeOfDayMinutes(hhmm: string): number {
-  const [h, m] = hhmm.split(':').map((x) => Number.parseInt(x, 10));
-  return (h ?? 0) * 60 + (m ?? 0);
 }
 
 /**

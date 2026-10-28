@@ -92,6 +92,29 @@ export class Store {
     return { stored: 'inserted', record };
   }
 
+  /**
+   * Store an immutable class revision and the preference that selects it in one
+   * strict transaction. Schedule correction uses this path because the selected
+   * revision determines Prep's scheduled hour and the run's hard close; neither
+   * write may become visible without the other.
+   */
+  async putClassRevisionAndPreference(
+    record: StoredClassRevision,
+    preference: PreferenceEntry,
+  ): Promise<PutClassResult> {
+    const tx = this.db.transaction(
+      ['classes', 'preferences'],
+      'readwrite',
+      durabilityOption('strict'),
+    );
+    const classes = tx.objectStore('classes');
+    const existing = await classes.get(record.sourceHash);
+    if (!existing) await classes.put(record);
+    await tx.objectStore('preferences').put(preference.value, preference.key);
+    await tx.done;
+    return { stored: existing ? 'existing' : 'inserted', record: existing ?? record };
+  }
+
   getClassRevision(sourceHash: string): Promise<StoredClassRevision | undefined> {
     return this.db.get('classes', sourceHash);
   }

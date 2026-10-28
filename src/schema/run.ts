@@ -82,7 +82,7 @@ export interface RunEventBase {
 /**
  * Begin Class. Captures the actual start and the once-and-only-once hard
  * close, both persisted with the run and never recomputed
- * (docs/implementation-treaty.md § Re-anchored plan).
+ * (docs/implementation-treaty.md § Scheduled-hour plan).
  */
 export interface RunStartedEvent extends RunEventBase {
   readonly type: 'run_started';

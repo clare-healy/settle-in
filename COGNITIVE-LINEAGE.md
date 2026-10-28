@@ -45,7 +45,7 @@ Claude Fable 5, operating through Claude Code, performed the final build-readine
 - Verifying internal consistency of the canonical package, fixture arithmetic, and archive checksums
 - Renaming the contract convention to the treaty convention across the package (principles-based computing)
 - Defining the as-taught export schema (Export Schema v1) in `docs/class-format.md`, closing the loop behind the end "each taught class strengthens future class construction"
-- Establishing the integrated-system rule between the app and the Claude project then named "Yin Flow State," and authoring the canonical instructions now at `docs/settle-in-authoring-instructions.md`
+- Establishing the integrated-system rule between the app and the Claude "Yin Flow State" authoring project, and authoring `docs/yin-flow-state-instructions.md`
 - Adopting the yes/no/triangulate decision primitive for the decision log and missing-decision handling
 - Defining post-hard-close run behavior, restore merge semantics, and the warn-without-blocking fixture path (`fixtures/warning-short-plan.md`, acceptance test C9)
 - Reframing wireframes as refinements rather than build gates
@@ -64,6 +64,8 @@ During adversarial review, Clare identified the operational ambiguity between a 
 ## Clare + Claude + OpenAI Codex — October 28, 2026 authoring sync and bilateral midpoint cues
 
 Claude reviewed the live Settle In authoring project against the repository, surfaced rather than silently resolved the differences, recorded Clare's rulings, and passed the uncommitted canonical-instruction changes back to Codex. Clare established that each side of a bilateral pose is a distinct experience requiring its own midpoint cue, retired Bethany's automatic Monday deliverables, broadened the valid uses of Child's pose, retained her source standards, and clarified that Grounding absorbs a relationally late start through her manual advancement at its planned close. Codex preserved Claude's documentation work and implemented per-side midpoint cues as a backward-compatible Schema v1 extension: existing shared sentences retain their meaning, while an explicit `right`/`left` map binds each cue to the correct side card regardless of authored order. No database or as-taught export migration was introduced.
+
+Lineage clarification: the July contribution above is preserved in its original historical form. The authoring project was later renamed Settle In, and its canonical instructions now live at `docs/settle-in-authoring-instructions.md`.
 
 ## Continuing lineage
 

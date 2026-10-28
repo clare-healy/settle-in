@@ -130,6 +130,8 @@ For the valid fixture begun at 7:00 PM:
 
 For an authored 7:00–8:00 class, when Begin Class occurs at 7:03 PM, Grounding remains planned for 7:00–7:10 and initial drift is `+3 min`. The hard close remains 8:00 PM and the wake message remains eligible from 7:58 PM (displayed only once Savasana is current).
 
+The scheduled occurrence nearest Begin is used for every authored hour. For a 12:15–1:15 AM class tapped at 11:58 PM, the upcoming 12:15 AM occurrence is selected and the hard close is 1:15 AM the following date; it is never constructed almost a day in the past.
+
 ### D4 — Drift on segment entry
 
 If a segment's scheduled planned start is 7:15 and it is entered at 7:18, drift is `+3 min` and remains stable during that visit.

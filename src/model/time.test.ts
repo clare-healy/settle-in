@@ -138,6 +138,13 @@ describe('Hard-close construction — built once from Begin, never recomputed', 
     expect(hc.localDate).toBe('2026-07-29');
     expect(hc.iso).toBe('2026-07-29T00:30:00-05:00');
   });
+
+  it('maps an early pre-midnight tap to a just-after-midnight scheduled hour', () => {
+    const begin = localEpoch(2026, 7, 28, 23, 58, 0, CDT_OFFSET_MIN);
+    const hc = constructHardClose(begin, CDT_OFFSET_MIN, '01:15', '00:15');
+    expect(hc.localDate).toBe('2026-07-29');
+    expect(hc.iso).toBe('2026-07-29T01:15:00-05:00');
+  });
 });
 
 describe('D7 — elapsed from durable timestamps, never negative', () => {

@@ -4,7 +4,7 @@
 // (screen-states.md § 4 Prep, Display Options); Clare's upcoming-class choice; and,
 // per class, the revision she last chose to teach from.
 
-import type { Store } from '../store/index.js';
+import type { PreferenceEntry, Store } from '../store/index.js';
 
 const NEXT_POSE_PREVIEW_KEY = 'pref.nextPosePreview';
 const UPCOMING_CLASS_KEY = 'pref.upcomingClassId';
@@ -50,8 +50,8 @@ export async function setUpcomingClassId(store: Store, classId: string): Promise
  * stored (changing a time back), so "most recently imported" alone cannot say
  * which revision Prep should show (implementation treaty § Schedule correction).
  */
-export async function setCurrentRevision(store: Store, classId: string, sourceHash: string): Promise<void> {
-  await store.setPreference(`${CURRENT_REVISION_PREFIX}${classId}`, sourceHash);
+export function currentRevisionPreference(classId: string, sourceHash: string): PreferenceEntry {
+  return { key: `${CURRENT_REVISION_PREFIX}${classId}`, value: sourceHash };
 }
 
 /** Every recorded current-revision choice, as classId → sourceHash. */

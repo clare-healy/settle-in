@@ -13,8 +13,17 @@ The log operates on the yes/no/triangulate primitive. Each entry records a quest
 
 Context: the independent Claude Code review of PR #1 found that changing a scheduled time and then changing it back could revive the wrong hour. The second change resolves to the original revision, which is already stored and is never re-saved, so the mistaken revision stayed the most recently imported. After a relaunch or a Home → Prep round trip, Prep showed the mistaken hour, and Begin Class persisted its hard close.
 
-- Question: should Prep reopen on the revision Clare last chose, even when that choice resolves to an earlier stored revision? **Yes.** This restores the treaty's promise that a correction returns to Prep with the revised schedule visible and that Begin Class starts the revision shown there. The choice is recorded per class as a local preference (`pref.currentRevision.<class_id>`), written by a schedule change and by importing a new revision. If the recorded revision is missing, for example after a restore, the most recently imported revision is used as before.
+- Question: should Prep reopen on the revision Clare last chose, even when that choice resolves to an earlier stored revision? **Yes.** This restores the treaty's promise that a correction returns to Prep with the revised schedule visible and that Begin Class starts the revision shown there. The choice is recorded per class as a local preference (`pref.currentRevision.<class_id>`), written by a schedule change and by importing a new revision. If the recorded revision is missing, for example after a restore, the most recently imported revision is used as before. Clare accepted Codex's review recommendation that this teaching-critical choice and its immutable revision use one strict, atomic transaction rather than two separately durable writes.
 - Question: does this change a stored schema? **No.** Class, export, backup, and database schema versions are unchanged. Preferences already travel in the whole-library backup, and merge leaves existing local preferences untouched.
+
+## October 28, 2026 — Independent-review hardening before merge
+
+Context: Claude's independent review and Codex's follow-up review found three low-frequency technical paths that could weaken an otherwise correct release. These were resolved before merging to `main` rather than carried as undocumented limits.
+
+- Question: should nearest-occurrence timing apply only to schedules that cross midnight? **No.** It applies to every authored hour. This prevents an early 11:58 PM tap for a 12:15–1:15 AM class from constructing a hard close almost a day in the past.
+- Question: may pull-request verification share the production Pages deployment queue? **No.** Only the `deploy` job uses the Pages concurrency group, and that job additionally requires a push to `main`; pull-request and manual verification runs cannot deploy or displace a waiting production deployment.
+- Question: must the PWA update test require a waiting worker to remain inactive after the browser process dies? **No.** The treaty explicitly permits activation after process death. The test now protects recovery to the exact segment, absence of an in-run update action, and absence of a forced reload, while accepting either permitted activation state.
+- Protected-history repair: the July cognitive-lineage sentence is restored verbatim, and the later project rename/path change is recorded as an appended clarification.
 
 ## October 28, 2026 — Authoring-project sync review
 
