@@ -25,6 +25,13 @@ Context: Claude's independent review and Codex's follow-up review found three lo
 - Question: must the PWA update test require a waiting worker to remain inactive after the browser process dies? **No.** The treaty explicitly permits activation after process death. The test now protects recovery to the exact segment, absence of an in-run update action, and absence of a forced reload, while accepting either permitted activation state.
 - Protected-history repair: the July cognitive-lineage sentence is restored verbatim, and the later project rename/path change is recorded as an appended clarification.
 
+## October 28, 2026 — Final review rulings before merge
+
+- Question: does re-importing an identical class source deliberately re-select that existing revision? **Yes.** Opening the duplicate records its exact `source_hash` as the current revision without creating or rewriting a class record.
+- Question: does a skipped but non-empty dictated reflection remain in the corpus? **Yes.** It is retained verbatim and labeled `saved draft`; Skip means the reflection was not finalized, not that Clare's words were deleted. The run's as-taught export may still state `None recorded` because no final reflection was submitted.
+- Question: may a run begun under 0.1.0 adopt scheduled-hour timing if it is recovered under 0.2.0 after process death? **Yes.** The case is accepted as rare; the release handoff mitigates it by applying the phone update only when no run is active.
+- Question: should GitHub require passing checks before future merges to `main`? **Yes.** Configure branch protection after this release merge so future pull requests cannot merge until the hosted verification job passes.
+
 ## October 28, 2026 — Authoring-project sync review
 
 Context: a Claude session with this repository mounted followed `docs/pass-to-settle-in-authoring-project.md`, compared the canonical v3 instructions and the current `docs/class-format.md` with the live Claude "Settle In" project, and surfaced conflicts instead of resolving them. Clare ruled on each. Full detail and the open requests are in `docs/pass-to-codex-authoring-sync.md`.

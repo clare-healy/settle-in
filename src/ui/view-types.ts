@@ -73,6 +73,8 @@ export type ImportView =
       readonly source: string;
       /** The existing class to open instead of duplicating (C5). */
       readonly existingClassId: string;
+      /** The exact existing revision Clare deliberately re-imported. */
+      readonly existingSourceHash: string;
     };
 
 // --- Restore flow (screen-states § 13; I5/I6) -------------------------------
@@ -136,7 +138,7 @@ export interface AppActions {
   importReturnToSource(): void;
   importCopyErrors(): void;
   importConfirm(): void;
-  importOpenExisting(classId: string): void;
+  importOpenExisting(classId: string, sourceHash: string): void;
 
   // Library / class detail.
   setUpcoming(classId: string): void;

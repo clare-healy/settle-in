@@ -70,7 +70,7 @@ Imported Markdown containing HTML, a script tag, a link, or a YAML executable/cu
 
 ### C5 — Idempotent duplicate
 
-Importing the exact same normalized source twice does not create a second class.
+Importing the exact same normalized source twice does not create a second class. Opening the existing class records that exact revision as Clare's current choice.
 
 ### C6 — Changed revision
 

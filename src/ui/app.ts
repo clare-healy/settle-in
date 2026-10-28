@@ -567,7 +567,14 @@ export class AppController {
       importReturnToSource: () => this.importBackToInput(),
       importCopyErrors: () => this.importCopyErrors(),
       importConfirm: () => this.importConfirm(),
-      importOpenExisting: (classId) => this.dispatch(async () => {
+      importOpenExisting: (classId, sourceHash) => this.dispatch(async () => {
+        const existing = await this.store.getClassRevision(sourceHash);
+        if (existing) {
+          await this.store.putClassRevisionAndPreference(
+            existing,
+            currentRevisionPreference(classId, sourceHash),
+          );
+        }
         await this.loadLibrary();
         this.importState = { phase: 'input', source: '' };
         this.route = { kind: 'class-detail', classId };
@@ -625,7 +632,12 @@ export class AppController {
       const existing = await this.store.getClassRevision(def.sourceHash);
       if (existing) {
         // Exact source_hash already present → open the existing class (C5).
-        this.importState = { phase: 'duplicate', source, existingClassId: existing.classId };
+        this.importState = {
+          phase: 'duplicate',
+          source,
+          existingClassId: existing.classId,
+          existingSourceHash: existing.sourceHash,
+        };
         return;
       }
       const sameId = await this.store.getClassRevisionsByClassId(def.classId);

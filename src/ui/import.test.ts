@@ -123,12 +123,17 @@ describe('Import — duplicate and revision', () => {
     await validate(h, VALID);
 
     expect(byId(h.root, 'import-duplicate').textContent).toContain('already in the library');
-    const countBefore = (await h.store.getAllClassRevisions()).length;
+    const revisions = await h.store.getAllClassRevisions();
+    const countBefore = revisions.length;
+    const existing = revisions[0]!;
+    await h.store.setPreference(`pref.currentRevision.${existing.classId}`, 'a-different-revision');
     byId(h.root, 'import-open-existing').click();
     await h.app.idle();
     expect(h.app.routeKind).toBe('class-detail');
     // No duplicate written.
     expect((await h.store.getAllClassRevisions()).length).toBe(countBefore);
+    // Re-importing is a deliberate choice: the exact existing revision becomes current.
+    expect(await h.store.getPreference(`pref.currentRevision.${existing.classId}`)).toBe(existing.sourceHash);
   });
 
   it('changed content with the same class_id is offered as a revision (C6)', async () => {
